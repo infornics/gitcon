@@ -16,20 +16,25 @@ A high-performance, premium GitHub contribution dashboard built with **Revine**,
 ## 🚀 Getting Started
 
 ### 1. Clone & Install
+
 ```bash
 npm install
 ```
 
 ### 2. Configure GitHub Token (Optional but Recommended)
+
 To avoid GitHub API rate limits, create a Personal Access Token and add it to a `.env` file in the root:
+
 ```bash
-VITE_GITHUB_TOKEN=your_github_token_here
+REVINE_PUBLIC_GITHUB_TOKEN=your_github_token_here
 ```
 
 ### 3. Start Development
+
 ```bash
 npm run dev
 ```
+
 Open [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## 🛠 Project Structure
