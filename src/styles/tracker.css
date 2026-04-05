@@ -66,7 +66,7 @@ header {
   border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
   box-shadow: var(--shadow-sm);
 }
-.brand-copy strong { display: block; font-family: var(--font-display); font-size: var(--text-sm); letter-spacing: 0.02em; }
+.brand-copy strong { display: block; font-family: var(--font-display); letter-spacing: 0.02em; }
 .brand-copy span { color: var(--color-text-muted); font-size: var(--text-xs); }
 .theme-toggle {
   width: 46px; height: 46px; border-radius: var(--radius-full); border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
