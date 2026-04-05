@@ -1,4 +1,3 @@
-
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-b from-white via-white to-indigo-200">
@@ -109,4 +108,3 @@ export default function HomePage() {
     </main>
   );
 }
-  
