@@ -1,63 +1,55 @@
-# gitcon-web
+# Gitcon
 
-Welcome to your new Revine project!
+A high-performance, premium GitHub contribution dashboard built with **Revine**, the next-generation React framework. Gitcon transforms your public activity into a living heatmap of coding momentum.
 
-## Getting Started
+![Preview](https://github.githubassets.com/images/modules/profile/achievements/pull-shark-default.png)
 
-### 1. Install dependencies
+## ✨ Features
+
+- **Live Data Fetching**: Powered by GitHub's GraphQL API for accurate and detailed contribution metrics.
+- **Dynamic Heatmap**: Interactive calendar grid with adjustable ranges (6, 12, or 24 months).
+- **Momentum Tracking**: Real-time calculation of current streaks, longest streaks, and daily averages.
+- **Repository Insights**: Discover your most productive projects with repository-level contribution breakdown.
+- **Premium Design**: Built with Satoshi and Cabinet Grotesk typography, featuring a gorgeous dark mode and glassmorphism.
+- **Ultra-Fast**: Built on **Revine** for instant hot-module reloading and a streamlined developer experience.
+
+## 🚀 Getting Started
+
+### 1. Clone & Install
 ```bash
 npm install
 ```
 
-### 2. Start development server
+### 2. Configure GitHub Token (Optional but Recommended)
+To avoid GitHub API rate limits, create a Personal Access Token and add it to a `.env` file in the root:
+```bash
+VITE_GITHUB_TOKEN=your_github_token_here
+```
+
+### 3. Start Development
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-## Scripts
-- npm run dev - Start dev server
+## 🛠 Project Structure
 
-- npm run build - Production build
-
-- npm run preview - Preview production build
-
-## Project Structure
-```bash
+```text
 src/
-├── pages/         # Application routes
-│   └── index.tsx  # Home page
-├── App.tsx        # Router configuration
-└── main.tsx       # Application entry point
+├── components/   # Reusable Atomic UI elements (Grid, StatCard, etc.)
+├── pages/        # File-based routing (index.tsx)
+├── styles/       # Design system & Global CSS
+├── utils/        # Business logic & GitHub API integration
+└── root.tsx      # Application entry point
 ```
 
-## Customization
-### Add a New Page
-Create new .tsx file in src/pages
+## 🏗 Built With
 
-```tsx
-// src/pages/about.tsx
-export default function About() {
-  return <h1>About Page</h1>
-}
-```
-Access at /about
+- **[Revine](https://revine.infornics.com)**: The developer-first React framework.
+- **React**: Modern functional components with hooks.
+- **Tailwind CSS**: Utility-first styling for layout.
+- **GitHub GraphQL**: Advanced data queries.
 
-### Modify Vite Config
-Edit vite.config.ts:
+## 📄 License
 
-```typescript
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    port: 8080 // Custom port
-  }
-});
-```
-
-## Deployment
-Build for production:
-
-```bash
-npm run build
-```
-The build artifacts will be in dist/ directory.
+This project is open-source and available under the MIT License.
