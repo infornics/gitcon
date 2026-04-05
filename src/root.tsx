@@ -1,0 +1,14 @@
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { RouterProvider } from "revine";
+import { router } from "revine/routing";
+import "./styles/global.css";
+
+const container = document.getElementById("root")!;
+const root = createRoot(container);
+
+root.render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>,
+);
