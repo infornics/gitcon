@@ -194,10 +194,9 @@ export default function Home() {
                     )}
                   </div>
                 </div>
-                <div className="label">Intensity</div>
               </div>
               <ContributionGrid
-                days={series.slice(-126)}
+                days={series.slice(-196)}
                 maxCount={stats.max}
                 skeleton={loading}
                 onHover={showTooltip}
