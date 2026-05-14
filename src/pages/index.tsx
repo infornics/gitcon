@@ -1,10 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "revine";
-import { Header } from "../components/common";
 import { ContributionGrid } from "../components/ContributionGrid";
 import { StatCard } from "../components/StatCard";
 import {
-  buildDateSeries,
   calculateStats,
   fetchContributions,
   GithubUserData,
@@ -79,7 +77,10 @@ export default function Home() {
     });
   }, [series]);
 
-  const handleLoadData = async (targetUsername: string, targetRange: number) => {
+  const handleLoadData = async (
+    targetUsername: string,
+    targetRange: number,
+  ) => {
     if (!targetUsername) return;
     setLoading(true);
     setStatus("Loading contribution data…");
@@ -141,177 +142,176 @@ export default function Home() {
   };
 
   return (
-    <div className="page-shell-wrapper">
-      <div className="page-shell">
-        <Header />
-        <main>
-          <section className="hero">
-            <div>
-              <div className="eyebrow">GitHub activity dashboard</div>
-              <h1 className="tracker-title">
-                Deep-dive into your GitHub momentum and coding DNA.
-              </h1>
-              <p>
-                Explore beautiful analytics for any GitHub user. Track streaks,
-                analyze repository impact, and discover technology stacks at a glance.
-              </p>
-              <div className="hero-actions">
-                <button
-                  className="btn btn-primary"
-                  onClick={() => document.getElementById("global-search-input")?.focus()}
-                >
-                  Visualize now
-                </button>
-                <a
-                  className="btn btn-secondary"
-                  href="https://docs.github.com/en/account-and-profile/concepts/contributions-on-your-profile"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  How counts work
-                </a>
+    <>
+      <main>
+        <section className="hero">
+          <div>
+            <div className="eyebrow">GitHub activity dashboard</div>
+            <h1 className="tracker-title">
+              Deep-dive into your GitHub momentum and coding DNA.
+            </h1>
+            <p>
+              Explore beautiful analytics for any GitHub user. Track streaks,
+              analyze repository impact, and discover technology stacks at a
+              glance.
+            </p>
+            <div className="hero-actions">
+              <button
+                className="btn btn-primary"
+                onClick={() =>
+                  document.getElementById("global-search-input")?.focus()
+                }
+              >
+                Visualize now
+              </button>
+              <a
+                className="btn btn-secondary"
+                href="https://docs.github.com/en/account-and-profile/concepts/contributions-on-your-profile"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                How counts work
+              </a>
+            </div>
+          </div>
+          <aside className="hero-card">
+            <div className="hero-card-header">
+              <div className="flex items-center gap-3">
+                {userData?.avatarUrl && (
+                  <img
+                    src={userData.avatarUrl}
+                    alt={userData.login}
+                    className="w-10 h-10 rounded-full border border-white/10"
+                  />
+                )}
+                <div>
+                  <div className="label">Preview snapshot</div>
+                  <div className="value">
+                    {userData?.name || userData?.login || "rachit-bharadwaj"}
+                  </div>
+                  {userData && (
+                    <Link
+                      href={`/user/${userData.login}`}
+                      className="text-xs text-primary underline mt-1 block"
+                    >
+                      View full profile →
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
-            <aside className="hero-card">
-              <div className="hero-card-header">
-                <div className="flex items-center gap-3">
-                  {userData?.avatarUrl && (
-                    <img
-                      src={userData.avatarUrl}
-                      alt={userData.login}
-                      className="w-10 h-10 rounded-full border border-white/10"
-                    />
-                  )}
-                  <div>
-                    <div className="label">Preview snapshot</div>
-                    <div className="value">
-                      {userData?.name || userData?.login || "rachit-bharadwaj"}
-                    </div>
-                    {userData && (
-                      <Link
-                        href={`/user/${userData.login}`}
-                        className="text-xs text-primary underline mt-1 block"
-                      >
-                        View full profile →
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <ContributionGrid
-                days={series.slice(-196)}
-                maxCount={stats.max}
-                skeleton={loading}
-                onHover={showTooltip}
-                onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
+            <ContributionGrid
+              days={series.slice(-196)}
+              maxCount={stats.max}
+              skeleton={loading}
+              onHover={showTooltip}
+              onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
+            />
+            <div className="mini-kpis">
+              <StatCard
+                label="Total (past 1 year)"
+                value={stats.total.toLocaleString()}
+                isMini
               />
-              <div className="mini-kpis">
-                <StatCard
-                  label="Total (past 1 year)"
-                  value={stats.total.toLocaleString()}
-                  isMini
-                />
-                <StatCard label="Longest streak" value={stats.longest} isMini />
+              <StatCard label="Longest streak" value={stats.longest} isMini />
+            </div>
+          </aside>
+        </section>
+
+        <section className="workspace-wide" id="tracker">
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Momentum</h2>
+                <p>Consistency and intensity signals.</p>
               </div>
-            </aside>
+            </div>
+            <div className="kpi-stack">
+              <StatCard
+                label="Total contributions"
+                value={stats.total.toLocaleString()}
+                subValue={`${stats.activeDays ? (stats.total / stats.activeDays).toFixed(1) : "0.0"} per active day`}
+              />
+              <StatCard
+                label="Current streak"
+                value={`${stats.current} days`}
+                subValue="Measured from the latest day."
+              />
+              <div className="kpi">
+                <div className="label">Longest streak</div>
+                <strong>{stats.longest} days</strong>
+                <div className="text-xs opacity-60">
+                  {stats.longestStart && stats.longestEnd
+                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                    : "Peak consistency"}
+                </div>
+              </div>
+              <StatCard
+                label="Best day"
+                value={
+                  stats.best.date
+                    ? new Date(
+                        stats.best.date + "T00:00:00Z",
+                      ).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "—"
+                }
+                subValue={
+                  stats.best.date
+                    ? `${stats.best.count} contributions in a day`
+                    : "No data yet."
+                }
+              />
+            </div>
           </section>
 
-          <section className="workspace-wide" id="tracker">
-            <section className="panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Momentum</h2>
-                  <p>Consistency and intensity signals.</p>
-                </div>
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Top repositories</h2>
+                <p>Ranked by commit contributions in selected range.</p>
               </div>
-              <div className="kpi-stack">
-                <StatCard
-                  label="Total contributions"
-                  value={stats.total.toLocaleString()}
-                  subValue={`${stats.activeDays ? (stats.total / stats.activeDays).toFixed(1) : "0.0"} per active day`}
-                />
-                <StatCard
-                  label="Current streak"
-                  value={`${stats.current} days`}
-                  subValue="Measured from the latest day."
-                />
-                  <div className="kpi">
-                    <div className="label">Longest streak</div>
-                    <strong>{stats.longest} days</strong>
-                    <div className="text-xs opacity-60">
-                      {stats.longestStart && stats.longestEnd
-                        ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                        : "Peak consistency"}
-                    </div>
-                  </div>
-                <StatCard
-                  label="Best day"
-                  value={
-                    stats.best.date
-                      ? new Date(stats.best.date + "T00:00:00Z").toLocaleDateString(
-                          undefined,
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          },
-                        )
-                      : "—"
-                  }
-                  subValue={
-                    stats.best.date
-                      ? `${stats.best.count} contributions in a day`
-                      : "No data yet."
-                  }
-                />
-              </div>
-            </section>
-
-            <section className="panel">
-              <div className="panel-head">
-                <div>
-                  <h2>Top repositories</h2>
-                  <p>Ranked by commit contributions in selected range.</p>
-                </div>
-              </div>
-              <div className="repo-list">
-                {repos.length > 0 ? (
-                  repos.slice(0, 10).map((repo, i) => (
-                    <div key={i} className="repo-item">
-                      <div>
-                        <strong>{repo.name}</strong>
-                        <span>{repo.owner}</span>
-                      </div>
-                      <strong>{repo.count}</strong>
-                    </div>
-                  ))
-                ) : (
-                  <div className="repo-item">
+            </div>
+            <div className="repo-list">
+              {repos.length > 0 ? (
+                repos.slice(0, 10).map((repo, i) => (
+                  <div key={i} className="repo-item">
                     <div>
-                      <strong>No data yet</strong>
-                      <span>Load a profile to see repos.</span>
+                      <strong>{repo.name}</strong>
+                      <span>{repo.owner}</span>
                     </div>
-                    <strong>—</strong>
+                    <strong>{repo.count}</strong>
                   </div>
-                )}
-              </div>
-            </section>
+                ))
+              ) : (
+                <div className="repo-item">
+                  <div>
+                    <strong>No data yet</strong>
+                    <span>Load a profile to see repos.</span>
+                  </div>
+                  <strong>—</strong>
+                </div>
+              )}
+            </div>
           </section>
-        </main>
+        </section>
+      </main>
 
-        {tooltip.show && (
-          <div
-            className="tooltip show"
-            style={{
-              left: tooltip.x,
-              top: tooltip.y,
-              transform: "translate(12px, 12px)",
-            }}
-          >
-            {tooltip.text}
-          </div>
-        )}
-      </div>
-    </div>
+      {tooltip.show && (
+        <div
+          className="tooltip show"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y,
+            transform: "translate(12px, 12px)",
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
+    </>
   );
 }

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "revine";
-import { Header } from "../../components/common";
 import { ContributionGrid } from "../../components/ContributionGrid";
 import { StatCard } from "../../components/StatCard";
 import {
@@ -138,7 +137,6 @@ export default function UserProfile() {
     return (
       <div className="page-shell-wrapper">
         <div className="page-shell">
-          <Header />
           <main>
             <section className="profile-hero">
               <div className="profile-info">
@@ -175,7 +173,6 @@ export default function UserProfile() {
     return (
       <div className="page-shell-wrapper">
         <div className="page-shell">
-          <Header />
           <main className="flex items-center justify-center min-h-[60vh]">
             <div className="text-center">
               <h2 className="text-2xl font-bold text-red-500 mb-2">Error</h2>
@@ -194,187 +191,183 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="page-shell-wrapper">
-      <div className="page-shell">
-        <Header />
-        <main>
-          <section className="profile-hero">
-            <div className="profile-info">
-              {userData?.avatarUrl && (
-                <img
-                  src={userData.avatarUrl}
-                  alt={userData.login}
-                  className="profile-avatar"
-                />
-              )}
-              <div>
-                <h1 className="profile-name">
-                  {userData?.name || userData?.login}
-                </h1>
-                <p className="profile-username">@{userData?.login}</p>
+    <>
+      <main>
+        <section className="profile-hero">
+          <div className="profile-info">
+            {userData?.avatarUrl && (
+              <img
+                src={userData.avatarUrl}
+                alt={userData.login}
+                className="profile-avatar"
+              />
+            )}
+            <div>
+              <h1 className="profile-name">
+                {userData?.name || userData?.login}
+              </h1>
+              <p className="profile-username">@{userData?.login}</p>
+            </div>
+          </div>
+
+          <div className="profile-stats-grid">
+            <StatCard
+              label="Total contributions"
+              value={stats.total.toLocaleString()}
+              subValue="In past 1 year"
+            />
+            <div className="kpi">
+              <div className="label">Longest streak</div>
+              <strong>{stats.longest} days</strong>
+              <div className="text-xs opacity-60">
+                {stats.longestStart && stats.longestEnd
+                  ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                  : "Peak consistency"}
               </div>
             </div>
-
-            <div className="profile-stats-grid">
-              <StatCard
-                label="Total contributions"
-                value={stats.total.toLocaleString()}
-                subValue="In past 1 year"
-              />
-              <div className="kpi">
-                <div className="label">Longest streak</div>
-                <strong>{stats.longest} days</strong>
-                <div className="text-xs opacity-60">
-                  {stats.longestStart && stats.longestEnd
-                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                    : "Peak consistency"}
-                </div>
-              </div>
-              <StatCard
-                label="Current streak"
-                value={`${stats.current} days`}
-                subValue="Active now"
-              />
-              <StatCard
-                label="Best day"
-                value={
-                  stats.best.date
-                    ? new Date(
-                        stats.best.date + "T00:00:00Z",
-                      ).toLocaleDateString(undefined, {
+            <StatCard
+              label="Current streak"
+              value={`${stats.current} days`}
+              subValue="Active now"
+            />
+            <StatCard
+              label="Best day"
+              value={
+                stats.best.date
+                  ? new Date(stats.best.date + "T00:00:00Z").toLocaleDateString(
+                      undefined,
+                      {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
-                      })
-                    : "—"
-                }
-                subValue={
-                  stats.best.date
-                    ? `${stats.best.count} contributions`
-                    : "No data yet"
-                }
+                      },
+                    )
+                  : "—"
+              }
+              subValue={
+                stats.best.date
+                  ? `${stats.best.count} contributions`
+                  : "No data yet"
+              }
+            />
+          </div>
+        </section>
+
+        <section className="workspace">
+          <div className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Contribution Activity</h2>
+                <p>Heatmap of commits, pull requests, and issues.</p>
+              </div>
+              <select
+                className="tracker-select"
+                value={range}
+                onChange={(e) => setRange(Number(e.target.value))}
+              >
+                <option value="182">Last 6 months</option>
+                <option value="365">Last 12 months</option>
+              </select>
+            </div>
+
+            <div className="graph-wrap">
+              <div className="graph-header">
+                <div className="label">{series.length} days of activity</div>
+                <div className="legend">
+                  <span className="muted">Less</span>
+                  <div className="legend-scale">
+                    <span className="lvl-0"></span>
+                    <span className="lvl-1"></span>
+                    <span className="lvl-2"></span>
+                    <span className="lvl-3"></span>
+                    <span className="lvl-4"></span>
+                  </div>
+                  <span className="muted">More</span>
+                </div>
+              </div>
+              <div className="months">
+                {months.map((m, i) => (
+                  <div key={i}>{m}</div>
+                ))}
+              </div>
+              <ContributionGrid
+                days={series}
+                maxCount={stats.max}
+                skeleton={loading}
+                onHover={showTooltip}
+                onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
               />
             </div>
-          </section>
+          </div>
 
-          <section className="workspace">
+          <aside className="flex flex-col gap-6">
             <div className="panel">
               <div className="panel-head">
-                <div>
-                  <h2>Contribution Activity</h2>
-                  <p>Heatmap of commits, pull requests, and issues.</p>
-                </div>
-                <select
-                  className="tracker-select"
-                  value={range}
-                  onChange={(e) => setRange(Number(e.target.value))}
-                >
-                  <option value="182">Last 6 months</option>
-                  <option value="365">Last 12 months</option>
-                </select>
+                <h2>Most Used Languages</h2>
               </div>
-
-              <div className="graph-wrap">
-                <div className="graph-header">
-                  <div className="label">{series.length} days of activity</div>
-                  <div className="legend">
-                    <span className="muted">Less</span>
-                    <div className="legend-scale">
-                      <span className="lvl-0"></span>
-                      <span className="lvl-1"></span>
-                      <span className="lvl-2"></span>
-                      <span className="lvl-3"></span>
-                      <span className="lvl-4"></span>
+              <div className="lang-list flex flex-col gap-4 mt-2">
+                {languages.length > 0 ? (
+                  languages.map((lang, i) => (
+                    <div key={i} className="lang-item">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{lang.name}</span>
+                        <span className="opacity-60">
+                          {lang.percent.toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
+                        <div
+                          className="lang-bar h-full rounded-full"
+                          style={{
+                            width: `${lang.percent}%`,
+                            backgroundColor: lang.color,
+                          }}
+                        />
+                      </div>
                     </div>
-                    <span className="muted">More</span>
-                  </div>
-                </div>
-                <div className="months">
-                  {months.map((m, i) => (
-                    <div key={i}>{m}</div>
-                  ))}
-                </div>
-                <ContributionGrid
-                  days={series}
-                  maxCount={stats.max}
-                  skeleton={loading}
-                  onHover={showTooltip}
-                  onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
-                />
+                  ))
+                ) : (
+                  <div className="muted p-4">No language data available.</div>
+                )}
               </div>
             </div>
 
-            <aside className="flex flex-col gap-6">
-              <div className="panel">
-                <div className="panel-head">
-                  <h2>Most Used Languages</h2>
-                </div>
-                <div className="lang-list flex flex-col gap-4 mt-2">
-                  {languages.length > 0 ? (
-                    languages.map((lang, i) => (
-                      <div key={i} className="lang-item">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>{lang.name}</span>
-                          <span className="opacity-60">
-                            {lang.percent.toFixed(2)}%
-                          </span>
-                        </div>
-                        <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
-                          <div
-                            className="lang-bar h-full rounded-full"
-                            style={{
-                              width: `${lang.percent}%`,
-                              backgroundColor: lang.color,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="muted p-4">No language data available.</div>
-                  )}
-                </div>
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Top Repositories</h2>
               </div>
-
-              <div className="panel">
-                <div className="panel-head">
-                  <h2>Top Repositories</h2>
-                </div>
-                <div className="repo-list">
-                  {repos.length > 0 ? (
-                    repos.slice(0, 10).map((repo, i) => (
-                      <div key={i} className="repo-item">
-                        <div>
-                          <strong>{repo.name}</strong>
-                          <span>{repo.owner}</span>
-                        </div>
-                        <strong>{repo.count}</strong>
+              <div className="repo-list">
+                {repos.length > 0 ? (
+                  repos.slice(0, 10).map((repo, i) => (
+                    <div key={i} className="repo-item">
+                      <div>
+                        <strong>{repo.name}</strong>
+                        <span>{repo.owner}</span>
                       </div>
-                    ))
-                  ) : (
-                    <div className="muted p-4">
-                      No repository data available.
+                      <strong>{repo.count}</strong>
                     </div>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <div className="muted p-4">No repository data available.</div>
+                )}
               </div>
-            </aside>
-          </section>
-        </main>
+            </div>
+          </aside>
+        </section>
+      </main>
 
-        {tooltip.show && (
-          <div
-            className="tooltip show"
-            style={{
-              left: tooltip.x,
-              top: tooltip.y,
-              transform: "translate(12px, 12px)",
-            }}
-          >
-            {tooltip.text}
-          </div>
-        )}
-      </div>
-    </div>
+      {tooltip.show && (
+        <div
+          className="tooltip show"
+          style={{
+            left: tooltip.x,
+            top: tooltip.y,
+            transform: "translate(12px, 12px)",
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
+    </>
   );
 }
