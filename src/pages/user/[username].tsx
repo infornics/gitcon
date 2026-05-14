@@ -79,8 +79,27 @@ export default function UserProfile() {
       <div className="page-shell-wrapper">
         <div className="page-shell">
           <Header />
-          <main className="flex items-center justify-center min-h-[60vh]">
-            <div className="text-xl opacity-50">Loading profile...</div>
+          <main>
+            <section className="profile-hero">
+              <div className="profile-info">
+                <div className="profile-avatar skeleton" style={{ border: 'none' }} />
+                <div className="flex flex-col gap-2">
+                  <div className="skeleton h-10 w-48 rounded-md" />
+                  <div className="skeleton h-6 w-32 rounded-md" />
+                </div>
+              </div>
+              <div className="profile-stats-grid">
+                <div className="panel skeleton h-32" />
+                <div className="panel skeleton h-32" />
+                <div className="panel skeleton h-32" />
+              </div>
+            </section>
+            <section className="workspace">
+              <div className="panel h-[400px] skeleton" />
+              <aside>
+                <div className="panel h-[500px] skeleton" />
+              </aside>
+            </section>
           </main>
         </div>
       </div>
