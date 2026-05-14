@@ -125,7 +125,7 @@ export async function fetchContributions(username: string, daysBack: number) {
               }
             }
           }
-          commitContributionsByRepository(maxRepositories: 10) {
+          commitContributionsByRepository(maxRepositories: 100) {
             repository { 
               name 
               owner { login } 
