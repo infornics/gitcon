@@ -33,49 +33,52 @@ export default function Footer() {
 
         <div className="footer-nav">
           <div className="footer-group">
-            <h4>Platform</h4>
-            <Link href="/">Dashboard</Link>
-            <a
-              href="https://github.com"
+            <h4>Company</h4>
+            <Link
+              href="https://infornics.com/marketplace"
               target="_blank"
               rel="noopener noreferrer"
             >
-              GitHub Profile
-            </a>
-          </div>
-          <div className="footer-group">
-            <h4>Resources</h4>
-            <a
-              href="https://docs.github.com/en/rest"
+              Infornics Marketplace
+            </Link>
+            <Link
+              href="https://infornics.com/about"
               target="_blank"
               rel="noopener noreferrer"
             >
-              GitHub API
-            </a>
-            <a
-              href="https://docs.github.com/en/account-and-profile/concepts/contributions-on-your-profile"
+              About Us
+            </Link>
+            <Link
+              href="https://github.com/infornics/gitcon"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Contribution Rules
-            </a>
+              Gitcon Github
+            </Link>
           </div>
           <div className="footer-group">
             <h4>Connect</h4>
-            <a
-              href="https://github.com/infornics"
+            <Link
+              href="https://www.linkedin.com/company/infornics"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Infornics
-            </a>
-            <a
-              href="https://twitter.com"
+              LinkedIn
+            </Link>
+            <Link
+              href="https://instagram.com/infornicsofficial"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Twitter
-            </a>
+              Instagram
+            </Link>
+            <Link
+              href="https://infornics.com/contact"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Contact Us
+            </Link>
           </div>
         </div>
       </div>
