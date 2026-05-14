@@ -233,22 +233,15 @@ export default function Home() {
                   value={`${stats.current} days`}
                   subValue="Measured from the latest day."
                 />
-                <div className="kpi">
-                  <div className="label">Longest streak</div>
-                  <strong>{stats.longest} days</strong>
-                  <div className="text-xs opacity-60 mb-2">
-                    {stats.longestStart && stats.longestEnd
-                      ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                      : "Peak consistency"}
+                  <div className="kpi">
+                    <div className="label">Longest streak</div>
+                    <strong>{stats.longest} days</strong>
+                    <div className="text-xs opacity-60">
+                      {stats.longestStart && stats.longestEnd
+                        ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                        : "Peak consistency"}
+                    </div>
                   </div>
-                  <div className="streak-meter">
-                    <span
-                      style={{
-                        width: `${Math.min(100, stats.longest ? (stats.current / stats.longest) * 100 : 0)}%`,
-                      }}
-                    ></span>
-                  </div>
-                </div>
                 <StatCard
                   label="Best day"
                   value={

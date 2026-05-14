@@ -221,15 +221,15 @@ export default function UserProfile() {
                 value={stats.total.toLocaleString()}
                 subValue="In past 1 year"
               />
-              <StatCard
-                label="Longest streak"
-                value={`${stats.longest} days`}
-                subValue={
-                  stats.longestStart && stats.longestEnd
-                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}`
-                    : "Peak consistency"
-                }
-              />
+              <div className="kpi">
+                <div className="label">Longest streak</div>
+                <strong>{stats.longest} days</strong>
+                <div className="text-xs opacity-60">
+                  {stats.longestStart && stats.longestEnd
+                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                    : "Peak consistency"}
+                </div>
+              </div>
               <StatCard
                 label="Current streak"
                 value={`${stats.current} days`}

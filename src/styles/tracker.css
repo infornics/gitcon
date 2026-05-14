@@ -287,9 +287,6 @@ h1.tracker-title {
 .panel {
   padding: var(--space-6);
 }
-.panel + .panel {
-  margin-top: var(--space-6);
-}
 .panel-head {
   display: flex;
   justify-content: space-between;
