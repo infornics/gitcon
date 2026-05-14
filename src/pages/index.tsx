@@ -156,9 +156,12 @@ export default function Home() {
                 analyze repository impact, and discover technology stacks at a glance.
               </p>
               <div className="hero-actions">
-                <a className="btn btn-primary" href="#tracker">
-                  Open tracker
-                </a>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => document.getElementById("global-search-input")?.focus()}
+                >
+                  Visualize now
+                </button>
                 <a
                   className="btn btn-secondary"
                   href="https://docs.github.com/en/account-and-profile/concepts/contributions-on-your-profile"

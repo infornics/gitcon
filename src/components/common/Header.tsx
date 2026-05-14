@@ -59,6 +59,7 @@ export default function Header() {
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
         <input
+          id="global-search-input"
           type="text"
           placeholder="Search GitHub username..."
           value={query}
