@@ -53,22 +53,49 @@ export function calculateStats(days: Array<{ date: string; count: number }>) {
   const total = sorted.reduce((sum, day) => sum + day.count, 0);
   const activeDays = sorted.filter((day) => day.count > 0);
   const max = Math.max(...sorted.map((d) => d.count), 0);
-  let current = 0,
-    longest = 0,
-    running = 0;
+  
+  let longest = 0,
+    running = 0,
+    runningStart = null as string | null,
+    longestStart = null as string | null,
+    longestEnd = null as string | null;
+
   for (const day of sorted) {
-    running = day.count > 0 ? running + 1 : 0;
-    longest = Math.max(longest, running);
+    if (day.count > 0) {
+      if (running === 0) runningStart = day.date;
+      running++;
+      if (running > longest) {
+        longest = running;
+        longestStart = runningStart;
+        longestEnd = day.date;
+      }
+    } else {
+      running = 0;
+      runningStart = null;
+    }
   }
+
+  let current = 0;
   for (let i = sorted.length - 1; i >= 0; i--) {
     if (sorted[i].count > 0) current++;
     else if (current) break;
   }
+
   const best = sorted.reduce(
     (top, day) => (day.count > top.count ? day : top),
     { count: 0, date: null as string | null },
   );
-  return { total, activeDays: activeDays.length, max, current, longest, best };
+
+  return {
+    total,
+    activeDays: activeDays.length,
+    max,
+    current,
+    longest,
+    longestStart,
+    longestEnd,
+    best,
+  };
 }
 
 export async function fetchContributions(username: string, daysBack: number) {

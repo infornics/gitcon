@@ -197,7 +197,11 @@ export default function UserProfile() {
               <StatCard
                 label="Longest streak"
                 value={`${stats.longest} days`}
-                subValue="Peak consistency"
+                subValue={
+                  stats.longestStart && stats.longestEnd
+                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })}`
+                    : "Peak consistency"
+                }
               />
               <StatCard
                 label="Current streak"
