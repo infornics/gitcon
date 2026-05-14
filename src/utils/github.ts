@@ -17,7 +17,16 @@ export interface GithubUserData {
       weeks: ContributionWeek[];
     };
     commitContributionsByRepository: Array<{
-      repository: { name: string; owner: { login: string } };
+      repository: {
+        name: string;
+        owner: { login: string };
+        languages: {
+          edges: Array<{
+            size: number;
+            node: { name: string; color: string };
+          }>;
+        };
+      };
       contributions: { totalCount: number };
     }>;
   };
@@ -116,8 +125,17 @@ export async function fetchContributions(username: string, daysBack: number) {
               }
             }
           }
-          commitContributionsByRepository(maxRepositories: 8) {
-            repository { name owner { login } }
+          commitContributionsByRepository(maxRepositories: 10) {
+            repository { 
+              name 
+              owner { login } 
+              languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
+                edges {
+                  size
+                  node { name color }
+                }
+              }
+            }
             contributions(first: 1) { totalCount }
           }
         }

@@ -36,6 +36,9 @@ export default function UserProfile() {
   const [repos, setRepos] = useState<
     Array<{ name: string; owner: string; count: number }>
   >([]);
+  const [languages, setLanguages] = useState<
+    Array<{ name: string; color: string; percent: number }>
+  >([]);
   const [range, setRange] = useState(365);
   const [tooltip, setTooltip] = useState({ text: "", x: 0, y: 0, show: false });
 
@@ -64,9 +67,32 @@ export default function UserProfile() {
         }))
         .sort((a, b) => b.count - a.count);
 
+      const langMap = new Map<string, { size: number; color: string }>();
+      let totalSize = 0;
+      user.contributionsCollection.commitContributionsByRepository.forEach(
+        (repo) => {
+          repo.repository.languages.edges.forEach((edge) => {
+            const { name, color } = edge.node;
+            const current = langMap.get(name) || { size: 0, color };
+            langMap.set(name, { size: current.size + edge.size, color });
+            totalSize += edge.size;
+          });
+        },
+      );
+
+      const extractedLangs = Array.from(langMap.entries())
+        .map(([name, { size, color }]) => ({
+          name,
+          color,
+          percent: totalSize > 0 ? (size / totalSize) * 100 : 0,
+        }))
+        .sort((a, b) => b.percent - a.percent)
+        .slice(0, 6);
+
       setUserData(user);
       setSeries(merged);
       setRepos(extractedRepos);
+      setLanguages(extractedLangs);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -134,8 +160,9 @@ export default function UserProfile() {
             </section>
             <section className="workspace">
               <div className="panel h-[400px] skeleton" />
-              <aside>
-                <div className="panel h-[500px] skeleton" />
+              <aside className="flex flex-col gap-6">
+                <div className="panel h-[200px] skeleton" />
+                <div className="panel h-[400px] skeleton" />
               </aside>
             </section>
           </main>
@@ -277,7 +304,38 @@ export default function UserProfile() {
               </div>
             </div>
 
-            <aside>
+            <aside className="flex flex-col gap-6">
+              <div className="panel">
+                <div className="panel-head">
+                  <h2>Most Used Languages</h2>
+                </div>
+                <div className="lang-list flex flex-col gap-4 mt-2">
+                  {languages.length > 0 ? (
+                    languages.map((lang, i) => (
+                      <div key={i} className="lang-item">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span>{lang.name}</span>
+                          <span className="opacity-60">
+                            {lang.percent.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
+                          <div
+                            className="lang-bar h-full rounded-full"
+                            style={{
+                              width: `${lang.percent}%`,
+                              backgroundColor: lang.color,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="muted p-4">No language data available.</div>
+                  )}
+                </div>
+              </div>
+
               <div className="panel">
                 <div className="panel-head">
                   <h2>Top Repositories</h2>
