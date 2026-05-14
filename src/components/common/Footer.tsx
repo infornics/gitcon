@@ -85,7 +85,7 @@ export default function Footer() {
           © {currentYear} Gitcon. All rights reserved.
         </div>
         <div className="made-with">
-          Built in <span className="text-primary">✦</span> India
+          Built by Infornics <span className="text-primary">✦</span> in India
         </div>
       </div>
     </footer>

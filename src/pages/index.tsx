@@ -1,3 +1,4 @@
+import { IOSS } from "@/components/home";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "revine";
 import { ContributionGrid } from "../components/ContributionGrid";
@@ -298,6 +299,8 @@ export default function Home() {
             </div>
           </section>
         </section>
+
+        <IOSS />
       </main>
 
       {tooltip.show && (
