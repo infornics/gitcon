@@ -86,8 +86,15 @@ export function calculateStats(days: Array<{ date: string; count: number }>) {
 
   let current = 0;
   for (let i = sorted.length - 1; i >= 0; i--) {
-    if (sorted[i].count > 0) current++;
-    else if (current) break;
+    if (sorted[i].count > 0) {
+      current++;
+    } else if (i === sorted.length - 1) {
+      // Today is empty, that's fine, streak can still be active from yesterday
+      continue;
+    } else {
+      // Yesterday or older is empty, streak is broken
+      break;
+    }
   }
 
   const best = sorted.reduce(
