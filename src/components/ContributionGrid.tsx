@@ -1,4 +1,4 @@
-import React from 'react';
+import { FC, FocusEvent, MouseEvent } from "react";
 
 interface Day {
   date: string;
@@ -24,33 +24,47 @@ const levelForCount = (count: number, max: number) => {
 };
 
 const formatDate = (dateString: string) => {
-  return new Date(dateString + 'T00:00:00Z').toLocaleDateString(undefined, { 
-    month: 'short', 
-    day: 'numeric', 
-    year: 'numeric', 
-    timeZone: 'UTC' 
+  return new Date(dateString + "T00:00:00Z").toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
   });
 };
 
-export const ContributionGrid: React.FC<ContributionGridProps> = ({ 
-  days, maxCount, skeleton, onHover, onLeave 
+export const ContributionGrid: FC<ContributionGridProps> = ({
+  days,
+  maxCount,
+  skeleton,
+  onHover,
+  onLeave,
 }) => {
-  const handleMouseMove = (event: React.MouseEvent, day: Day) => {
+  const handleMouseMove = (event: MouseEvent, day: Day) => {
     if (onHover) {
       onHover(day, event.clientX, event.clientY);
     }
   };
 
-  function handleHover(event: React.MouseEvent | React.FocusEvent, day: Day) {
+  function handleHover(event: MouseEvent | FocusEvent, day: Day) {
     if (onHover) {
-      const clientX = 'clientX' in event ? event.clientX : (event.target as HTMLElement).getBoundingClientRect().left;
-      const clientY = 'clientY' in event ? event.clientY : (event.target as HTMLElement).getBoundingClientRect().top;
+      const clientX =
+        "clientX" in event
+          ? event.clientX
+          : (event.target as HTMLElement).getBoundingClientRect().left;
+      const clientY =
+        "clientY" in event
+          ? event.clientY
+          : (event.target as HTMLElement).getBoundingClientRect().top;
       onHover(day, clientX, clientY);
     }
   }
 
   return (
-    <div className={`calendar-grid ${skeleton ? 'skeleton' : ''}`} role="grid" aria-label="GitHub contribution calendar">
+    <div
+      className={`calendar-grid ${skeleton ? "skeleton" : ""}`}
+      role="grid"
+      aria-label="GitHub contribution calendar"
+    >
       {days.map((day, idx) => (
         <button
           key={`${day.date}-${idx}`}

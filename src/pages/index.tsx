@@ -34,7 +34,7 @@ export default function Home() {
     }
     return "light";
   });
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("rachit-bharadwaj");
   const [range, setRange] = useState(365);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("Enter a username and load the graph.");
@@ -62,15 +62,9 @@ export default function Home() {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Starter Data
+  // Fetch initial data on mount
   useEffect(() => {
-    const starterDays = buildDateSeries(365).dates.map((date) => {
-      const seed = new Date(date + "T00:00:00Z").getUTCDate();
-      const count =
-        seed % 6 === 0 ? 8 : seed % 5 === 0 ? 5 : seed % 4 === 0 ? 2 : 0;
-      return { date, count };
-    });
-    setSeries(starterDays);
+    handleLoadData("rachit-bharadwaj", 365);
   }, []);
 
   const stats = useMemo(() => calculateStats(series), [series]);
@@ -84,16 +78,15 @@ export default function Home() {
     });
   }, [series]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username) return;
+  const handleLoadData = async (targetUsername: string, targetRange: number) => {
+    if (!targetUsername) return;
     setLoading(true);
     setStatus("Loading contribution data…");
 
     try {
-      const user = await fetchContributions(username, range);
+      const user = await fetchContributions(targetUsername, targetRange);
       const merged = mergeSeries(
-        range,
+        targetRange,
         user.contributionsCollection.contributionCalendar.weeks,
       );
       const extractedRepos = (
@@ -117,6 +110,11 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    handleLoadData(username, range);
   };
 
   const showTooltip = (
@@ -172,9 +170,20 @@ export default function Home() {
             </div>
             <aside className="hero-card">
               <div className="hero-card-header">
-                <div>
-                  <div className="label">Preview snapshot</div>
-                  <div className="value">{userData?.login || "octocat"}</div>
+                <div className="flex items-center gap-3">
+                  {userData?.avatarUrl && (
+                    <img
+                      src={userData.avatarUrl}
+                      alt={userData.login}
+                      className="w-10 h-10 rounded-full border border-white/10"
+                    />
+                  )}
+                  <div>
+                    <div className="label">Preview snapshot</div>
+                    <div className="value">
+                      {userData?.name || userData?.login || "rachit-bharadwaj"}
+                    </div>
+                  </div>
                 </div>
                 <div className="label">Intensity</div>
               </div>
@@ -187,7 +196,7 @@ export default function Home() {
               />
               <div className="mini-kpis">
                 <StatCard
-                  label="Total"
+                  label="Total (past 1 year)"
                   value={stats.total.toLocaleString()}
                   isMini
                 />
@@ -214,7 +223,7 @@ export default function Home() {
                     <input
                       id="username"
                       className="tracker-input"
-                      placeholder="octocat"
+                      placeholder="rachit-bharadwaj"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required

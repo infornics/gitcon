@@ -98,7 +98,6 @@ export async function fetchContributions(username: string, daysBack: number) {
     }
   `;
   const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
-  console.log(token);
   const response = await fetch("https://api.github.com/graphql", {
     method: "POST",
     headers: {
