@@ -1,4 +1,5 @@
 import { IOSS } from "@/components/home";
+import Leaderboard from "../components/Leaderboard";
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "revine";
 import { ContributionGrid } from "../components/ContributionGrid";
@@ -298,6 +299,10 @@ export default function Home() {
               )}
             </div>
           </section>
+        </section>
+
+        <section className="workspace-wide mt-12">
+          <Leaderboard />
         </section>
 
         <IOSS />

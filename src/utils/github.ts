@@ -172,7 +172,6 @@ export async function fetchContributions(username: string, daysBack: number) {
   if (!payload.data?.user) throw new Error("GitHub user not found.");
   return payload.data.user as GithubUserData;
 }
-
 export function mergeSeries(daysBack: number, apiWeeks: ContributionWeek[]) {
   const { dates } = buildDateSeries(daysBack);
   const map = new Map<string, number>();
@@ -180,4 +179,38 @@ export function mergeSeries(daysBack: number, apiWeeks: ContributionWeek[]) {
     .flatMap((week) => week.contributionDays)
     .forEach((day) => map.set(day.date, day.contributionCount));
   return dates.map((date) => ({ date, count: map.get(date) || 0 }));
+}
+
+export async function fetchGlobalLeaderboard(count = 10, extraUsers: string[] = []) {
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  
+  // 1. Discover top users by followers (proxy for "global top developers")
+  const searchResponse = await fetch(
+    `https://api.github.com/search/users?q=type:user&sort=followers&order=desc&per_page=${count}`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    }
+  );
+  
+  if (!searchResponse.ok) throw new Error("Failed to discover global users.");
+  const searchData = await searchResponse.json();
+  const discoveredLogins = searchData.items.map((u: any) => u.login);
+
+  // Combine with extra users and ensure uniqueness
+  const logins = [...new Set([...extraUsers, ...discoveredLogins])];
+
+  // 2. Fetch full stats for each discovered user
+  const results = await Promise.all(
+    logins.map(async (login: string) => {
+      try {
+        return await fetchContributions(login, 365);
+      } catch (e) {
+        return null;
+      }
+    })
+  );
+
+  return results.filter((r): r is GithubUserData => r !== null);
 }
