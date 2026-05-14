@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "revine";
 import { Header } from "../../components/common";
 import { ContributionGrid } from "../../components/ContributionGrid";
@@ -11,8 +11,18 @@ import {
 } from "../../utils/github";
 
 const MONTH_NAMES = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 export default function UserProfile() {
@@ -20,8 +30,12 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<GithubUserData | null>(null);
-  const [series, setSeries] = useState<Array<{ date: string; count: number }>>([]);
-  const [repos, setRepos] = useState<Array<{ name: string; owner: string; count: number }>>([]);
+  const [series, setSeries] = useState<Array<{ date: string; count: number }>>(
+    [],
+  );
+  const [repos, setRepos] = useState<
+    Array<{ name: string; owner: string; count: number }>
+  >([]);
   const [range, setRange] = useState(365);
   const [tooltip, setTooltip] = useState({ text: "", x: 0, y: 0, show: false });
 
@@ -36,9 +50,14 @@ export default function UserProfile() {
     setError(null);
     try {
       const user = await fetchContributions(uname, days);
-      const merged = mergeSeries(days, user.contributionsCollection.contributionCalendar.weeks);
-      const extractedRepos = (user.contributionsCollection.commitContributionsByRepository || [])
-        .map(item => ({
+      const merged = mergeSeries(
+        days,
+        user.contributionsCollection.contributionCalendar.weeks,
+      );
+      const extractedRepos = (
+        user.contributionsCollection.commitContributionsByRepository || []
+      )
+        .map((item) => ({
           name: item.repository.name,
           owner: item.repository.owner.login,
           count: item.contributions.totalCount,
@@ -56,7 +75,7 @@ export default function UserProfile() {
   }
 
   const stats = useMemo(() => calculateStats(series), [series]);
-  
+
   const months = useMemo(() => {
     const weeks: string[][] = [];
     for (let i = 0; i < series.length; i += 7)
@@ -67,11 +86,26 @@ export default function UserProfile() {
     });
   }, [series]);
 
-  const showTooltip = (day: { date: string; count: number }, x: number, y: number) => {
-    const dateFormatted = new Date(day.date + "T00:00:00Z").toLocaleDateString(undefined, {
-      month: "short", day: "numeric", year: "numeric", timeZone: "UTC"
+  const showTooltip = (
+    day: { date: string; count: number },
+    x: number,
+    y: number,
+  ) => {
+    const dateFormatted = new Date(day.date + "T00:00:00Z").toLocaleDateString(
+      undefined,
+      {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        timeZone: "UTC",
+      },
+    );
+    setTooltip({
+      text: `${day.count} contributions • ${dateFormatted}`,
+      x,
+      y,
+      show: true,
     });
-    setTooltip({ text: `${day.count} contributions • ${dateFormatted}`, x, y, show: true });
   };
 
   if (loading && !userData) {
@@ -82,13 +116,17 @@ export default function UserProfile() {
           <main>
             <section className="profile-hero">
               <div className="profile-info">
-                <div className="profile-avatar skeleton" style={{ border: 'none' }} />
+                <div
+                  className="profile-avatar skeleton"
+                  style={{ border: "none" }}
+                />
                 <div className="flex flex-col gap-2">
                   <div className="skeleton h-10 w-48 rounded-md" />
                   <div className="skeleton h-6 w-32 rounded-md" />
                 </div>
               </div>
               <div className="profile-stats-grid">
+                <div className="panel skeleton h-32" />
                 <div className="panel skeleton h-32" />
                 <div className="panel skeleton h-32" />
                 <div className="panel skeleton h-32" />
@@ -115,7 +153,10 @@ export default function UserProfile() {
             <div className="text-center">
               <h2 className="text-2xl font-bold text-red-500 mb-2">Error</h2>
               <p className="opacity-70">{error}</p>
-              <button onClick={() => username && loadData(username, range)} className="btn btn-primary mt-4">
+              <button
+                onClick={() => username && loadData(username, range)}
+                className="btn btn-primary mt-4"
+              >
                 Try again
               </button>
             </div>
@@ -133,18 +174,55 @@ export default function UserProfile() {
           <section className="profile-hero">
             <div className="profile-info">
               {userData?.avatarUrl && (
-                <img src={userData.avatarUrl} alt={userData.login} className="profile-avatar" />
+                <img
+                  src={userData.avatarUrl}
+                  alt={userData.login}
+                  className="profile-avatar"
+                />
               )}
               <div>
-                <h1 className="profile-name">{userData?.name || userData?.login}</h1>
+                <h1 className="profile-name">
+                  {userData?.name || userData?.login}
+                </h1>
                 <p className="profile-username">@{userData?.login}</p>
               </div>
             </div>
-            
+
             <div className="profile-stats-grid">
-              <StatCard label="Total contributions" value={stats.total.toLocaleString()} subValue="In selected range" />
-              <StatCard label="Longest streak" value={`${stats.longest} days`} subValue="Peak consistency" />
-              <StatCard label="Current streak" value={`${stats.current} days`} subValue="Active now" />
+              <StatCard
+                label="Total contributions"
+                value={stats.total.toLocaleString()}
+                subValue="In selected range"
+              />
+              <StatCard
+                label="Longest streak"
+                value={`${stats.longest} days`}
+                subValue="Peak consistency"
+              />
+              <StatCard
+                label="Current streak"
+                value={`${stats.current} days`}
+                subValue="Active now"
+              />
+              <StatCard
+                label="Best day"
+                value={
+                  stats.best.date
+                    ? new Date(
+                        stats.best.date + "T00:00:00Z",
+                      ).toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "—"
+                }
+                subValue={
+                  stats.best.date
+                    ? `${stats.best.count} contributions`
+                    : "No data yet"
+                }
+              />
             </div>
           </section>
 
@@ -155,9 +233,9 @@ export default function UserProfile() {
                   <h2>Contribution Activity</h2>
                   <p>Heatmap of commits, pull requests, and issues.</p>
                 </div>
-                <select 
-                  className="tracker-select" 
-                  value={range} 
+                <select
+                  className="tracker-select"
+                  value={range}
                   onChange={(e) => setRange(Number(e.target.value))}
                 >
                   <option value="182">Last 6 months</option>
@@ -171,22 +249,26 @@ export default function UserProfile() {
                   <div className="legend">
                     <span className="muted">Less</span>
                     <div className="legend-scale">
-                      <span className="lvl-0"></span><span className="lvl-1"></span>
-                      <span className="lvl-2"></span><span className="lvl-3"></span>
+                      <span className="lvl-0"></span>
+                      <span className="lvl-1"></span>
+                      <span className="lvl-2"></span>
+                      <span className="lvl-3"></span>
                       <span className="lvl-4"></span>
                     </div>
                     <span className="muted">More</span>
                   </div>
                 </div>
                 <div className="months">
-                  {months.map((m, i) => <div key={i}>{m}</div>)}
+                  {months.map((m, i) => (
+                    <div key={i}>{m}</div>
+                  ))}
                 </div>
                 <ContributionGrid
                   days={series}
                   maxCount={stats.max}
                   skeleton={loading}
                   onHover={showTooltip}
-                  onLeave={() => setTooltip(p => ({ ...p, show: false }))}
+                  onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
                 />
               </div>
             </div>
@@ -208,7 +290,9 @@ export default function UserProfile() {
                       </div>
                     ))
                   ) : (
-                    <div className="muted p-4">No repository data available.</div>
+                    <div className="muted p-4">
+                      No repository data available.
+                    </div>
                   )}
                 </div>
               </div>
