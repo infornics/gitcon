@@ -793,37 +793,67 @@ input.tracker-input {
   }
 }
 
-/* Leaderboard */
-.leaderboard-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+/* Leaderboard Tabular */
+.leaderboard-panel {
+  width: 100%;
+  padding: var(--space-8);
 }
 
-.leaderboard-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.leaderboard-table-wrapper {
+  margin-top: var(--space-8);
+  overflow-x: auto;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--text-sm);
+}
+
+.leaderboard-table th {
   padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
-  text-decoration: none;
-  color: inherit;
+  text-align: left;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
 }
 
-.leaderboard-item:hover {
-  background: color-mix(in oklab, var(--color-primary) 5%, transparent);
-  transform: translateX(4px);
+.leaderboard-table td {
+  padding: var(--space-4) var(--space-6);
+  vertical-align: middle;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 4%, transparent);
+  transition: background 0.2s ease;
 }
 
-.leaderboard-item .rank {
+.leaderboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.leaderboard-table tr:hover td {
+  background: color-mix(in oklab, var(--color-primary) 3%, transparent);
+}
+
+.leaderboard-table .rank {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: var(--text-lg);
-  width: 1.5ch;
-  opacity: 0.2;
+  opacity: 0.15;
 }
 
-.leaderboard-item:nth-child(1) .rank { color: #ffd700; opacity: 0.8; }
-.leaderboard-item:nth-child(2) .rank { color: #c0c0c0; opacity: 0.8; }
-.leaderboard-item:nth-child(3) .rank { color: #cd7f32; opacity: 0.8; }
+.leaderboard-table tr:nth-child(1) .rank { color: #ffd700; opacity: 0.8; }
+.leaderboard-table tr:nth-child(2) .rank { color: #c0c0c0; opacity: 0.8; }
+.leaderboard-table tr:nth-child(3) .rank { color: #cd7f32; opacity: 0.8; }
+
+@media (max-width: 768px) {
+  .leaderboard-table th:nth-child(4),
+  .leaderboard-table td:nth-child(4),
+  .leaderboard-table th:nth-child(5),
+  .leaderboard-table td:nth-child(5) {
+    display: none;
+  }
+}

@@ -301,7 +301,7 @@ export default function Home() {
           </section>
         </section>
 
-        <section className="workspace-wide mt-12">
+        <section className="mt-20">
           <Leaderboard />
         </section>
 
