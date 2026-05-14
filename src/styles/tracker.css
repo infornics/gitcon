@@ -279,12 +279,11 @@ h1.tracker-title {
   line-height: 1;
   margin-top: var(--space-2);
 }
-.workspace {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: var(--space-8);
-  align-items: start;
+.workspace, .workspace-wide {
+  display: grid; gap: var(--space-8); align-items: start;
 }
+.workspace { grid-template-columns: 1fr 380px; }
+.workspace-wide { grid-template-columns: 1fr 1.2fr; }
 .panel {
   padding: var(--space-6);
 }

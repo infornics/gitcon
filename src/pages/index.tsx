@@ -214,181 +214,93 @@ export default function Home() {
             </aside>
           </section>
 
-          <section className="workspace" id="tracker">
-            <div>
-              <section className="panel">
-                <div className="panel-head">
-                  <div>
-                    <h2>Contribution graph</h2>
-                    <p>
-                      Fetch live public contribution data and map it into a
-                      heatmap.
-                    </p>
+          <section className="workspace-wide" id="tracker">
+            <section className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Momentum</h2>
+                  <p>Consistency and intensity signals.</p>
+                </div>
+              </div>
+              <div className="kpi-stack">
+                <StatCard
+                  label="Total contributions"
+                  value={stats.total.toLocaleString()}
+                  subValue={`${stats.activeDays ? (stats.total / stats.activeDays).toFixed(1) : "0.0"} per active day`}
+                />
+                <StatCard
+                  label="Current streak"
+                  value={`${stats.current} days`}
+                  subValue="Measured from the latest day."
+                />
+                <div className="kpi">
+                  <div className="label">Longest streak</div>
+                  <strong>{stats.longest} days</strong>
+                  <div className="text-xs opacity-60 mb-2">
+                    {stats.longestStart && stats.longestEnd
+                      ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
+                      : "Peak consistency"}
+                  </div>
+                  <div className="streak-meter">
+                    <span
+                      style={{
+                        width: `${Math.min(100, stats.longest ? (stats.current / stats.longest) * 100 : 0)}%`,
+                      }}
+                    ></span>
                   </div>
                 </div>
-                <form onSubmit={handleSubmit} className="control-grid">
-                  <div className="field">
-                    <label htmlFor="username">GitHub username</label>
-                    <input
-                      id="username"
-                      className="tracker-input"
-                      placeholder="rachit-bharadwaj"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="field">
-                    <label htmlFor="range">Range</label>
-                    <select
-                      id="range"
-                      className="tracker-select"
-                      value={range}
-                      onChange={(e) => setRange(Number(e.target.value))}
-                    >
-                      <option value="182">Last 6 months</option>
-                      <option value="365">Last 12 months</option>
-                      <option value="730">Last 24 months</option>
-                    </select>
-                  </div>
-                  <div className="flex items-end pb-1">
-                    <button
-                      className="btn btn-primary w-full"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      {loading ? "Fetching..." : "Load graph"}
-                    </button>
-                  </div>
-                </form>
-                <div className="status">{status}</div>
-
-                <div className="graph-wrap">
-                  <div className="graph-header">
-                    <div className="label">
-                      {userData
-                        ? `${userData.name || userData.login} · ${series.length} days`
-                        : "No profile loaded"}
-                    </div>
-                    <div className="legend">
-                      <span className="muted">Less</span>
-                      <div className="legend-scale">
-                        <span className="lvl-0"></span>
-                        <span className="lvl-1"></span>
-                        <span className="lvl-2"></span>
-                        <span className="lvl-3"></span>
-                        <span className="lvl-4"></span>
-                      </div>
-                      <span className="muted">More</span>
-                    </div>
-                  </div>
-                  <div className="months">
-                    {months.map((m, i) => (
-                      <div key={i}>{m}</div>
-                    ))}
-                  </div>
-                  <ContributionGrid
-                    days={series}
-                    maxCount={stats.max}
-                    skeleton={loading}
-                    onHover={showTooltip}
-                    onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
-                  />
-                </div>
-                <p className="footer-note">
-                  Private contributions only appear if enabled on your profile.
-                  Timestamps follow UTC.
-                </p>
-              </section>
-            </div>
-
-            <aside>
-              <section className="panel">
-                <div className="panel-head">
-                  <div>
-                    <h2>Momentum</h2>
-                    <p>Consistency and intensity signals.</p>
-                  </div>
-                </div>
-                <div className="kpi-stack">
-                  <StatCard
-                    label="Total contributions"
-                    value={stats.total.toLocaleString()}
-                    subValue={`${stats.activeDays ? (stats.total / stats.activeDays).toFixed(1) : "0.0"} per active day`}
-                  />
-                  <StatCard
-                    label="Current streak"
-                    value={`${stats.current} days`}
-                    subValue="Measured from the latest day."
-                  />
-                  <div className="kpi">
-                    <div className="label">Longest streak</div>
-                    <strong>{stats.longest} days</strong>
-                    <div className="text-xs opacity-60 mb-2">
-                      {stats.longestStart && stats.longestEnd
-                        ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                        : "Peak consistency"}
-                    </div>
-                    <div className="streak-meter">
-                      <span
-                        style={{
-                          width: `${Math.min(100, stats.longest ? (stats.current / stats.longest) * 100 : 0)}%`,
-                        }}
-                      ></span>
-                    </div>
-                  </div>
-                  <StatCard
-                    label="Best day"
-                    value={
-                      stats.best.date
-                        ? new Date(
-                            stats.best.date + "T00:00:00Z",
-                          ).toLocaleDateString(undefined, {
+                <StatCard
+                  label="Best day"
+                  value={
+                    stats.best.date
+                      ? new Date(stats.best.date + "T00:00:00Z").toLocaleDateString(
+                          undefined,
+                          {
                             month: "short",
                             day: "numeric",
                             year: "numeric",
-                          })
-                        : "—"
-                    }
-                    subValue={
-                      stats.best.date
-                        ? `${stats.best.count} contributions in a day`
-                        : "No data yet."
-                    }
-                  />
-                </div>
-              </section>
+                          },
+                        )
+                      : "—"
+                  }
+                  subValue={
+                    stats.best.date
+                      ? `${stats.best.count} contributions in a day`
+                      : "No data yet."
+                  }
+                />
+              </div>
+            </section>
 
-              <section className="panel">
-                <div className="panel-head">
-                  <div>
-                    <h2>Top repositories</h2>
-                    <p>Ranked by commit contributions in selected range.</p>
-                  </div>
+            <section className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Top repositories</h2>
+                  <p>Ranked by commit contributions in selected range.</p>
                 </div>
-                <div className="repo-list">
-                  {repos.length > 0 ? (
-                    repos.slice(0, 5).map((repo, i) => (
-                      <div key={i} className="repo-item">
-                        <div>
-                          <strong>{repo.name}</strong>
-                          <span>{repo.owner}</span>
-                        </div>
-                        <strong>{repo.count}</strong>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="repo-item">
+              </div>
+              <div className="repo-list">
+                {repos.length > 0 ? (
+                  repos.slice(0, 10).map((repo, i) => (
+                    <div key={i} className="repo-item">
                       <div>
-                        <strong>No data yet</strong>
-                        <span>Load a profile to see repos.</span>
+                        <strong>{repo.name}</strong>
+                        <span>{repo.owner}</span>
                       </div>
-                      <strong>—</strong>
+                      <strong>{repo.count}</strong>
                     </div>
-                  )}
-                </div>
-              </section>
-            </aside>
+                  ))
+                ) : (
+                  <div className="repo-item">
+                    <div>
+                      <strong>No data yet</strong>
+                      <span>Load a profile to see repos.</span>
+                    </div>
+                    <strong>—</strong>
+                  </div>
+                )}
+              </div>
+            </section>
           </section>
         </main>
 
