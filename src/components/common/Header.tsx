@@ -11,8 +11,17 @@ export default function Header() {
     return "light";
   });
 
+  const [query, setQuery] = useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (query.trim()) {
+      window.location.href = `/user/${query.trim()}`;
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-50 px-3! rounded-lg bg-transparent backdrop-blur-lg">
+    <header className="sticky top-0 z-50 flex items-center justify-between py-4 bg-transparent backdrop-blur-lg">
       <Link className="brand" href="/" aria-label="Gitcon home">
         <div className="brand-mark" aria-hidden="true">
           <svg
@@ -34,6 +43,30 @@ export default function Header() {
           <strong className="text-xl">Gitcon</strong>
         </div>
       </Link>
+
+      <form className="header-search" onSubmit={handleSearch}>
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search GitHub username..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search GitHub username"
+        />
+      </form>
+
       <button
         className="theme-toggle"
         type="button"
