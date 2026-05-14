@@ -149,11 +149,11 @@ export default function Home() {
             <div>
               <div className="eyebrow">GitHub activity dashboard</div>
               <h1 className="tracker-title">
-                See your coding streak as a living contribution graph.
+                Deep-dive into your GitHub momentum and coding DNA.
               </h1>
               <p>
-                Paste a GitHub username, choose a time window, and get a clean
-                heatmap with streaks, totals, and busiest repositories.
+                Explore beautiful analytics for any GitHub user. Track streaks,
+                analyze repository impact, and discover technology stacks at a glance.
               </p>
               <div className="hero-actions">
                 <a className="btn btn-primary" href="#tracker">
