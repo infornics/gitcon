@@ -192,7 +192,7 @@ export default function UserProfile() {
               <StatCard
                 label="Total contributions"
                 value={stats.total.toLocaleString()}
-                subValue="In selected range"
+                subValue="In past 1 year"
               />
               <StatCard
                 label="Longest streak"
