@@ -316,7 +316,7 @@ export default function UserProfile() {
                         <div className="flex justify-between text-sm mb-1">
                           <span>{lang.name}</span>
                           <span className="opacity-60">
-                            {lang.percent.toFixed(1)}%
+                            {lang.percent.toFixed(2)}%
                           </span>
                         </div>
                         <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
