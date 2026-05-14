@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "revine";
 import { Header } from "../components/common";
 import { ContributionGrid } from "../components/ContributionGrid";
 import { StatCard } from "../components/StatCard";
@@ -183,6 +184,14 @@ export default function Home() {
                     <div className="value">
                       {userData?.name || userData?.login || "rachit-bharadwaj"}
                     </div>
+                    {userData && (
+                      <Link
+                        href={`/user/${userData.login}`}
+                        className="text-xs text-primary underline mt-1 block"
+                      >
+                        View full profile →
+                      </Link>
+                    )}
                   </div>
                 </div>
                 <div className="label">Intensity</div>
