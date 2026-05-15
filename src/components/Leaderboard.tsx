@@ -107,7 +107,13 @@ export default function Leaderboard() {
               const globalRank = (currentPage - 1) * rowsPerPage + i + 1;
               return (
                 <tr key={user.login}>
-                  <td className="rank text-center">{globalRank}</td>
+                  <td className={`rank text-center ${
+                    globalRank === 1 ? "gold" : 
+                    globalRank === 2 ? "silver" : 
+                    globalRank === 3 ? "bronze" : ""
+                  }`}>
+                    {globalRank}
+                  </td>
                   <td>
                     <div className="flex items-center gap-3">
                       <img

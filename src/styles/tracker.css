@@ -844,9 +844,9 @@ input.tracker-input {
   opacity: 0.15;
 }
 
-.leaderboard-table tr:nth-child(1) .rank { color: #ffd700; opacity: 0.8; }
-.leaderboard-table tr:nth-child(2) .rank { color: #c0c0c0; opacity: 0.8; }
-.leaderboard-table tr:nth-child(3) .rank { color: #cd7f32; opacity: 0.8; }
+.leaderboard-table .rank.gold { color: #ffd700; opacity: 0.8; }
+.leaderboard-table .rank.silver { color: #c0c0c0; opacity: 0.8; }
+.leaderboard-table .rank.bronze { color: #cd7f32; opacity: 0.8; }
 
 @media (max-width: 768px) {
   .leaderboard-table th:nth-child(4),
