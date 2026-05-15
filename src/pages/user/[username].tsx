@@ -396,10 +396,10 @@ export default function UserProfile() {
                   <p>Weekly activity intensity over the selected period.</p>
                 </div>
               </div>
-              <div className="mt-6 relative h-[200px] w-full">
+              <div className="mt-6 relative chart-container">
                 <svg
                   viewBox="0 0 1000 180"
-                  className="w-full h-full overflow-visible"
+                  className="w-full overflow-visible"
                   preserveAspectRatio="none"
                 >
                   <defs>
@@ -553,10 +553,10 @@ export default function UserProfile() {
                   {stats.total.toLocaleString()} Total
                 </div>
               </div>
-              <div className="mt-6 relative h-[200px] w-full">
+              <div className="mt-6 relative chart-container">
                 <svg
                   viewBox="0 0 1000 180"
-                  className="w-full h-full overflow-visible"
+                  className="w-full overflow-visible"
                   preserveAspectRatio="none"
                 >
                   <defs>

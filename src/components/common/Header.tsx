@@ -21,7 +21,7 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between py-4 bg-transparent backdrop-blur-lg">
+    <header>
       <Link className="brand" href="/" aria-label="Gitcon home">
         <div className="brand-mark" aria-hidden="true">
           <svg
