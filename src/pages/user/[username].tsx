@@ -39,7 +39,7 @@ export default function UserProfile() {
     Array<{ name: string; color: string; percent: number }>
   >([]);
   const [range, setRange] = useState(365);
-  const [tooltip, setTooltip] = useState({ text: "", x: 0, y: 0, show: false });
+  const [tooltip, setTooltip] = useState({ text: "", date: "", x: 0, y: 0, show: false });
 
   useEffect(() => {
     if (username) {
@@ -169,6 +169,7 @@ export default function UserProfile() {
     );
     setTooltip({
       text: `${day.count} contributions • ${dateFormatted}`,
+      date: day.date,
       x,
       y,
       show: true,
@@ -451,6 +452,43 @@ export default function UserProfile() {
                     );
                   }
                   return null;
+                })}
+
+                {/* Hover Highlights */}
+                {tooltip.show && tooltip.date && weeklyData.some(w => w.date === tooltip.date) && (
+                   (() => {
+                      const activeIndex = weeklyData.findIndex(w => w.date === tooltip.date);
+                      if (activeIndex === -1) return null;
+                      const x = (activeIndex / (weeklyData.length - 1)) * 1000;
+                      const y = 150 - (weeklyData[activeIndex].count / maxWeekly) * 150;
+                      return (
+                        <g>
+                          <line x1={x} y1="0" x2={x} y2="150" stroke="var(--color-primary)" strokeWidth="1" strokeDasharray="4 4" />
+                          <circle cx={x} cy={y} r="6" fill="var(--color-primary)" stroke="var(--color-surface)" strokeWidth="2" />
+                        </g>
+                      );
+                   })()
+                )}
+
+                {/* Hover Triggers */}
+                {weeklyData.map((w, i) => {
+                  const width = 1000 / weeklyData.length;
+                  const x = (i / (weeklyData.length - 1)) * 1000 - width / 2;
+                  return (
+                    <rect
+                      key={i}
+                      x={x}
+                      y="0"
+                      width={width}
+                      height="150"
+                      fill="transparent"
+                      className="cursor-pointer"
+                      onMouseMove={(e) => {
+                        showTooltip({ date: w.date, count: w.count }, e.clientX, e.clientY);
+                      }}
+                      onMouseLeave={() => setTooltip(p => ({ ...p, show: false }))}
+                    />
+                  );
                 })}
               </svg>
             </div>
