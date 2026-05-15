@@ -202,13 +202,15 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <ContributionGrid
-              days={series.slice(-196)}
-              maxCount={stats.max}
-              skeleton={loading}
-              onHover={showTooltip}
-              onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
-            />
+            <div className="graph-wrap">
+              <ContributionGrid
+                days={series.slice(-196)}
+                maxCount={stats.max}
+                skeleton={loading}
+                onHover={showTooltip}
+                onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
+              />
+            </div>
             <div className="mini-kpis">
               <StatCard
                 label="Total (past 1 year)"

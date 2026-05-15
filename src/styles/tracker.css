@@ -207,6 +207,9 @@ main {
   align-items: center;
   padding: clamp(var(--space-8), 8vw, 7rem) 0 var(--space-10);
 }
+.hero > * {
+  min-width: 0;
+}
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -625,7 +628,8 @@ input.tracker-input {
 
 @media (max-width: 960px) {
   .hero,
-  .workspace {
+  .workspace,
+  .workspace-wide {
     grid-template-columns: 1fr;
   }
   h1.tracker-title {
@@ -1002,11 +1006,17 @@ input.tracker-input {
 }
 
 @media (max-width: 768px) {
+  .leaderboard-table th:nth-child(1),
+  .leaderboard-table td:nth-child(1),
   .leaderboard-table th:nth-child(4),
   .leaderboard-table td:nth-child(4),
   .leaderboard-table th:nth-child(5),
   .leaderboard-table td:nth-child(5) {
     display: none;
+  }
+  .leaderboard-table th, 
+  .leaderboard-table td {
+    padding: var(--space-3) var(--space-4);
   }
 }
 
