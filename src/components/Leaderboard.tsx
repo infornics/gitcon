@@ -96,10 +96,10 @@ export default function Leaderboard() {
             <tr>
               <th className="text-center w-16">Rank</th>
               <th>Developer</th>
-              <th className="text-right">Contributions</th>
-              <th className="text-right">Longest Streak</th>
-              <th className="text-right">Current Streak</th>
-              <th className="text-center">Profile</th>
+              <th className="!text-center">Contributions</th>
+              <th className="!text-center">Longest Streak</th>
+              <th className="!text-center">Current Streak</th>
+              <th className="!text-center">Profile</th>
             </tr>
           </thead>
           <tbody>
@@ -121,16 +121,16 @@ export default function Leaderboard() {
                       </div>
                     </div>
                   </td>
-                  <td className="text-right font-mono font-bold text-primary">
+                  <td className="!text-center font-mono font-bold text-primary">
                     {user.totalContributions.toLocaleString()}
                   </td>
-                  <td className="text-right font-mono">
+                  <td className="!text-center font-mono">
                     {user.longestStreak} days
                   </td>
-                  <td className="text-right font-mono">
+                  <td className="!text-center font-mono">
                     {user.currentStreak} days
                   </td>
-                  <td className="text-center">
+                  <td className="!text-center">
                     <Link
                       href={`/user/${user.login}`}
                       className="btn btn-secondary !py-1 !px-3 !text-xs"

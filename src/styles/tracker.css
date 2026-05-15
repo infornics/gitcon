@@ -813,7 +813,6 @@ input.tracker-input {
 
 .leaderboard-table th {
   padding: var(--space-4) var(--space-6);
-  text-align: left;
   font-family: var(--font-display);
   font-weight: 700;
   text-transform: uppercase;
