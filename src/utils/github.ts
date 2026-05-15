@@ -1,3 +1,4 @@
+import { revineFetch } from "revine";
 export interface ContributionDay {
   date: string;
   contributionCount: number;
@@ -150,24 +151,31 @@ export async function fetchContributions(username: string, daysBack: number) {
     }
   `;
   const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
-  const response = await fetch("https://api.github.com/graphql", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({
-      query,
-      variables: { username, from: start.toISOString(), to: end.toISOString() },
-    }),
-  });
-
-  if (response.status === 403 || response.status === 401) {
-    throw new Error(
-      "GitHub API blocked the request. Try adding a REVINE_PUBLIC_GITHUB_TOKEN to your environment if you hit rate limits.",
-    );
+  let response;
+  try {
+    response = await revineFetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        query,
+        variables: { username, from: start.toISOString(), to: end.toISOString() },
+      }),
+      cacheTTL: 600000, // 10 minutes cache
+      persist: true,    // Persist to localStorage
+    });
+  } catch (err: any) {
+    if (err.status === 403 || err.status === 401) {
+      throw new Error(
+        "GitHub API blocked the request. Try adding a REVINE_PUBLIC_GITHUB_TOKEN to your environment if you hit rate limits.",
+      );
+    }
+    throw err;
   }
-  const payload = await response.json();
+
+  const payload = response;
   if (payload.errors?.length) throw new Error(payload.errors[0].message);
   if (!payload.data?.user) throw new Error("GitHub user not found.");
   return payload.data.user as GithubUserData;
@@ -185,17 +193,22 @@ export async function fetchGlobalLeaderboard(count = 10, extraUsers: string[] = 
   const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
   
   // 1. Discover top users by followers (proxy for "global top developers")
-  const searchResponse = await fetch(
-    `https://api.github.com/search/users?q=type:user&sort=followers&order=desc&per_page=${count}`,
-    {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-    }
-  );
+  let searchData;
+  try {
+    searchData = await revineFetch(
+      `https://api.github.com/search/users?q=type:user&sort=followers&order=desc&per_page=${count}`,
+      {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        cacheTTL: 3600000, // 1 hour cache
+        persist: true,
+      }
+    );
+  } catch (err) {
+    throw new Error("Failed to discover global users.");
+  }
   
-  if (!searchResponse.ok) throw new Error("Failed to discover global users.");
-  const searchData = await searchResponse.json();
   const discoveredLogins = searchData.items.map((u: any) => u.login);
 
   // Combine with extra users and ensure uniqueness
