@@ -18,11 +18,13 @@ interface LeaderboardUser {
 export default function Leaderboard() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 10;
 
   useEffect(() => {
     async function loadLeaderboard() {
       try {
-        const topUsers = await fetchGlobalLeaderboard(12, hardcodedUsers);
+        const topUsers = await fetchGlobalLeaderboard(30, hardcodedUsers);
         const results = topUsers.map((data) => {
           const merged = data.contributionsCollection.contributionCalendar.weeks.flatMap(
             (w) =>
@@ -58,9 +60,15 @@ export default function Leaderboard() {
     loadLeaderboard();
   }, []);
 
+  const totalPages = Math.ceil(users.length / rowsPerPage);
+  const paginatedUsers = users.slice(
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage,
+  );
+
   if (loading) {
     return (
-      <section className="panel">
+      <section className="panel leaderboard-panel">
         <div className="panel-head">
           <h2>Global Leaderboard</h2>
           <p>Loading top contributors...</p>
@@ -95,43 +103,66 @@ export default function Leaderboard() {
             </tr>
           </thead>
           <tbody>
-            {users.map((user, i) => (
-              <tr key={user.login}>
-                <td className="rank text-center">{i + 1}</td>
-                <td>
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={user.avatarUrl}
-                      alt={user.login}
-                      className="w-10 h-10 rounded-full border border-white/5"
-                    />
-                    <div>
-                      <div className="font-bold">{user.name}</div>
-                      <div className="text-xs opacity-60">@{user.login}</div>
+            {paginatedUsers.map((user, i) => {
+              const globalRank = (currentPage - 1) * rowsPerPage + i + 1;
+              return (
+                <tr key={user.login}>
+                  <td className="rank text-center">{globalRank}</td>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={user.avatarUrl}
+                        alt={user.login}
+                        className="w-10 h-10 rounded-full border border-white/5"
+                      />
+                      <div>
+                        <div className="font-bold">{user.name}</div>
+                        <div className="text-xs opacity-60">@{user.login}</div>
+                      </div>
                     </div>
-                  </div>
-                </td>
-                <td className="text-right font-mono font-bold text-primary">
-                  {user.totalContributions.toLocaleString()}
-                </td>
-                <td className="text-right font-mono">
-                  {user.longestStreak} days
-                </td>
-                <td className="text-right font-mono">
-                  {user.currentStreak} days
-                </td>
-                <td className="text-center">
-                  <Link
-                    href={`/user/${user.login}`}
-                    className="btn btn-secondary !py-1 !px-3 !text-xs"
-                  >
-                    View
-                  </Link>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="text-right font-mono font-bold text-primary">
+                    {user.totalContributions.toLocaleString()}
+                  </td>
+                  <td className="text-right font-mono">
+                    {user.longestStreak} days
+                  </td>
+                  <td className="text-right font-mono">
+                    {user.currentStreak} days
+                  </td>
+                  <td className="text-center">
+                    <Link
+                      href={`/user/${user.login}`}
+                      className="btn btn-secondary !py-1 !px-3 !text-xs"
+                    >
+                      View
+                    </Link>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
+      </div>
+
+      <div className="pagination">
+        <button
+          className="pagination-btn"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+        >
+          Previous
+        </button>
+        <span className="page-info">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="pagination-btn"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+        >
+          Next
+        </button>
       </div>
     </section>
   );
