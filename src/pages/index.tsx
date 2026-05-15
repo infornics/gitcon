@@ -279,7 +279,7 @@ export default function Home() {
             </div>
             <div className="repo-list">
               {repos.length > 0 ? (
-                repos.slice(0, 10).map((repo, i) => (
+                repos.slice(0, 5).map((repo, i) => (
                   <div key={i} className="repo-item">
                     <div>
                       <strong>{repo.name}</strong>
