@@ -111,6 +111,48 @@ export default function UserProfile() {
     });
   }, [series]);
 
+  const weeklyData = useMemo(() => {
+    if (series.length === 0) return [];
+    const weeks: { count: number; date: string }[] = [];
+    for (let i = 0; i < series.length; i += 7) {
+      const chunk = series.slice(i, i + 7);
+      const sum = chunk.reduce((acc, curr) => acc + curr.count, 0);
+      weeks.push({ count: sum, date: chunk[0].date });
+    }
+    return weeks;
+  }, [series]);
+
+  const maxWeekly = useMemo(
+    () => Math.max(...weeklyData.map((w) => w.count), 1),
+    [weeklyData],
+  );
+
+  const chartPath = useMemo(() => {
+    if (weeklyData.length < 2) return "";
+    const width = 1000;
+    const height = 150;
+    const points = weeklyData.map((w, i) => {
+      const x = (i / (weeklyData.length - 1)) * width;
+      const y = height - (w.count / maxWeekly) * height;
+      return { x, y };
+    });
+
+    // Generate smooth curve using cubic bezier
+    let path = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      path += ` C ${cp1x} ${p0.y}, ${cp1x} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+    return path;
+  }, [weeklyData, maxWeekly]);
+
+  const areaPath = useMemo(() => {
+    if (!chartPath) return "";
+    return `${chartPath} L 1000 150 L 0 150 Z`;
+  }, [chartPath]);
+
   const showTooltip = (
     day: { date: string; count: number },
     x: number,
@@ -197,8 +239,8 @@ export default function UserProfile() {
           <div className="profile-info">
             {userData?.avatarUrl && (
               <img
-                src={userData.avatarUrl}
-                alt={userData.login}
+                src={userData?.avatarUrl}
+                alt={userData?.login}
                 className="profile-avatar"
               />
             )}
@@ -300,59 +342,140 @@ export default function UserProfile() {
             </div>
           </div>
 
-          <aside className="flex flex-col gap-6">
-            <div className="panel">
-              <div className="panel-head">
-                <h2>Most Used Languages</h2>
-              </div>
-              <div className="lang-list flex flex-col gap-4 mt-2">
-                {languages.length > 0 ? (
-                  languages.map((lang, i) => (
-                    <div key={i} className="lang-item">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>{lang.name}</span>
-                        <span className="opacity-60">
-                          {lang.percent.toFixed(2)}%
-                        </span>
-                      </div>
-                      <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
-                        <div
-                          className="lang-bar h-full rounded-full"
-                          style={{
-                            width: `${lang.percent}%`,
-                            backgroundColor: lang.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="muted p-4">No language data available.</div>
-                )}
-              </div>
+          <div className="panel">
+            <div className="panel-head">
+              <h2>Most Used Languages</h2>
             </div>
+            <div className="lang-list flex flex-col gap-4 mt-2">
+              {languages.length > 0 ? (
+                languages.map((lang, i) => (
+                  <div key={i} className="lang-item">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>{lang.name}</span>
+                      <span className="opacity-60">
+                        {lang.percent.toFixed(2)}%
+                      </span>
+                    </div>
+                    <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
+                      <div
+                        className="lang-bar h-full rounded-full"
+                        style={{
+                          width: `${lang.percent}%`,
+                          backgroundColor: lang.color,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="muted p-4">No language data available.</div>
+              )}
+            </div>
+          </div>
 
-            <div className="panel">
-              <div className="panel-head">
-                <h2>Top Repositories</h2>
-              </div>
-              <div className="repo-list">
-                {repos.length > 0 ? (
-                  repos.slice(0, 10).map((repo, i) => (
-                    <div key={i} className="repo-item">
-                      <div>
-                        <strong>{repo.name}</strong>
-                        <span>{repo.owner}</span>
-                      </div>
-                      <strong>{repo.count}</strong>
-                    </div>
-                  ))
-                ) : (
-                  <div className="muted p-4">No repository data available.</div>
-                )}
+          <div className="panel mt-6">
+            <div className="panel-head">
+              <div>
+                <h2>Contribution Momentum</h2>
+                <p>Weekly activity intensity over the selected period.</p>
               </div>
             </div>
-          </aside>
+            <div className="mt-6 relative h-[200px] w-full">
+              <svg
+                viewBox="0 0 1000 180"
+                className="w-full h-full overflow-visible"
+                preserveAspectRatio="none"
+              >
+                <defs>
+                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="0%"
+                      stopColor="var(--color-primary)"
+                      stopOpacity="0.3"
+                    />
+                    <stop
+                      offset="100%"
+                      stopColor="var(--color-primary)"
+                      stopOpacity="0"
+                    />
+                  </linearGradient>
+                </defs>
+
+                {/* Grid Lines */}
+                {[0, 0.25, 0.5, 0.75, 1].map((p) => (
+                  <line
+                    key={p}
+                    x1="0"
+                    y1={150 * p}
+                    x2="1000"
+                    y2={150 * p}
+                    stroke="var(--color-text)"
+                    strokeOpacity="0.05"
+                    strokeWidth="1"
+                  />
+                ))}
+
+                {/* Area */}
+                <path
+                  d={areaPath}
+                  fill="url(#areaGradient)"
+                  className="transition-all duration-700 ease-in-out"
+                />
+
+                {/* Line */}
+                <path
+                  d={chartPath}
+                  fill="none"
+                  stroke="var(--color-primary)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="transition-all duration-700 ease-in-out"
+                />
+
+                {/* X-Axis Labels (Months) */}
+                {weeklyData.map((w, i) => {
+                  const d = new Date(w.date + "T00:00:00Z");
+                  if (d.getUTCDate() <= 7) {
+                    return (
+                      <text
+                        key={i}
+                        x={(i / (weeklyData.length - 1)) * 1000}
+                        y="175"
+                        fontSize="12"
+                        fill="var(--color-text-faint)"
+                        textAnchor="middle"
+                      >
+                        {MONTH_NAMES[d.getUTCMonth()]}
+                      </text>
+                    );
+                  }
+                  return null;
+                })}
+              </svg>
+            </div>
+          </div>
+
+          <div className="panel mt-6">
+            <div className="panel-head">
+              <h2>Top Repositories</h2>
+            </div>
+            <div className="repo-list">
+              {repos.length > 0 ? (
+                repos.slice(0, 10).map((repo, i) => (
+                  <div key={i} className="repo-item">
+                    <div>
+                      <strong>{repo.name}</strong>
+                      <span>{repo.owner}</span>
+                    </div>
+                    <strong>{repo.count}</strong>
+                  </div>
+                ))
+              ) : (
+                <div className="muted p-4">No repository data available.</div>
+              )}
+            </div>
+          </div>
         </section>
       </main>
 
