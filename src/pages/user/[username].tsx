@@ -40,6 +40,7 @@ export default function UserProfile() {
   >([]);
   const [range, setRange] = useState(365);
   const [tooltip, setTooltip] = useState({ text: "", date: "", x: 0, y: 0, show: false });
+  const [hoveredChart, setHoveredChart] = useState<string | null>(null);
 
   useEffect(() => {
     if (username) {
@@ -152,6 +153,44 @@ export default function UserProfile() {
     if (!chartPath) return "";
     return `${chartPath} L 1000 150 L 0 150 Z`;
   }, [chartPath]);
+
+  const cumulativeData = useMemo(() => {
+    let sum = 0;
+    return weeklyData.map((w) => {
+      sum += w.count;
+      return { date: w.date, count: sum };
+    });
+  }, [weeklyData]);
+
+  const maxCumulative = useMemo(
+    () => Math.max(...cumulativeData.map((w) => w.count), 1),
+    [cumulativeData],
+  );
+
+  const cumulativePath = useMemo(() => {
+    if (cumulativeData.length < 2) return "";
+    const width = 1000;
+    const height = 150;
+    const points = cumulativeData.map((w, i) => {
+      const x = (i / (weeklyData.length - 1)) * width;
+      const y = height - (w.count / maxCumulative) * height;
+      return { x, y };
+    });
+
+    let path = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+      const cp1x = p0.x + (p1.x - p0.x) / 2;
+      path += ` C ${cp1x} ${p0.y}, ${cp1x} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+    return path;
+  }, [cumulativeData, maxCumulative]);
+
+  const cumulativeAreaPath = useMemo(() => {
+    if (!cumulativePath) return "";
+    return `${cumulativePath} L 1000 150 L 0 150 Z`;
+  }, [cumulativePath]);
 
   const showTooltip = (
     day: { date: string; count: number },
@@ -297,223 +336,419 @@ export default function UserProfile() {
         </section>
 
         <section className="workspace">
-          <div className="panel">
-            <div className="panel-head">
-              <div>
-                <h2>Contribution Activity</h2>
-                <p>Heatmap of commits, pull requests, and issues.</p>
+          <div className="flex flex-col gap-6">
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Contribution Activity</h2>
+                  <p>Heatmap of commits, pull requests, and issues.</p>
+                </div>
+                <select
+                  className="tracker-select"
+                  value={range}
+                  onChange={(e) => setRange(Number(e.target.value))}
+                >
+                  <option value="182">Last 6 months</option>
+                  <option value="365">Last 12 months</option>
+                </select>
               </div>
-              <select
-                className="tracker-select"
-                value={range}
-                onChange={(e) => setRange(Number(e.target.value))}
-              >
-                <option value="182">Last 6 months</option>
-                <option value="365">Last 12 months</option>
-              </select>
+
+              <div className="graph-wrap">
+                <div className="graph-header">
+                  <div className="label">{series.length} days of activity</div>
+                  <div className="legend">
+                    <span className="muted">Less</span>
+                    <div className="legend-scale">
+                      <span className="lvl-0"></span>
+                      <span className="lvl-1"></span>
+                      <span className="lvl-2"></span>
+                      <span className="lvl-3"></span>
+                      <span className="lvl-4"></span>
+                    </div>
+                    <span className="muted">More</span>
+                  </div>
+                </div>
+                <div className="months">
+                  {months.map((m, i) => (
+                    <div key={i}>{m}</div>
+                  ))}
+                </div>
+                <ContributionGrid
+                  days={series}
+                  maxCount={stats.max}
+                  skeleton={loading}
+                  onHover={showTooltip}
+                  onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
+                />
+              </div>
             </div>
 
-            <div className="graph-wrap">
-              <div className="graph-header">
-                <div className="label">{series.length} days of activity</div>
-                <div className="legend">
-                  <span className="muted">Less</span>
-                  <div className="legend-scale">
-                    <span className="lvl-0"></span>
-                    <span className="lvl-1"></span>
-                    <span className="lvl-2"></span>
-                    <span className="lvl-3"></span>
-                    <span className="lvl-4"></span>
-                  </div>
-                  <span className="muted">More</span>
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Contribution Momentum</h2>
+                  <p>Weekly activity intensity over the selected period.</p>
                 </div>
               </div>
-              <div className="months">
-                {months.map((m, i) => (
-                  <div key={i}>{m}</div>
-                ))}
-              </div>
-              <ContributionGrid
-                days={series}
-                maxCount={stats.max}
-                skeleton={loading}
-                onHover={showTooltip}
-                onLeave={() => setTooltip((p) => ({ ...p, show: false }))}
-              />
-            </div>
-          </div>
+              <div className="mt-6 relative h-[200px] w-full">
+                <svg
+                  viewBox="0 0 1000 180"
+                  className="w-full h-full overflow-visible"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0.3"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0"
+                      />
+                    </linearGradient>
+                  </defs>
 
-          <div className="panel">
-            <div className="panel-head">
-              <h2>Most Used Languages</h2>
-            </div>
-            <div className="lang-list flex flex-col gap-4 mt-2">
-              {languages.length > 0 ? (
-                languages.map((lang, i) => (
-                  <div key={i} className="lang-item">
-                    <div className="flex justify-between text-sm mb-1">
-                      <span>{lang.name}</span>
-                      <span className="opacity-60">
-                        {lang.percent.toFixed(2)}%
-                      </span>
-                    </div>
-                    <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
-                      <div
-                        className="lang-bar h-full rounded-full"
-                        style={{
-                          width: `${lang.percent}%`,
-                          backgroundColor: lang.color,
+                  {/* Grid Lines */}
+                  {[0, 0.25, 0.5, 0.75, 1].map((p) => (
+                    <line
+                      key={p}
+                      x1="0"
+                      y1={150 * p}
+                      x2="1000"
+                      y2={150 * p}
+                      stroke="var(--color-text)"
+                      strokeOpacity="0.05"
+                      strokeWidth="1"
+                    />
+                  ))}
+
+                  {/* Area */}
+                  <path
+                    d={areaPath}
+                    fill="url(#areaGradient)"
+                    className="transition-all duration-700 ease-in-out"
+                  />
+
+                  {/* Line */}
+                  <path
+                    d={chartPath}
+                    fill="none"
+                    stroke="var(--color-primary)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all duration-700 ease-in-out"
+                  />
+
+                  {/* X-Axis Labels (Months) */}
+                  {weeklyData.map((w, i) => {
+                    const d = new Date(w.date + "T00:00:00Z");
+                    if (d.getUTCDate() <= 7) {
+                      return (
+                        <text
+                          key={i}
+                          x={(i / (weeklyData.length - 1)) * 1000}
+                          y="175"
+                          fontSize="12"
+                          fill="var(--color-text-faint)"
+                          textAnchor="middle"
+                        >
+                          {MONTH_NAMES[d.getUTCMonth()]}
+                        </text>
+                      );
+                    }
+                    return null;
+                  })}
+
+                  {/* Hover Highlights */}
+                  {tooltip.show &&
+                    hoveredChart === "momentum" &&
+                    tooltip.date &&
+                    weeklyData.some((w) => w.date === tooltip.date) && (
+                      (() => {
+                        const activeIndex = weeklyData.findIndex(
+                          (w) => w.date === tooltip.date,
+                        );
+                        if (activeIndex === -1) return null;
+                        const x = (activeIndex / (weeklyData.length - 1)) * 1000;
+                        const y =
+                          150 - (weeklyData[activeIndex].count / maxWeekly) * 150;
+                        return (
+                          <g>
+                            <line
+                              x1={x}
+                              y1="0"
+                              x2={x}
+                              y2="150"
+                              stroke="var(--color-primary)"
+                              strokeWidth="1"
+                              strokeDasharray="4 4"
+                            />
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r="6"
+                              fill="var(--color-primary)"
+                              stroke="var(--color-surface)"
+                              strokeWidth="2"
+                            />
+                          </g>
+                        );
+                      })()
+                    )}
+
+                  {/* Hover Triggers */}
+                  {weeklyData.map((w, i) => {
+                    const width = 1000 / weeklyData.length;
+                    const x = (i / (weeklyData.length - 1)) * 1000 - width / 2;
+                    return (
+                      <rect
+                        key={i}
+                        x={x}
+                        y="0"
+                        width={width}
+                        height="150"
+                        fill="transparent"
+                        className="cursor-pointer"
+                        onMouseMove={(e) => {
+                          setHoveredChart("momentum");
+                          showTooltip(
+                            { date: w.date, count: w.count },
+                            e.clientX,
+                            e.clientY,
+                          );
+                        }}
+                        onMouseLeave={() => {
+                          setTooltip((p) => ({ ...p, show: false }));
+                          setHoveredChart(null);
                         }}
                       />
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="muted p-4">No language data available.</div>
-              )}
-            </div>
-          </div>
-
-          <div className="panel mt-6">
-            <div className="panel-head">
-              <div>
-                <h2>Contribution Momentum</h2>
-                <p>Weekly activity intensity over the selected period.</p>
+                    );
+                  })}
+                </svg>
               </div>
             </div>
-            <div className="mt-6 relative h-[200px] w-full">
-              <svg
-                viewBox="0 0 1000 180"
-                className="w-full h-full overflow-visible"
-                preserveAspectRatio="none"
-              >
-                <defs>
-                  <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="0%"
-                      stopColor="var(--color-primary)"
-                      stopOpacity="0.3"
-                    />
-                    <stop
-                      offset="100%"
-                      stopColor="var(--color-primary)"
-                      stopOpacity="0"
-                    />
-                  </linearGradient>
-                </defs>
 
-                {/* Grid Lines */}
-                {[0, 0.25, 0.5, 0.75, 1].map((p) => (
-                  <line
-                    key={p}
-                    x1="0"
-                    y1={150 * p}
-                    x2="1000"
-                    y2={150 * p}
-                    stroke="var(--color-text)"
-                    strokeOpacity="0.05"
-                    strokeWidth="1"
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Cumulative Growth</h2>
+                  <p>Total contributions trend over the past year.</p>
+                </div>
+                <div className="text-primary font-bold">
+                  {stats.total.toLocaleString()} Total
+                </div>
+              </div>
+              <div className="mt-6 relative h-[200px] w-full">
+                <svg
+                  viewBox="0 0 1000 180"
+                  className="w-full h-full overflow-visible"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop
+                        offset="0%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0.3"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0"
+                      />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Grid Lines */}
+                  {[0, 0.25, 0.5, 0.75, 1].map((p) => (
+                    <line
+                      key={p}
+                      x1="0"
+                      y1={150 * p}
+                      x2="1000"
+                      y2={150 * p}
+                      stroke="var(--color-text)"
+                      strokeOpacity="0.05"
+                      strokeWidth="1"
+                    />
+                  ))}
+
+                  {/* Area */}
+                  <path
+                    d={cumulativeAreaPath}
+                    fill="url(#growthGradient)"
+                    className="transition-all duration-700 ease-in-out"
                   />
-                ))}
 
-                {/* Area */}
-                <path
-                  d={areaPath}
-                  fill="url(#areaGradient)"
-                  className="transition-all duration-700 ease-in-out"
-                />
+                  {/* Line */}
+                  <path
+                    d={cumulativePath}
+                    fill="none"
+                    stroke="var(--color-primary)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all duration-700 ease-in-out"
+                  />
 
-                {/* Line */}
-                <path
-                  d={chartPath}
-                  fill="none"
-                  stroke="var(--color-primary)"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="transition-all duration-700 ease-in-out"
-                />
-
-                {/* X-Axis Labels (Months) */}
-                {weeklyData.map((w, i) => {
-                  const d = new Date(w.date + "T00:00:00Z");
-                  if (d.getUTCDate() <= 7) {
-                    return (
-                      <text
-                        key={i}
-                        x={(i / (weeklyData.length - 1)) * 1000}
-                        y="175"
-                        fontSize="12"
-                        fill="var(--color-text-faint)"
-                        textAnchor="middle"
-                      >
-                        {MONTH_NAMES[d.getUTCMonth()]}
-                      </text>
-                    );
-                  }
-                  return null;
-                })}
-
-                {/* Hover Highlights */}
-                {tooltip.show && tooltip.date && weeklyData.some(w => w.date === tooltip.date) && (
-                   (() => {
-                      const activeIndex = weeklyData.findIndex(w => w.date === tooltip.date);
-                      if (activeIndex === -1) return null;
-                      const x = (activeIndex / (weeklyData.length - 1)) * 1000;
-                      const y = 150 - (weeklyData[activeIndex].count / maxWeekly) * 150;
+                  {/* X-Axis Labels (Months) */}
+                  {cumulativeData.map((w, i) => {
+                    const d = new Date(w.date + "T00:00:00Z");
+                    if (d.getUTCDate() <= 7) {
                       return (
-                        <g>
-                          <line x1={x} y1="0" x2={x} y2="150" stroke="var(--color-primary)" strokeWidth="1" strokeDasharray="4 4" />
-                          <circle cx={x} cy={y} r="6" fill="var(--color-primary)" stroke="var(--color-surface)" strokeWidth="2" />
-                        </g>
+                        <text
+                          key={i}
+                          x={(i / (cumulativeData.length - 1)) * 1000}
+                          y="175"
+                          fontSize="12"
+                          fill="var(--color-text-faint)"
+                          textAnchor="middle"
+                        >
+                          {MONTH_NAMES[d.getUTCMonth()]}
+                        </text>
                       );
-                   })()
-                )}
+                    }
+                    return null;
+                  })}
 
-                {/* Hover Triggers */}
-                {weeklyData.map((w, i) => {
-                  const width = 1000 / weeklyData.length;
-                  const x = (i / (weeklyData.length - 1)) * 1000 - width / 2;
-                  return (
-                    <rect
-                      key={i}
-                      x={x}
-                      y="0"
-                      width={width}
-                      height="150"
-                      fill="transparent"
-                      className="cursor-pointer"
-                      onMouseMove={(e) => {
-                        showTooltip({ date: w.date, count: w.count }, e.clientX, e.clientY);
-                      }}
-                      onMouseLeave={() => setTooltip(p => ({ ...p, show: false }))}
-                    />
-                  );
-                })}
-              </svg>
+                  {/* Hover Highlights */}
+                  {tooltip.show &&
+                    hoveredChart === "growth" &&
+                    tooltip.date &&
+                    cumulativeData.some((w) => w.date === tooltip.date) && (
+                      (() => {
+                        const activeIndex = cumulativeData.findIndex(
+                          (w) => w.date === tooltip.date,
+                        );
+                        if (activeIndex === -1) return null;
+                        const x = (activeIndex / (cumulativeData.length - 1)) * 1000;
+                        const y =
+                          150 -
+                          (cumulativeData[activeIndex].count / maxCumulative) * 150;
+                        return (
+                          <g>
+                            <line
+                              x1={x}
+                              y1="0"
+                              x2={x}
+                              y2="150"
+                              stroke="var(--color-primary)"
+                              strokeWidth="1"
+                              strokeDasharray="4 4"
+                            />
+                            <circle
+                              cx={x}
+                              cy={y}
+                              r="6"
+                              fill="var(--color-primary)"
+                              stroke="var(--color-surface)"
+                              strokeWidth="2"
+                            />
+                          </g>
+                        );
+                      })()
+                    )}
+
+                  {/* Hover Triggers */}
+                  {cumulativeData.map((w, i) => {
+                    const width = 1000 / cumulativeData.length;
+                    const x = (i / (cumulativeData.length - 1)) * 1000 - width / 2;
+                    return (
+                      <rect
+                        key={i}
+                        x={x}
+                        y="0"
+                        width={width}
+                        height="150"
+                        fill="transparent"
+                        className="cursor-pointer"
+                        onMouseMove={(e) => {
+                          setHoveredChart("growth");
+                          const dateFormatted = new Date(
+                            w.date + "T00:00:00Z",
+                          ).toLocaleDateString(undefined, {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                            timeZone: "UTC",
+                          });
+                          setTooltip({
+                            text: `${w.count.toLocaleString()} total • ${dateFormatted}`,
+                            date: w.date,
+                            x: e.clientX,
+                            y: e.clientY,
+                            show: true,
+                          });
+                        }}
+                        onMouseLeave={() => {
+                          setTooltip((p) => ({ ...p, show: false }));
+                          setHoveredChart(null);
+                        }}
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
             </div>
           </div>
 
-          <div className="panel mt-6">
-            <div className="panel-head">
-              <h2>Top Repositories</h2>
-            </div>
-            <div className="repo-list">
-              {repos.length > 0 ? (
-                repos.slice(0, 10).map((repo, i) => (
-                  <div key={i} className="repo-item">
-                    <div>
-                      <strong>{repo.name}</strong>
-                      <span>{repo.owner}</span>
+          <aside className="flex flex-col gap-6">
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Most Used Languages</h2>
+              </div>
+              <div className="lang-list flex flex-col gap-4 mt-2">
+                {languages.length > 0 ? (
+                  languages.map((lang, i) => (
+                    <div key={i} className="lang-item">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{lang.name}</span>
+                        <span className="opacity-60">
+                          {lang.percent.toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="lang-bar-bg h-2 rounded-full bg-surface-offset overflow-hidden">
+                        <div
+                          className="lang-bar h-full rounded-full"
+                          style={{
+                            width: `${lang.percent}%`,
+                            backgroundColor: lang.color,
+                          }}
+                        />
+                      </div>
                     </div>
-                    <strong>{repo.count}</strong>
-                  </div>
-                ))
-              ) : (
-                <div className="muted p-4">No repository data available.</div>
-              )}
+                  ))
+                ) : (
+                  <div className="muted p-4">No language data available.</div>
+                )}
+              </div>
             </div>
-          </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Top Repositories</h2>
+              </div>
+              <div className="repo-list">
+                {repos.length > 0 ? (
+                  repos.slice(0, 10).map((repo, i) => (
+                    <div key={i} className="repo-item">
+                      <div>
+                        <strong>{repo.name}</strong>
+                        <span>{repo.owner}</span>
+                      </div>
+                      <strong>{repo.count}</strong>
+                    </div>
+                  ))
+                ) : (
+                  <div className="muted p-4">No repository data available.</div>
+                )}
+              </div>
+            </div>
+          </aside>
         </section>
       </main>
 
