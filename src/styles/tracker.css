@@ -279,11 +279,18 @@ h1.tracker-title {
   line-height: 1;
   margin-top: var(--space-2);
 }
-.workspace, .workspace-wide {
-  display: grid; gap: var(--space-8); align-items: start;
+.workspace,
+.workspace-wide {
+  display: grid;
+  gap: var(--space-8);
+  align-items: start;
 }
-.workspace { grid-template-columns: 1fr 380px; }
-.workspace-wide { grid-template-columns: 1fr 1.2fr; }
+.workspace {
+  grid-template-columns: 1fr 380px;
+}
+.workspace-wide {
+  grid-template-columns: 1fr 1.2fr;
+}
 .panel {
   padding: var(--space-6);
 }
@@ -612,7 +619,8 @@ input.tracker-input {
   outline: none;
   background: var(--color-surface-2);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--color-primary) 15%, transparent);
+  box-shadow: 0 0 0 4px
+    color-mix(in oklab, var(--color-primary) 15%, transparent);
 }
 .header-search svg {
   position: absolute;
@@ -741,8 +749,15 @@ input.tracker-input {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-  50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.1); }
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
 }
 
 .brand-badge {
@@ -819,13 +834,15 @@ input.tracker-input {
   letter-spacing: 0.1em;
   font-size: var(--text-xs);
   color: var(--color-text-faint);
-  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-text) 8%, transparent);
 }
 
 .leaderboard-table td {
   padding: var(--space-4) var(--space-6);
   vertical-align: middle;
-  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 4%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-text) 4%, transparent);
   transition: background 0.2s ease;
 }
 
@@ -844,9 +861,18 @@ input.tracker-input {
   opacity: 0.15;
 }
 
-.leaderboard-table .rank.gold { color: #ffd700; opacity: 0.8; }
-.leaderboard-table .rank.silver { color: #c0c0c0; opacity: 0.8; }
-.leaderboard-table .rank.bronze { color: #cd7f32; opacity: 0.8; }
+.leaderboard-table .rank.gold {
+  color: #ffd700;
+  opacity: 0.8;
+}
+.leaderboard-table .rank.silver {
+  color: #c0c0c0;
+  opacity: 0.8;
+}
+.leaderboard-table .rank.bronze {
+  color: #cd7f32;
+  opacity: 0.8;
+}
 
 @media (max-width: 768px) {
   .leaderboard-table th:nth-child(4),

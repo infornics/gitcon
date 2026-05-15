@@ -39,7 +39,13 @@ export default function UserProfile() {
     Array<{ name: string; color: string; percent: number }>
   >([]);
   const [range, setRange] = useState(365);
-  const [tooltip, setTooltip] = useState({ text: "", date: "", x: 0, y: 0, show: false });
+  const [tooltip, setTooltip] = useState({
+    text: "",
+    date: "",
+    x: 0,
+    y: 0,
+    show: false,
+  });
   const [hoveredChart, setHoveredChart] = useState<string | null>(null);
 
   useEffect(() => {
@@ -397,7 +403,13 @@ export default function UserProfile() {
                   preserveAspectRatio="none"
                 >
                   <defs>
-                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="areaGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop
                         offset="0%"
                         stopColor="var(--color-primary)"
@@ -467,38 +479,37 @@ export default function UserProfile() {
                   {tooltip.show &&
                     hoveredChart === "momentum" &&
                     tooltip.date &&
-                    weeklyData.some((w) => w.date === tooltip.date) && (
-                      (() => {
-                        const activeIndex = weeklyData.findIndex(
-                          (w) => w.date === tooltip.date,
-                        );
-                        if (activeIndex === -1) return null;
-                        const x = (activeIndex / (weeklyData.length - 1)) * 1000;
-                        const y =
-                          150 - (weeklyData[activeIndex].count / maxWeekly) * 150;
-                        return (
-                          <g>
-                            <line
-                              x1={x}
-                              y1="0"
-                              x2={x}
-                              y2="150"
-                              stroke="var(--color-primary)"
-                              strokeWidth="1"
-                              strokeDasharray="4 4"
-                            />
-                            <circle
-                              cx={x}
-                              cy={y}
-                              r="6"
-                              fill="var(--color-primary)"
-                              stroke="var(--color-surface)"
-                              strokeWidth="2"
-                            />
-                          </g>
-                        );
-                      })()
-                    )}
+                    weeklyData.some((w) => w.date === tooltip.date) &&
+                    (() => {
+                      const activeIndex = weeklyData.findIndex(
+                        (w) => w.date === tooltip.date,
+                      );
+                      if (activeIndex === -1) return null;
+                      const x = (activeIndex / (weeklyData.length - 1)) * 1000;
+                      const y =
+                        150 - (weeklyData[activeIndex].count / maxWeekly) * 150;
+                      return (
+                        <g>
+                          <line
+                            x1={x}
+                            y1="0"
+                            x2={x}
+                            y2="150"
+                            stroke="var(--color-primary)"
+                            strokeWidth="1"
+                            strokeDasharray="4 4"
+                          />
+                          <circle
+                            cx={x}
+                            cy={y}
+                            r="6"
+                            fill="var(--color-primary)"
+                            stroke="var(--color-surface)"
+                            strokeWidth="2"
+                          />
+                        </g>
+                      );
+                    })()}
 
                   {/* Hover Triggers */}
                   {weeklyData.map((w, i) => {
@@ -549,7 +560,13 @@ export default function UserProfile() {
                   preserveAspectRatio="none"
                 >
                   <defs>
-                    <linearGradient id="growthGradient" x1="0" y1="0" x2="0" y2="1">
+                    <linearGradient
+                      id="growthGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
                       <stop
                         offset="0%"
                         stopColor="var(--color-primary)"
@@ -619,44 +636,46 @@ export default function UserProfile() {
                   {tooltip.show &&
                     hoveredChart === "growth" &&
                     tooltip.date &&
-                    cumulativeData.some((w) => w.date === tooltip.date) && (
-                      (() => {
-                        const activeIndex = cumulativeData.findIndex(
-                          (w) => w.date === tooltip.date,
-                        );
-                        if (activeIndex === -1) return null;
-                        const x = (activeIndex / (cumulativeData.length - 1)) * 1000;
-                        const y =
-                          150 -
-                          (cumulativeData[activeIndex].count / maxCumulative) * 150;
-                        return (
-                          <g>
-                            <line
-                              x1={x}
-                              y1="0"
-                              x2={x}
-                              y2="150"
-                              stroke="var(--color-primary)"
-                              strokeWidth="1"
-                              strokeDasharray="4 4"
-                            />
-                            <circle
-                              cx={x}
-                              cy={y}
-                              r="6"
-                              fill="var(--color-primary)"
-                              stroke="var(--color-surface)"
-                              strokeWidth="2"
-                            />
-                          </g>
-                        );
-                      })()
-                    )}
+                    cumulativeData.some((w) => w.date === tooltip.date) &&
+                    (() => {
+                      const activeIndex = cumulativeData.findIndex(
+                        (w) => w.date === tooltip.date,
+                      );
+                      if (activeIndex === -1) return null;
+                      const x =
+                        (activeIndex / (cumulativeData.length - 1)) * 1000;
+                      const y =
+                        150 -
+                        (cumulativeData[activeIndex].count / maxCumulative) *
+                          150;
+                      return (
+                        <g>
+                          <line
+                            x1={x}
+                            y1="0"
+                            x2={x}
+                            y2="150"
+                            stroke="var(--color-primary)"
+                            strokeWidth="1"
+                            strokeDasharray="4 4"
+                          />
+                          <circle
+                            cx={x}
+                            cy={y}
+                            r="6"
+                            fill="var(--color-primary)"
+                            stroke="var(--color-surface)"
+                            strokeWidth="2"
+                          />
+                        </g>
+                      );
+                    })()}
 
                   {/* Hover Triggers */}
                   {cumulativeData.map((w, i) => {
                     const width = 1000 / cumulativeData.length;
-                    const x = (i / (cumulativeData.length - 1)) * 1000 - width / 2;
+                    const x =
+                      (i / (cumulativeData.length - 1)) * 1000 - width / 2;
                     return (
                       <rect
                         key={i}
