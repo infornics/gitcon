@@ -27,14 +27,7 @@ const MONTH_NAMES = [
 ];
 
 export default function Home() {
-  const [theme, setTheme] = useState<"light" | "dark">(() => {
-    if (typeof window !== "undefined") {
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
-    }
-    return "light";
-  });
+
   const [username, setUsername] = useState("rachit-bharadwaj");
   const [range, setRange] = useState(365);
   const [loading, setLoading] = useState(false);
@@ -58,10 +51,7 @@ export default function Home() {
     show: false,
   });
 
-  // Theme Sync
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
+
 
   // Fetch initial data on mount
   useEffect(() => {

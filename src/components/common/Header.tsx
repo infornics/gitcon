@@ -1,15 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "revine";
 
 export default function Header() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme") as "light" | "dark";
+      if (savedTheme) return savedTheme;
       return window.matchMedia("(prefers-color-scheme: dark)").matches
         ? "dark"
         : "light";
     }
     return "light";
   });
+
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   const [query, setQuery] = useState("");
 
@@ -21,7 +38,7 @@ export default function Header() {
   };
 
   return (
-    <header>
+    <header className={scrolled ? "scrolled" : ""}>
       <Link className="brand" href="/" aria-label="Gitcon home">
         <div className="brand-mark" aria-hidden="true">
           <svg
