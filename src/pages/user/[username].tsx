@@ -284,17 +284,48 @@ export default function UserProfile() {
         <section className="profile-hero">
           <div className="profile-info">
             {userData?.avatarUrl && (
-              <img
-                src={userData?.avatarUrl}
-                alt={userData?.login}
-                className="profile-avatar"
-              />
+              <a
+                href={`https://github.com/${userData?.login}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block shrink-0"
+                title="View GitHub profile"
+              >
+                <img
+                  src={userData?.avatarUrl}
+                  alt={userData?.login}
+                  className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
+                />
+              </a>
             )}
             <div>
               <h1 className="profile-name">
                 {userData?.name || userData?.login}
               </h1>
-              <p className="profile-username">@{userData?.login}</p>
+              <a
+                href={`https://github.com/${userData?.login}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                title="View GitHub profile"
+              >
+                @{userData?.login}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+              </a>
             </div>
           </div>
 
