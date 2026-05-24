@@ -1,6 +1,6 @@
 import { IOSS } from "@/components/home";
 import Leaderboard from "../components/Leaderboard";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "revine";
 import { ContributionGrid } from "../components/ContributionGrid";
 import { StatCard } from "../components/StatCard";
@@ -27,7 +27,6 @@ const MONTH_NAMES = [
 ];
 
 export default function Home() {
-
   const [username, setUsername] = useState("rachit-bharadwaj");
   const [range, setRange] = useState(365);
   const [loading, setLoading] = useState(false);
@@ -50,6 +49,23 @@ export default function Home() {
     y: 0,
     show: false,
   });
+
+  const graphWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollToEnd = () => {
+      if (graphWrapRef.current) {
+        graphWrapRef.current.scrollLeft = graphWrapRef.current.scrollWidth;
+      }
+    };
+    scrollToEnd();
+    const rafId = requestAnimationFrame(scrollToEnd);
+    const timeoutId = setTimeout(scrollToEnd, 50);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
+  }, [series, loading]);
 
 
 
@@ -192,7 +208,7 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="graph-wrap">
+            <div className="graph-wrap" ref={graphWrapRef}>
               <ContributionGrid
                 days={series.slice(-196)}
                 maxCount={stats.max}

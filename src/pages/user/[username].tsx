@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "revine";
 import { ContributionGrid } from "../../components/ContributionGrid";
 import { StatCard } from "../../components/StatCard";
@@ -47,6 +47,23 @@ export default function UserProfile() {
     show: false,
   });
   const [hoveredChart, setHoveredChart] = useState<string | null>(null);
+
+  const graphWrapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollToEnd = () => {
+      if (graphWrapRef.current) {
+        graphWrapRef.current.scrollLeft = graphWrapRef.current.scrollWidth;
+      }
+    };
+    scrollToEnd();
+    const rafId = requestAnimationFrame(scrollToEnd);
+    const timeoutId = setTimeout(scrollToEnd, 50);
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(timeoutId);
+    };
+  }, [series, loading]);
 
   useEffect(() => {
     if (username) {
@@ -437,7 +454,7 @@ export default function UserProfile() {
                 </select>
               </div>
 
-              <div className="graph-wrap">
+              <div className="graph-wrap" ref={graphWrapRef}>
                 <div className="graph-header">
                   <div className="label">{series.length} days of activity</div>
                   <div className="legend">
@@ -453,9 +470,20 @@ export default function UserProfile() {
                   </div>
                 </div>
                 <div className="months">
-                  {months.map((m, i) => (
-                    <div key={i}>{m}</div>
-                  ))}
+                  {months.map((m, i) => {
+                    if (!m) return null;
+                    return (
+                      <span
+                        key={i}
+                        style={{
+                          position: "absolute",
+                          left: `calc(var(--col-step) * ${i})`,
+                        }}
+                      >
+                        {m}
+                      </span>
+                    );
+                  })}
                 </div>
                 <ContributionGrid
                   days={series}

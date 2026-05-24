@@ -492,10 +492,9 @@ input.tracker-input {
   flex-wrap: wrap;
 }
 .months {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(14px, auto);
-  gap: 4px;
+  position: relative;
+  height: 20px;
+  --col-step: 18px;
   min-width: max-content;
   margin: var(--space-3) 0 var(--space-2);
   color: var(--color-text-muted);
@@ -504,8 +503,7 @@ input.tracker-input {
 
 @media (max-width: 640px) {
   .months {
-    grid-auto-columns: minmax(11px, auto);
-    gap: 3px;
+    --col-step: 14px;
   }
 }
 .legend-scale {
