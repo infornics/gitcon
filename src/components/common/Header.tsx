@@ -62,6 +62,14 @@ export default function Header() {
       </Link>
 
       <form className="header-search" onSubmit={handleSearch}>
+        <input
+          id="global-search-input"
+          type="text"
+          placeholder="Search GitHub username..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search GitHub username"
+        />
         <svg
           width="16"
           height="16"
@@ -75,14 +83,6 @@ export default function Header() {
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input
-          id="global-search-input"
-          type="text"
-          placeholder="Search GitHub username..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search GitHub username"
-        />
       </form>
 
       <div className="flex items-center gap-3">
