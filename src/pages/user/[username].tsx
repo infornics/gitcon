@@ -108,6 +108,19 @@ export default function UserProfile() {
 
   const stats = useMemo(() => calculateStats(series), [series]);
 
+  const growthRate = useMemo(() => {
+    if (series.length < 2) return null;
+    const mid = Math.floor(series.length / 2);
+    const firstHalf = series.slice(0, mid);
+    const secondHalf = series.slice(mid);
+    const firstHalfTotal = firstHalf.reduce((acc, curr) => acc + curr.count, 0);
+    const secondHalfTotal = secondHalf.reduce((acc, curr) => acc + curr.count, 0);
+    if (firstHalfTotal === 0) {
+      return secondHalfTotal > 0 ? 100 : 0;
+    }
+    return ((secondHalfTotal - firstHalfTotal) / firstHalfTotal) * 100;
+  }, [series]);
+
   const months = useMemo(() => {
     const weeks: string[][] = [];
     for (let i = 0; i < series.length; i += 7)
@@ -369,6 +382,40 @@ export default function UserProfile() {
                   : "No data yet"
               }
             />
+            {growthRate !== null && (
+              <div className="kpi">
+                <div className="label">Growth rate</div>
+                <strong className={`flex items-center gap-1.5 ${
+                  growthRate > 0 
+                    ? "text-emerald-500" 
+                    : growthRate < 0 
+                      ? "text-rose-500" 
+                      : "opacity-60"
+                }`}>
+                  {growthRate > 0 ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="inline text-emerald-500">
+                      <line x1="7" y1="17" x2="17" y2="7"></line>
+                      <polyline points="7 7 17 7 17 17"></polyline>
+                    </svg>
+                  ) : growthRate < 0 ? (
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="inline text-rose-500">
+                      <line x1="7" y1="7" x2="17" y2="17"></line>
+                      <polyline points="17 7 17 17 7 17"></polyline>
+                    </svg>
+                  ) : null}
+                  {growthRate > 0 ? "+" : ""}{growthRate.toFixed(1)}%
+                </strong>
+                <span className="muted text-xs block mt-1">
+                  {growthRate > 0 
+                    ? "Activity accelerating" 
+                    : growthRate < 0 
+                      ? "Activity slowing" 
+                      : "Activity stable"
+                  }{" "}
+                  vs. first half
+                </span>
+              </div>
+            )}
           </div>
         </section>
 
