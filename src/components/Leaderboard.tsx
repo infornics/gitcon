@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "revine";
+import { Link, useNavigate } from "revine";
 import {
   fetchGlobalLeaderboard,
   calculateStats,
@@ -16,6 +16,7 @@ interface LeaderboardUser {
 }
 
 export default function Leaderboard() {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -84,7 +85,6 @@ export default function Leaderboard() {
                 <th className="!text-center">Contributions</th>
                 <th className="!text-center">Longest Streak</th>
                 <th className="!text-center">Current Streak</th>
-                <th className="!text-center">Profile</th>
               </tr>
             </thead>
             <tbody>
@@ -110,9 +110,6 @@ export default function Leaderboard() {
                   </td>
                   <td className="!text-center">
                     <div className="skeleton h-5 w-20 mx-auto rounded" />
-                  </td>
-                  <td className="!text-center">
-                    <div className="skeleton h-6 w-14 mx-auto rounded-full" />
                   </td>
                 </tr>
               ))}
@@ -140,14 +137,17 @@ export default function Leaderboard() {
               <th className="!text-center">Contributions</th>
               <th className="!text-center">Longest Streak</th>
               <th className="!text-center">Current Streak</th>
-              <th className="!text-center">Profile</th>
             </tr>
           </thead>
           <tbody>
             {paginatedUsers.map((user, i) => {
               const globalRank = (currentPage - 1) * rowsPerPage + i + 1;
               return (
-                <tr key={user.login}>
+                <tr
+                  key={user.login}
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/user/${user.login}`)}
+                >
                   <td className={`rank text-center ${
                     globalRank === 1 ? "gold" : 
                     globalRank === 2 ? "silver" : 
@@ -176,14 +176,6 @@ export default function Leaderboard() {
                   </td>
                   <td className="!text-center font-mono">
                     {user.currentStreak} days
-                  </td>
-                  <td className="!text-center">
-                    <Link
-                      href={`/user/${user.login}`}
-                      className="btn btn-secondary !py-1 !px-3 !text-xs"
-                    >
-                      View
-                    </Link>
                   </td>
                 </tr>
               );
