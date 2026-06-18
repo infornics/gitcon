@@ -1,8 +1,8 @@
 import { IOSS } from "@/components/home";
-import Leaderboard from "../components/Leaderboard";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "revine";
 import { ContributionGrid } from "../components/ContributionGrid";
+import Leaderboard from "../components/Leaderboard";
 import { StatCard } from "../components/StatCard";
 import {
   calculateStats,
@@ -66,8 +66,6 @@ export default function Home() {
       clearTimeout(timeoutId);
     };
   }, [series, loading]);
-
-
 
   // Fetch initial data on mount
   useEffect(() => {
@@ -228,95 +226,180 @@ export default function Home() {
           </aside>
         </section>
 
-        <section className="workspace-wide" id="tracker">
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <h2>Momentum</h2>
-                <p>Consistency and intensity signals.</p>
-              </div>
-            </div>
-            <div className="kpi-stack">
-              <StatCard
-                label="Total contributions"
-                value={stats.total.toLocaleString()}
-                subValue={`${stats.activeDays ? (stats.total / stats.activeDays).toFixed(1) : "0.0"} per active day`}
-              />
-              <StatCard
-                label="Current streak"
-                value={`${stats.current} days`}
-                subValue="Measured from the latest day."
-              />
-              <div className="kpi">
-                <div className="label">Longest streak</div>
-                <strong>{stats.longest} days</strong>
-                <div className="text-xs opacity-60">
-                  {stats.longestStart && stats.longestEnd
-                    ? `${new Date(stats.longestStart + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })} — ${new Date(stats.longestEnd + "T00:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric" })}`
-                    : "Peak consistency"}
-                </div>
-              </div>
-              <StatCard
-                label="Best day"
-                value={
-                  stats.best.date
-                    ? new Date(
-                        stats.best.date + "T00:00:00Z",
-                      ).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })
-                    : "—"
-                }
-                subValue={
-                  stats.best.date
-                    ? `${stats.best.count} contributions in a day`
-                    : "No data yet."
-                }
-              />
-            </div>
-          </section>
-
-          <section className="panel">
-            <div className="panel-head">
-              <div>
-                <h2>Top repositories</h2>
-                <p>Ranked by commit contributions in selected range.</p>
-              </div>
-            </div>
-            <div className="repo-list">
-              {repos.length > 0 ? (
-                repos.slice(0, 5).map((repo, i) => (
-                  <a
-                    key={i}
-                    href={`https://github.com/${repo.owner}/${repo.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="repo-item hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 cursor-pointer text-inherit no-underline"
-                  >
-                    <div>
-                      <strong>{repo.name}</strong>
-                      <span>{repo.owner}</span>
-                    </div>
-                    <strong>{repo.count}</strong>
-                  </a>
-                ))
-              ) : (
-                <div className="repo-item">
-                  <div>
-                    <strong>No data yet</strong>
-                    <span>Load a profile to see repos.</span>
-                  </div>
-                  <strong>—</strong>
-                </div>
-              )}
-            </div>
-          </section>
-        </section>
-
         <section className="mt-20">
           <Leaderboard />
+        </section>
+
+        <section className="workspace-wide mt-20" id="tracker">
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Developer Rhythms & Insights</h2>
+                <p>Analyze your daily patterns and coding rhythms over time.</p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                    <line x1="16" y1="2" x2="16" y2="6" />
+                    <line x1="8" y1="2" x2="8" y2="6" />
+                    <line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Weekly Activity Rhythm</h3>
+                  <p className="text-sm opacity-70 mt-1">
+                    Identifies your peak coding days and active streaks. Tracks
+                    day-of-week averages to help optimize your coding schedule.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">
+                    Hourly Focus Distribution
+                  </h3>
+                  <p className="text-sm opacity-70 mt-1">
+                    Plots commit density by the hour of the day. Pinpoint your
+                    core focus hours, whether you are a morning coder or a
+                    late-night developer.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-2 p-4 rounded-xl bg-surface-2/50 border border-white/5">
+                <div className="flex justify-between items-center mb-3 text-xs opacity-60">
+                  <span>Activity Pattern</span>
+                  <span>Peak focus: Afternoon</span>
+                </div>
+                <div className="flex items-end gap-1.5 h-16 px-2">
+                  {[20, 35, 15, 60, 80, 45, 10].map((h, i) => (
+                    <div
+                      key={i}
+                      className="flex-1 rounded-t bg-primary/20 hover:bg-primary transition-colors"
+                      style={{ height: `${h}%` }}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="panel">
+            <div className="panel-head">
+              <div>
+                <h2>Advanced Project Analytics</h2>
+                <p>
+                  Uncover repository impact and developer network contributions.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col gap-6 mt-6">
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Contributed Accounts</h3>
+                  <p className="text-sm opacity-70 mt-1">
+                    Discovers which organizations, namespaces, and creator
+                    accounts you commit to most, highlighting collaborative
+                    contributions.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4">
+                <div className="p-3.5 rounded-xl bg-primary/10 text-primary shrink-0">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-bold text-lg">Language Genomics</h3>
+                  <p className="text-sm opacity-70 mt-1">
+                    Detailed breakdown of languages used across repositories.
+                    Track language dominance percentages and stack evolution.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-2 p-4 rounded-xl bg-surface-2/50 border border-white/5 flex flex-col gap-2.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold">TypeScript</span>
+                  <span className="opacity-60">72.4%</span>
+                </div>
+                <div className="h-2 rounded-full bg-surface-offset overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-primary"
+                    style={{ width: "72.4%" }}
+                  />
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold">CSS / Styling</span>
+                  <span className="opacity-60">15.8%</span>
+                </div>
+                <div className="h-2 rounded-full bg-surface-offset overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-[#38bdf8]"
+                    style={{ width: "15.8%" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
 
         <IOSS />
