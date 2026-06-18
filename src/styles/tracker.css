@@ -134,7 +134,7 @@ html, body {
 }
 
 .page-shell {
-  width: min(1400px, calc(100% - 2rem));
+  width: min(1500px, calc(100% - 2rem));
   margin: 0 auto;
   position: relative;
 }
