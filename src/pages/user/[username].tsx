@@ -1025,6 +1025,14 @@ export default function UserProfile() {
                   <div className="muted p-4">No repository data available.</div>
                 )}
               </div>
+              {repos.length > 0 && (
+                <Link
+                  href={`/user/${username}/repositories`}
+                  className="btn btn-secondary w-full justify-center mt-6 !min-h-0 !py-2.5 !text-xs font-bold"
+                >
+                  View all repositories
+                </Link>
+              )}
             </div>
           </aside>
         </section>
