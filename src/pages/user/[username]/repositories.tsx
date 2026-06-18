@@ -75,13 +75,18 @@ export default function UserRepositories() {
             <div>
               <h2>All Repositories</h2>
               <p className="text-sm">
-                Complete breakdown of repositories with commit contributions by <strong>@{username}</strong> in the past year.
+                Complete breakdown of repositories with commit contributions by{" "}
+                <strong>@{username}</strong> in the past year.
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <div className="text-xs opacity-60 uppercase tracking-wider">Total Repos</div>
-                <div className="font-bold text-primary font-mono">{repos.length}</div>
+                <div className="text-xs opacity-60 uppercase tracking-wider">
+                  Total Repos
+                </div>
+                <div className="font-bold text-primary font-mono">
+                  {repos.length}
+                </div>
               </div>
               <Link
                 href={`/user/${username}`}
@@ -93,51 +98,137 @@ export default function UserRepositories() {
           </div>
 
           <div className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {repos.map((repo, i) => (
-                <a
-                  key={i}
-                  href={`https://github.com/${repo.owner}/${repo.name}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-5 rounded-xl bg-surface-2 border border-white/5 flex justify-between items-center hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 group text-inherit no-underline"
-                >
-                  <div className="flex flex-col min-w-0">
-                    <strong className="text-base truncate group-hover:text-primary transition-colors">
-                      {repo.name}
-                    </strong>
-                    <span className="text-xs opacity-60 truncate">
-                      {repo.owner}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex flex-col items-end">
-                      <strong className="font-mono text-primary text-lg leading-none">
-                        {repo.count}
-                      </strong>
-                      <span className="text-[10px] opacity-40 uppercase tracking-wider mt-1">
-                        commits
-                      </span>
-                    </div>
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="opacity-0 group-hover:opacity-60 transition-opacity duration-300"
+            {/* Top 3 Highlighted Grid */}
+            {repos.length > 0 && (
+              <div className="mb-10">
+                <div className="label mb-4 opacity-75">Top 3 Repositories</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {repos.slice(0, 3).map((repo, i) => {
+                    const badge =
+                      i === 0
+                        ? {
+                            label: "Most Contributions",
+                            color: "#ffd700",
+                          }
+                        : i === 1
+                          ? {
+                              label: "#2 Most Contributions",
+                              color: "#c0c0c0",
+                            }
+                          : {
+                              label: "#3 Most Contributions",
+                              color: "#cd7f32",
+                            };
+
+                    return (
+                      <a
+                        key={i}
+                        href={`https://github.com/${repo.owner}/${repo.name}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-6 rounded-2xl border flex flex-col gap-4 hover:scale-[1.02] transition-all duration-300 group text-inherit no-underline"
+                        style={{
+                          background: `radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 6%, var(--color-surface-2)), var(--color-surface-2))`,
+                          borderColor: badge.color + "35",
+                          boxShadow: `0 10px 30px ${badge.color}0a`,
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span
+                            className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5"
+                            style={{ color: badge.color }}
+                          >
+                            {badge.label}
+                          </span>
+                          <div className="flex items-center gap-1 bg-primary/10 text-primary px-2.5 py-0.5 rounded-full font-mono text-xs font-bold shrink-0">
+                            {repo.count} commits
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-end mt-2">
+                          <div className="flex flex-col min-w-0">
+                            <strong className="text-lg font-bold truncate group-hover:text-primary transition-colors tracking-tight">
+                              {repo.name}
+                            </strong>
+                            <span className="text-xs opacity-60 truncate mt-0.5">
+                              {repo.owner}
+                            </span>
+                          </div>
+
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="opacity-0 group-hover:opacity-60 transition-opacity duration-300 shrink-0 mb-1"
+                          >
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                            <polyline points="15 3 21 3 21 9" />
+                            <line x1="10" y1="14" x2="21" y2="3" />
+                          </svg>
+                        </div>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Other Repositories Grid */}
+            {repos.length > 3 && (
+              <div>
+                <div className="label mb-4 opacity-75">Other Repositories</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {repos.slice(3).map((repo, i) => (
+                    <a
+                      key={i}
+                      href={`https://github.com/${repo.owner}/${repo.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-5 rounded-xl bg-surface-2 border border-white/5 flex justify-between items-center hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 group text-inherit no-underline"
                     >
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                      <polyline points="15 3 21 3 21 9" />
-                      <line x1="10" y1="14" x2="21" y2="3" />
-                    </svg>
-                  </div>
-                </a>
-              ))}
-            </div>
+                      <div className="flex flex-col min-w-0">
+                        <strong className="text-base truncate group-hover:text-primary transition-colors">
+                          {repo.name}
+                        </strong>
+                        <span className="text-xs opacity-60 truncate">
+                          {repo.owner}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex flex-col items-end">
+                          <strong className="font-mono text-primary text-lg leading-none">
+                            {repo.count}
+                          </strong>
+                          <span className="text-[10px] opacity-40 uppercase tracking-wider mt-1">
+                            commits
+                          </span>
+                        </div>
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="opacity-0 group-hover:opacity-60 transition-opacity duration-300"
+                        >
+                          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                          <polyline points="15 3 21 3 21 9" />
+                          <line x1="10" y1="14" x2="21" y2="3" />
+                        </svg>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {repos.length === 0 && (
               <div className="text-center py-12 text-muted">
