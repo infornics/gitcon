@@ -231,6 +231,33 @@ export default function UserProfile() {
     return `${cumulativePath} L 1000 150 L 0 150 Z`;
   }, [cumulativePath]);
 
+  const dayOfWeekData = useMemo(() => {
+    if (series.length === 0) return [];
+    const days = [0, 0, 0, 0, 0, 0, 0]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
+    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const shortNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    
+    series.forEach((d) => {
+      const date = new Date(d.date + "T00:00:00Z");
+      const day = date.getUTCDay();
+      days[day] += d.count;
+    });
+    
+    const max = Math.max(...days, 1);
+    return days.map((count, index) => ({
+      day: dayNames[index],
+      shortDay: shortNames[index],
+      count,
+      percent: (count / max) * 100,
+    }));
+  }, [series]);
+
+  const peakDay = useMemo(() => {
+    if (dayOfWeekData.length === 0) return "";
+    const sorted = [...dayOfWeekData].sort((a, b) => b.count - a.count);
+    return sorted[0].day;
+  }, [dayOfWeekData]);
+
   const showTooltip = (
     day: { date: string; count: number },
     x: number,
@@ -278,10 +305,15 @@ export default function UserProfile() {
               </div>
             </section>
             <section className="workspace">
-              <div className="panel h-[400px] skeleton" />
+              <div className="flex flex-col gap-6">
+                <div className="panel h-[280px] skeleton" />
+                <div className="panel h-[250px] skeleton" />
+                <div className="panel h-[250px] skeleton" />
+                <div className="panel h-[250px] skeleton" />
+              </div>
               <aside className="flex flex-col gap-6">
-                <div className="panel h-[200px] skeleton" />
-                <div className="panel h-[400px] skeleton" />
+                <div className="panel h-[280px] skeleton" />
+                <div className="panel h-[560px] skeleton" />
               </aside>
             </section>
           </main>
@@ -807,6 +839,126 @@ export default function UserProfile() {
                           setHoveredChart(null);
                         }}
                       />
+                    );
+                  })}
+                </svg>
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <div>
+                  <h2>Weekly Coding Rhythm</h2>
+                  <p>Distribution of activity by day of the week.</p>
+                </div>
+                {peakDay && (
+                  <div className="text-primary font-bold">
+                    Peak: {peakDay}s
+                  </div>
+                )}
+              </div>
+              <div className="mt-6 relative chart-container">
+                <svg
+                  viewBox="0 0 700 180"
+                  className="w-full overflow-visible"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient
+                      id="barGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0.8"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity="0.3"
+                      />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Grid Lines */}
+                  {[0, 0.25, 0.5, 0.75, 1].map((p) => (
+                    <line
+                      key={p}
+                      x1="0"
+                      y1={140 * p}
+                      x2="700"
+                      y2={140 * p}
+                      stroke="var(--color-text)"
+                      strokeOpacity="0.05"
+                      strokeWidth="1"
+                    />
+                  ))}
+
+                  {/* Bars */}
+                  {dayOfWeekData.map((d, i) => {
+                    const slotWidth = 700 / 7;
+                    const barWidth = 46;
+                    const x = i * slotWidth + (slotWidth - barWidth) / 2;
+                    const chartHeight = 140;
+                    const barHeight = (d.count / (Math.max(...dayOfWeekData.map(item => item.count), 1))) * chartHeight;
+                    const y = chartHeight - barHeight;
+                    const rx = 6;
+                    
+                    const pathD = barHeight > rx 
+                      ? `M ${x} ${y + rx}
+                         A ${rx} ${rx} 0 0 1 ${x + rx} ${y}
+                         H ${x + barWidth - rx}
+                         A ${rx} ${rx} 0 0 1 ${x + barWidth} ${y + rx}
+                         V ${chartHeight}
+                         H ${x}
+                         Z`
+                      : barHeight > 0
+                        ? `M ${x} ${chartHeight}
+                           V ${y}
+                           H ${x + barWidth}
+                           V ${chartHeight}
+                           Z`
+                        : "";
+
+                    return (
+                      <g key={i}>
+                        {barHeight > 0 && (
+                          <path
+                            d={pathD}
+                            fill="url(#barGradient)"
+                            className="transition-all duration-300 ease-in-out hover:opacity-100 opacity-90 cursor-pointer"
+                            onMouseMove={(e) => {
+                              setHoveredChart("rhythm");
+                              setTooltip({
+                                text: `${d.count.toLocaleString()} contributions on ${d.day}s`,
+                                date: "",
+                                x: e.clientX,
+                                y: e.clientY,
+                                show: true,
+                              });
+                            }}
+                            onMouseLeave={() => {
+                              setTooltip((p) => ({ ...p, show: false }));
+                              setHoveredChart(null);
+                            }}
+                          />
+                        )}
+                        
+                        {/* X-Axis Labels */}
+                        <text
+                          x={i * slotWidth + slotWidth / 2}
+                          y="165"
+                          fontSize="12"
+                          fill="var(--color-text-faint)"
+                          textAnchor="middle"
+                        >
+                          {d.shortDay}
+                        </text>
+                      </g>
                     );
                   })}
                 </svg>
