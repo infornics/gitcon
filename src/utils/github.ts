@@ -12,6 +12,9 @@ export interface GithubUserData {
   name: string;
   login: string;
   avatarUrl: string;
+  followers?: {
+    totalCount: number;
+  };
   contributionsCollection: {
     contributionCalendar: {
       totalContributions: number;
@@ -123,6 +126,9 @@ export async function fetchContributions(username: string, daysBack: number) {
         name
         login
         avatarUrl(size: 160)
+        followers {
+          totalCount
+        }
         contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions

@@ -13,6 +13,7 @@ interface LeaderboardUser {
   totalContributions: number;
   longestStreak: number;
   currentStreak: number;
+  followers: number;
 }
 
 export default function Leaderboard() {
@@ -44,6 +45,7 @@ export default function Leaderboard() {
                 .totalContributions,
             longestStreak: stats.longest,
             currentStreak: stats.current,
+            followers: data.followers?.totalCount || 0,
           };
         });
 
@@ -85,6 +87,7 @@ export default function Leaderboard() {
                 <th className="!text-center">Contributions</th>
                 <th className="!text-center">Longest Streak</th>
                 <th className="!text-center">Current Streak</th>
+                <th className="!text-center">Followers</th>
               </tr>
             </thead>
             <tbody>
@@ -110,6 +113,9 @@ export default function Leaderboard() {
                   </td>
                   <td className="!text-center">
                     <div className="skeleton h-5 w-20 mx-auto rounded" />
+                  </td>
+                  <td className="!text-center">
+                    <div className="skeleton h-5 w-16 mx-auto rounded" />
                   </td>
                 </tr>
               ))}
@@ -137,6 +143,7 @@ export default function Leaderboard() {
               <th className="!text-center">Contributions</th>
               <th className="!text-center">Longest Streak</th>
               <th className="!text-center">Current Streak</th>
+              <th className="!text-center">Followers</th>
             </tr>
           </thead>
           <tbody>
@@ -176,6 +183,9 @@ export default function Leaderboard() {
                   </td>
                   <td className="!text-center font-mono">
                     {user.currentStreak} days
+                  </td>
+                  <td className="!text-center font-mono font-bold text-primary">
+                    {user.followers.toLocaleString()}
                   </td>
                 </tr>
               );
