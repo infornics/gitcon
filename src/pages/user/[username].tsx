@@ -968,16 +968,8 @@ export default function UserProfile() {
 
           <aside className="flex flex-col gap-6">
             <div className="panel">
-              <div className="panel-head flex justify-between items-center">
+              <div className="panel-head">
                 <h2>Most Used Languages</h2>
-                {languages.length > 0 && (
-                  <Link
-                    href={`/user/${username}/languages`}
-                    className="text-xs font-bold text-primary hover:underline whitespace-nowrap shrink-0"
-                  >
-                    View all →
-                  </Link>
-                )}
               </div>
               <div className="lang-list flex flex-col gap-4 mt-2">
                 {languages.length > 0 ? (
@@ -1004,6 +996,14 @@ export default function UserProfile() {
                   <div className="muted p-4">No language data available.</div>
                 )}
               </div>
+              {languages.length > 0 && (
+                <Link
+                  href={`/user/${username}/languages`}
+                  className="btn btn-secondary w-full justify-center mt-6 !min-h-0 !py-2.5 !text-xs font-bold"
+                >
+                  View all languages
+                </Link>
+              )}
             </div>
 
             <div className="panel">
