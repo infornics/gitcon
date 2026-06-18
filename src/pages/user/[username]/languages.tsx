@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "revine";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "revine";
 import { fetchContributions } from "../../../utils/github";
 
 interface Language {
@@ -37,7 +37,7 @@ export default function UserLanguages() {
       const user = await fetchContributions(uname, 365);
       const langMap = new Map<string, { size: number; color: string }>();
       let computedTotalSize = 0;
-      
+
       user.contributionsCollection.commitContributionsByRepository.forEach(
         (repo) => {
           repo.repository.languages.edges.forEach((edge) => {
@@ -99,13 +99,18 @@ export default function UserLanguages() {
             <div>
               <h2>All Languages</h2>
               <p className="text-sm">
-                Complete breakdown of programming languages used by <strong>@{username}</strong> in the past year.
+                Complete breakdown of programming languages used by{" "}
+                <strong>@{username}</strong> in the past year.
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right hidden sm:block">
-                <div className="text-xs opacity-60 uppercase tracking-wider">Total Code</div>
-                <div className="font-bold text-primary font-mono">{formatBytes(totalSize)}</div>
+                <div className="text-xs opacity-60 uppercase tracking-wider">
+                  Total Code
+                </div>
+                <div className="font-bold text-primary font-mono">
+                  {formatBytes(totalSize)}
+                </div>
               </div>
               <Link
                 href={`/user/${username}`}
@@ -123,11 +128,22 @@ export default function UserLanguages() {
                 <div className="label mb-4 opacity-75">Top 3 Languages</div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {languages.slice(0, 3).map((lang, i) => {
-                    const badge = 
-                      i === 0 ? { label: "🥇 #1 Most Used", color: "#ffd700" } :
-                      i === 1 ? { label: "🥈 #2 Most Used", color: "#c0c0c0" } :
-                      { label: "🥉 #3 Most Used", color: "#cd7f32" };
-                      
+                    const badge =
+                      i === 0
+                        ? {
+                            label: "Most Used",
+                            color: "#ffd700",
+                          }
+                        : i === 1
+                          ? {
+                              label: "#2 Most Used",
+                              color: "#c0c0c0",
+                            }
+                          : {
+                              label: "#3 Most Used",
+                              color: "#cd7f32",
+                            };
+
                     return (
                       <div
                         key={i}
@@ -138,22 +154,27 @@ export default function UserLanguages() {
                           boxShadow: `0 10px 30px ${badge.color}0a`,
                         }}
                       >
-                        <div className="flex justify-between items-start">
-                          <div className="flex flex-col gap-2">
-                            <span className="text-xs font-extrabold uppercase tracking-wider" style={{ color: badge.color }}>
+                        <div className="flex flex-col gap-3">
+                          <div className="flex justify-between items-center">
+                            <span
+                              className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5"
+                              style={{ color: badge.color }}
+                            >
                               {badge.label}
                             </span>
-                            <div className="flex items-center gap-3 mt-1.5">
-                              <span
-                                className="w-4.5 h-4.5 rounded-full inline-block shrink-0"
-                                style={{ backgroundColor: lang.color || "#ccc" }}
-                              />
-                              <span className="font-bold text-xl tracking-tight">{lang.name}</span>
-                            </div>
+                            <span className="font-mono text-primary font-extrabold text-2xl">
+                              {lang.percent.toFixed(2)}%
+                            </span>
                           </div>
-                          <span className="font-mono text-primary font-extrabold text-2xl">
-                            {lang.percent.toFixed(2)}%
-                          </span>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span
+                              className="w-4.5 h-4.5 rounded-full inline-block shrink-0"
+                              style={{ backgroundColor: lang.color || "#ccc" }}
+                            />
+                            <span className="font-bold text-xl tracking-tight">
+                              {lang.name}
+                            </span>
+                          </div>
                         </div>
 
                         <div className="lang-bar-bg h-3.5 rounded-full bg-surface-offset overflow-hidden mt-2">
@@ -168,7 +189,6 @@ export default function UserLanguages() {
 
                         <div className="flex justify-between text-xs opacity-60 font-mono mt-2">
                           <span>Size: {formatBytes(lang.size)}</span>
-                          <span>Share: {lang.percent.toFixed(1)}%</span>
                         </div>
                       </div>
                     );
@@ -219,7 +239,7 @@ export default function UserLanguages() {
                 </div>
               </div>
             )}
-            
+
             {languages.length === 0 && (
               <div className="text-center py-12 text-muted">
                 No language data found for this user.
