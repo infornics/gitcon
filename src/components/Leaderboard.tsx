@@ -70,13 +70,54 @@ export default function Leaderboard() {
     return (
       <section className="panel leaderboard-panel">
         <div className="panel-head">
-          <h2>Global Leaderboard</h2>
-          <p>Loading top contributors...</p>
+          <div>
+            <h2>Global Leaderboard</h2>
+            <p>Loading top contributors...</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 mt-6">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="h-16 bg-surface-offset animate-pulse rounded-lg" />
-          ))}
+        <div className="leaderboard-table-wrapper">
+          <table className="leaderboard-table">
+            <thead>
+              <tr>
+                <th className="text-center w-16">Rank</th>
+                <th>Developer</th>
+                <th className="!text-center">Contributions</th>
+                <th className="!text-center">Longest Streak</th>
+                <th className="!text-center">Current Streak</th>
+                <th className="!text-center">Profile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <tr key={i}>
+                  <td className="rank text-center">
+                    <div className="skeleton h-6 w-8 mx-auto rounded" />
+                  </td>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="skeleton w-10 h-10 rounded-full shrink-0" />
+                      <div className="flex flex-col gap-1.5">
+                        <div className="skeleton h-4 w-28 rounded" />
+                        <div className="skeleton h-3 w-20 rounded" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="!text-center">
+                    <div className="skeleton h-5 w-16 mx-auto rounded" />
+                  </td>
+                  <td className="!text-center">
+                    <div className="skeleton h-5 w-20 mx-auto rounded" />
+                  </td>
+                  <td className="!text-center">
+                    <div className="skeleton h-5 w-20 mx-auto rounded" />
+                  </td>
+                  <td className="!text-center">
+                    <div className="skeleton h-6 w-14 mx-auto rounded-full" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     );
