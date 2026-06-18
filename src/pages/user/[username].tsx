@@ -272,6 +272,11 @@ export default function UserProfile() {
     return sorted[0].day;
   }, [dayOfWeekData]);
 
+  const dailyAverage = useMemo(() => {
+    if (series.length === 0) return 0;
+    return stats.total / series.length;
+  }, [series, stats.total]);
+
   const topAccounts = useMemo(() => {
     if (repos.length === 0) return [];
     const accountsMap = new Map<string, number>();
@@ -414,6 +419,8 @@ export default function UserProfile() {
                 <div className="panel skeleton h-32" />
                 <div className="panel skeleton h-32" />
                 <div className="panel skeleton h-32" />
+                <div className="panel skeleton h-32" />
+                <div className="panel skeleton h-32" />
               </div>
             </section>
             <section className="workspace">
@@ -513,6 +520,11 @@ export default function UserProfile() {
               label="Total contributions"
               value={stats.total.toLocaleString()}
               subValue="In past 1 year"
+            />
+            <StatCard
+              label="Daily average"
+              value={dailyAverage.toFixed(2)}
+              subValue="Contributions / day"
             />
             <div className="kpi">
               <div className="label">Longest streak</div>

@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "revine";
-import {
-  fetchGlobalLeaderboard,
-  calculateStats,
-} from "../utils/github";
+import { useEffect, useState } from "react";
+import { useNavigate } from "revine";
 import hardcodedUsers from "../constants/users.json";
+import { calculateStats, fetchGlobalLeaderboard } from "../utils/github";
 
 interface LeaderboardUser {
   login: string;
@@ -28,13 +25,14 @@ export default function Leaderboard() {
       try {
         const topUsers = await fetchGlobalLeaderboard(10, hardcodedUsers);
         const results = topUsers.map((data) => {
-          const merged = data.contributionsCollection.contributionCalendar.weeks.flatMap(
-            (w) =>
-              w.contributionDays.map((d) => ({
-                date: d.date,
-                count: d.contributionCount,
-              })),
-          );
+          const merged =
+            data.contributionsCollection.contributionCalendar.weeks.flatMap(
+              (w) =>
+                w.contributionDays.map((d) => ({
+                  date: d.date,
+                  count: d.contributionCount,
+                })),
+            );
           const stats = calculateStats(merged);
           return {
             login: data.login,
@@ -155,11 +153,17 @@ export default function Leaderboard() {
                   className="cursor-pointer"
                   onClick={() => navigate(`/user/${user.login}`)}
                 >
-                  <td className={`rank text-center ${
-                    globalRank === 1 ? "gold" : 
-                    globalRank === 2 ? "silver" : 
-                    globalRank === 3 ? "bronze" : ""
-                  }`}>
+                  <td
+                    className={`rank text-center ${
+                      globalRank === 1
+                        ? "gold"
+                        : globalRank === 2
+                          ? "silver"
+                          : globalRank === 3
+                            ? "bronze"
+                            : ""
+                    }`}
+                  >
                     {globalRank}
                   </td>
                   <td>
