@@ -26,10 +26,10 @@ export default function UserAccounts() {
     try {
       const user = await fetchContributions(uname, 365);
       const accountsMap = new Map<string, number>();
-      
-      const repoContributions = 
+
+      const repoContributions =
         user.contributionsCollection.commitContributionsByRepository || [];
-      
+
       repoContributions.forEach((item) => {
         const owner = item.repository.owner.login;
         const current = accountsMap.get(owner) || 0;
@@ -86,8 +86,9 @@ export default function UserAccounts() {
             <div>
               <h2>All Contributed Accounts</h2>
               <p className="text-sm">
-                Complete breakdown of other user and organization accounts with commit contributions by{" "}
-                <strong>@{username}</strong> in the past year.
+                Complete breakdown of other user and organization accounts with
+                commit contributions by <strong>@{username}</strong> in the past
+                year.
               </p>
             </div>
             <div className="flex items-center gap-4">
@@ -112,7 +113,9 @@ export default function UserAccounts() {
             {/* Top 3 Highlighted Grid */}
             {accounts.length > 0 && (
               <div className="mb-10">
-                <div className="label mb-4 opacity-75">Top 3 Contributed Accounts</div>
+                <div className="label mb-4 opacity-75">
+                  Top 3 Contributed Accounts
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {accounts.slice(0, 3).map((acc, i) => {
                     const badge =
@@ -132,9 +135,12 @@ export default function UserAccounts() {
                             };
 
                     return (
-                      <div
+                     < a
                         key={i}
-                        className="p-6 rounded-2xl border flex flex-col gap-4 hover:scale-[1.02] transition-all duration-300"
+                        href={`https://github.com/${acc.name}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-6 rounded-2xl border flex flex-col gap-4 hover:scale-[1.02] hover:text-primary transition-all duration-300 cursor-pointer text-inherit no-underline"
                         style={{
                           background: `radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 8%, var(--color-surface-2)), var(--color-surface-2))`,
                           borderColor: badge.color + "35",
@@ -168,11 +174,7 @@ export default function UserAccounts() {
                             }}
                           />
                         </div>
-
-                        <div className="flex justify-between text-xs opacity-60 font-mono mt-2">
-                          <span>Commits: {acc.count}</span>
-                        </div>
-                      </div>
+                      </a>
                     );
                   })}
                 </div>
@@ -182,12 +184,17 @@ export default function UserAccounts() {
             {/* Other Accounts Grid */}
             {accounts.length > 3 && (
               <div>
-                <div className="label mb-4 opacity-75">Other Contributed Accounts</div>
+                <div className="label mb-4 opacity-75">
+                  Other Contributed Accounts
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {accounts.slice(3).map((acc, i) => (
-                    <div
+                    <a
                       key={i}
-                      className="p-5 rounded-xl bg-surface-2 border border-white/5 flex flex-col gap-3 hover:border-primary/20 transition-all duration-300"
+                      href={`https://github.com/${acc.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-5 rounded-xl bg-surface-2 border border-white/5 flex flex-col gap-3 hover:border-primary/20 hover:scale-[1.01] hover:text-primary transition-all duration-300 cursor-pointer text-inherit no-underline"
                     >
                       <div className="flex justify-between items-center">
                         <span className="font-bold text-lg">@{acc.name}</span>
@@ -208,7 +215,7 @@ export default function UserAccounts() {
                       <div className="flex justify-between text-xs opacity-60 font-mono mt-1">
                         <span>Rank: #{i + 4}</span>
                       </div>
-                    </div>
+                    </a>
                   ))}
                 </div>
               </div>

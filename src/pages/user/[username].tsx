@@ -1303,7 +1303,13 @@ export default function UserProfile() {
               <div className="account-list flex flex-col gap-4 mt-2">
                 {topAccounts.length > 0 ? (
                   topAccounts.slice(0, 5).map((acc, i) => (
-                    <div key={i} className="account-item flex flex-col gap-1.5">
+                    <a
+                      key={i}
+                      href={`https://github.com/${acc.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="account-item flex flex-col gap-1.5 hover:text-primary transition-all duration-200 cursor-pointer text-inherit no-underline"
+                    >
                       <div className="flex justify-between text-sm">
                         <span className="font-bold">@{acc.name}</span>
                         <span className="font-mono text-primary font-bold">
@@ -1318,7 +1324,7 @@ export default function UserProfile() {
                           }}
                         />
                       </div>
-                    </div>
+                    </a>
                   ))
                 ) : (
                   <div className="muted p-4 text-sm">
