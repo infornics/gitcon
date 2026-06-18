@@ -3,6 +3,8 @@ import { useNavigate } from "revine";
 import hardcodedUsers from "../constants/users.json";
 import { calculateStats, fetchGlobalLeaderboard } from "../utils/github";
 
+import { FaInfoCircle } from "react-icons/fa";
+
 interface LeaderboardUser {
   login: string;
   name: string;
@@ -30,7 +32,7 @@ export default function Leaderboard() {
           className="w-5 h-5 rounded-full bg-surface-offset flex items-center justify-center font-serif text-[11px] font-bold text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border-none"
           title={showGuide ? "Hide instructions" : "Show instructions"}
         >
-          i
+          <FaInfoCircle className="text-2xl" />
         </button>
       </div>
       {showGuide && (
