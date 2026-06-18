@@ -24,25 +24,37 @@ export default function Leaderboard() {
   const rowsPerPage = 10;
 
   const renderGuide = () => (
-    <div className="text-xs max-w-sm bg-surface-2 p-3.5 rounded-xl border border-white/5 opacity-80 leading-normal flex flex-col gap-2 shrink-0">
-      <div className="flex items-center gap-2 font-medium justify-between">
+    <div
+      onClick={() => {
+        if (!showGuide) setShowGuide(true);
+      }}
+      className={`text-xs max-w-md bg-surface-2 p-3.5 rounded-xl border border-white/5 opacity-80 leading-normal flex flex-col gap-2 shrink-0 transition-all ${
+        !showGuide ? "cursor-pointer hover:bg-surface-offset" : ""
+      }`}
+    >
+      <div
+        onClick={(e) => {
+          if (showGuide) {
+            e.stopPropagation();
+            setShowGuide(false);
+          }
+        }}
+        className={`flex items-center gap-2 font-medium justify-between ${
+          showGuide ? "cursor-pointer select-none" : ""
+        }`}
+        title={showGuide ? "Click to hide instructions" : "Click to show instructions"}
+      >
         <span>Want to see your name here?</span>
-        <button
-          onClick={() => setShowGuide(!showGuide)}
-          className="w-5 h-5 rounded-full bg-surface-offset flex items-center justify-center font-serif text-[11px] font-bold text-primary hover:bg-primary hover:text-white transition-all cursor-pointer border-none"
-          title={showGuide ? "Hide instructions" : "Show instructions"}
-        >
-          <FaInfoCircle className="text-2xl" />
-        </button>
+        <FaInfoCircle className="text-primary text-base shrink-0" />
       </div>
       {showGuide && (
-        <div className="text-[11px] opacity-90 border-t border-white/5 pt-2 mt-1 transition-all duration-300">
+        <div className="opacity-90 border-t border-white/5 pt-2 mt-1 transition-all duration-300">
           Add your GitHub username to the array in{" "}
           <a
             href="https://github.com/infornics/gitcon/blob/main/src/constants/users.json"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary font-mono text-[10px] bg-surface-offset px-1.5 py-0.5 rounded hover:underline inline-block"
+            className="text-primary font-mono bg-surface-offset px-1.5 py-0.5 rounded hover:underline inline-block"
           >
             src/constants/users.json
           </a>{" "}
