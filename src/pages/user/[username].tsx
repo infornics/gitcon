@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "revine";
+import { useParams, Link } from "revine";
 import { ContributionGrid } from "../../components/ContributionGrid";
 import { StatCard } from "../../components/StatCard";
 import {
@@ -968,8 +968,16 @@ export default function UserProfile() {
 
           <aside className="flex flex-col gap-6">
             <div className="panel">
-              <div className="panel-head">
+              <div className="panel-head flex justify-between items-center">
                 <h2>Most Used Languages</h2>
+                {languages.length > 0 && (
+                  <Link
+                    href={`/user/${username}/languages`}
+                    className="text-xs font-bold text-primary hover:underline whitespace-nowrap shrink-0"
+                  >
+                    View all →
+                  </Link>
+                )}
               </div>
               <div className="lang-list flex flex-col gap-4 mt-2">
                 {languages.length > 0 ? (
