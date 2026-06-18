@@ -1,5 +1,5 @@
 import { Analytics, IOSS, Rhythm } from "@/components/home";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "revine";
 import { ContributionGrid } from "../components/ContributionGrid";
 import Leaderboard from "../components/Leaderboard";
@@ -10,21 +10,6 @@ import {
   GithubUserData,
   mergeSeries,
 } from "../utils/github";
-
-const MONTH_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
 
 export default function Home() {
   const [username, setUsername] = useState("rachit-bharadwaj");
@@ -73,15 +58,6 @@ export default function Home() {
   }, []);
 
   const stats = useMemo(() => calculateStats(series), [series]);
-  const months = useMemo(() => {
-    const weeks: string[][] = [];
-    for (let i = 0; i < series.length; i += 7)
-      weeks.push(series.slice(i, i + 7).map((d) => d.date));
-    return weeks.map((week) => {
-      const d = new Date(week[0] + "T00:00:00Z");
-      return d.getUTCDate() <= 7 ? MONTH_NAMES[d.getUTCMonth()] : "";
-    });
-  }, [series]);
 
   const handleLoadData = async (
     targetUsername: string,
@@ -118,11 +94,6 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    handleLoadData(username, range);
   };
 
   const showTooltip = (
