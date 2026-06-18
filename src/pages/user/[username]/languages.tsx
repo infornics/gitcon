@@ -117,42 +117,108 @@ export default function UserLanguages() {
           </div>
 
           <div className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {languages.map((lang, i) => (
-                <div
-                  key={i}
-                  className="p-5 rounded-xl bg-surface-2 border border-white/5 flex flex-col gap-3 hover:border-primary/20 transition-all duration-300"
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-3.5 h-3.5 rounded-full inline-block"
-                        style={{ backgroundColor: lang.color || "#ccc" }}
-                      />
-                      <span className="font-bold text-lg">{lang.name}</span>
-                    </div>
-                    <span className="font-mono text-primary font-bold text-lg">
-                      {lang.percent.toFixed(2)}%
-                    </span>
-                  </div>
+            {/* Top 3 Highlighted Grid */}
+            {languages.length > 0 && (
+              <div className="mb-10">
+                <div className="label mb-4 opacity-75">Top 3 Languages</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {languages.slice(0, 3).map((lang, i) => {
+                    const badge = 
+                      i === 0 ? { label: "🥇 #1 Most Used", color: "#ffd700" } :
+                      i === 1 ? { label: "🥈 #2 Most Used", color: "#c0c0c0" } :
+                      { label: "🥉 #3 Most Used", color: "#cd7f32" };
+                      
+                    return (
+                      <div
+                        key={i}
+                        className="p-6 rounded-2xl border flex flex-col gap-4 hover:scale-[1.02] transition-all duration-300"
+                        style={{
+                          background: `radial-gradient(circle at top right, color-mix(in oklab, ${lang.color || "#ccc"} 10%, var(--color-surface-2)), var(--color-surface-2))`,
+                          borderColor: badge.color + "35",
+                          boxShadow: `0 10px 30px ${badge.color}0a`,
+                        }}
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex flex-col gap-2">
+                            <span className="text-xs font-extrabold uppercase tracking-wider" style={{ color: badge.color }}>
+                              {badge.label}
+                            </span>
+                            <div className="flex items-center gap-3 mt-1.5">
+                              <span
+                                className="w-4.5 h-4.5 rounded-full inline-block shrink-0"
+                                style={{ backgroundColor: lang.color || "#ccc" }}
+                              />
+                              <span className="font-bold text-xl tracking-tight">{lang.name}</span>
+                            </div>
+                          </div>
+                          <span className="font-mono text-primary font-extrabold text-2xl">
+                            {lang.percent.toFixed(2)}%
+                          </span>
+                        </div>
 
-                  <div className="lang-bar-bg h-2.5 rounded-full bg-surface-offset overflow-hidden">
-                    <div
-                      className="lang-bar h-full rounded-full"
-                      style={{
-                        width: `${lang.percent}%`,
-                        backgroundColor: lang.color || "#ccc",
-                      }}
-                    />
-                  </div>
+                        <div className="lang-bar-bg h-3.5 rounded-full bg-surface-offset overflow-hidden mt-2">
+                          <div
+                            className="lang-bar h-full rounded-full"
+                            style={{
+                              width: `${lang.percent}%`,
+                              backgroundColor: lang.color || "#ccc",
+                            }}
+                          />
+                        </div>
 
-                  <div className="flex justify-between text-xs opacity-60 font-mono mt-1">
-                    <span>Size: {formatBytes(lang.size)}</span>
-                    <span>Rank: #{i + 1}</span>
-                  </div>
+                        <div className="flex justify-between text-xs opacity-60 font-mono mt-2">
+                          <span>Size: {formatBytes(lang.size)}</span>
+                          <span>Share: {lang.percent.toFixed(1)}%</span>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Other Languages Grid */}
+            {languages.length > 3 && (
+              <div>
+                <div className="label mb-4 opacity-75">Other Languages</div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {languages.slice(3).map((lang, i) => (
+                    <div
+                      key={i}
+                      className="p-5 rounded-xl bg-surface-2 border border-white/5 flex flex-col gap-3 hover:border-primary/20 transition-all duration-300"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                          <span
+                            className="w-3.5 h-3.5 rounded-full inline-block"
+                            style={{ backgroundColor: lang.color || "#ccc" }}
+                          />
+                          <span className="font-bold text-lg">{lang.name}</span>
+                        </div>
+                        <span className="font-mono text-primary font-bold text-lg">
+                          {lang.percent.toFixed(2)}%
+                        </span>
+                      </div>
+
+                      <div className="lang-bar-bg h-2.5 rounded-full bg-surface-offset overflow-hidden">
+                        <div
+                          className="lang-bar h-full rounded-full"
+                          style={{
+                            width: `${lang.percent}%`,
+                            backgroundColor: lang.color || "#ccc",
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex justify-between text-xs opacity-60 font-mono mt-1">
+                        <span>Size: {formatBytes(lang.size)}</span>
+                        <span>Rank: #{i + 4}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             {languages.length === 0 && (
               <div className="text-center py-12 text-muted">
