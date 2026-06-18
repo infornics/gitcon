@@ -1267,7 +1267,7 @@ export default function UserProfile() {
               </div>
               <div className="repo-list">
                 {repos.length > 0 ? (
-                  repos.slice(0, 10).map((repo, i) => (
+                  repos.slice(0, 7).map((repo, i) => (
                     <a
                       key={i}
                       href={`https://github.com/${repo.owner}/${repo.name}`}
