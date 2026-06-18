@@ -258,6 +258,12 @@ export default function UserProfile() {
     return sorted[0].day;
   }, [dayOfWeekData]);
 
+  const leastDay = useMemo(() => {
+    if (dayOfWeekData.length === 0) return "";
+    const sorted = [...dayOfWeekData].sort((a, b) => a.count - b.count);
+    return sorted[0].day;
+  }, [dayOfWeekData]);
+
   const showTooltip = (
     day: { date: string; count: number },
     x: number,
@@ -851,9 +857,10 @@ export default function UserProfile() {
                   <h2>Weekly Coding Rhythm</h2>
                   <p>Distribution of activity by day of the week.</p>
                 </div>
-                {peakDay && (
-                  <div className="text-primary font-bold">
-                    Peak: {peakDay}s
+                {peakDay && leastDay && (
+                  <div className="text-right">
+                    <div className="text-primary font-bold text-sm">Peak: {peakDay}s</div>
+                    <div className="text-rose-500 font-bold text-xs mt-0.5">Low: {leastDay}s</div>
                   </div>
                 )}
               </div>
