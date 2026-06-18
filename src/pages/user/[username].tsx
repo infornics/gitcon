@@ -1013,13 +1013,19 @@ export default function UserProfile() {
               <div className="repo-list">
                 {repos.length > 0 ? (
                   repos.slice(0, 10).map((repo, i) => (
-                    <div key={i} className="repo-item">
+                    <a
+                      key={i}
+                      href={`https://github.com/${repo.owner}/${repo.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="repo-item hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 cursor-pointer text-inherit no-underline"
+                    >
                       <div>
                         <strong>{repo.name}</strong>
                         <span>{repo.owner}</span>
                       </div>
                       <strong>{repo.count}</strong>
-                    </div>
+                    </a>
                   ))
                 ) : (
                   <div className="muted p-4">No repository data available.</div>
