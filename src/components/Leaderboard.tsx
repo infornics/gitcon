@@ -25,7 +25,7 @@ export default function Leaderboard() {
   useEffect(() => {
     async function loadLeaderboard() {
       try {
-        const topUsers = await fetchGlobalLeaderboard(30, hardcodedUsers);
+        const topUsers = await fetchGlobalLeaderboard(10, hardcodedUsers);
         const results = topUsers.map((data) => {
           const merged = data.contributionsCollection.contributionCalendar.weeks.flatMap(
             (w) =>
