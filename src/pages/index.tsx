@@ -12,8 +12,6 @@ import {
 } from "../utils/github";
 
 export default function Home() {
-  const [username, setUsername] = useState("rachit-bharadwaj");
-  const [range, setRange] = useState(365);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("Enter a username and load the graph.");
   const [userData, setUserData] = useState<GithubUserData | null>(null);

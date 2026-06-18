@@ -71,6 +71,23 @@ src/
 
 ---
 
+## Join the Leaderboard
+
+To showcase your profile and metrics on the global leaderboard:
+
+1. Open [src/constants/users.json](file:///home/rachit/Documents/Code/Infornics/marketplace/gitcon/src/constants/users.json).
+2. Append your GitHub username to the list (verify that it is comma-separated and surrounded by double quotes):
+   ```json
+   [
+     "rachit-bharadwaj",
+     "torvalds",
+     "your-github-username"
+   ]
+   ```
+3. Commit the file and open a Pull Request to merge your addition!
+
+---
+
 ## Tech Stack
 
 - **Revine**: Single-page React framework built for optimal development speed.
