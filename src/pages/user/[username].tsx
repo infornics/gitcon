@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, Link } from "revine";
+import { Link, useParams } from "revine";
 import { ContributionGrid } from "../../components/ContributionGrid";
 import { StatCard } from "../../components/StatCard";
 import {
@@ -234,15 +234,23 @@ export default function UserProfile() {
   const dayOfWeekData = useMemo(() => {
     if (series.length === 0) return [];
     const days = [0, 0, 0, 0, 0, 0, 0]; // Sun, Mon, Tue, Wed, Thu, Fri, Sat
-    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
     const shortNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    
+
     series.forEach((d) => {
       const date = new Date(d.date + "T00:00:00Z");
       const day = date.getUTCDay();
       days[day] += d.count;
     });
-    
+
     const max = Math.max(...days, 1);
     return days.map((count, index) => ({
       day: dayNames[index],
@@ -264,52 +272,83 @@ export default function UserProfile() {
     return sorted[0].day;
   }, [dayOfWeekData]);
 
+  const topAccounts = useMemo(() => {
+    if (repos.length === 0) return [];
+    const accountsMap = new Map<string, number>();
+    repos.forEach((repo) => {
+      const current = accountsMap.get(repo.owner) || 0;
+      accountsMap.set(repo.owner, current + repo.count);
+    });
+    const sortedAccounts = Array.from(accountsMap.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+    const max = Math.max(...sortedAccounts.map((o) => o.count), 1);
+    return sortedAccounts.map((o) => ({
+      ...o,
+      percent: (o.count / max) * 100,
+    }));
+  }, [repos]);
+
   // Seeded deterministic pseudo-random generator
   const seedRandom = (seed: string) => {
     let h = 0;
     for (let i = 0; i < seed.length; i++) {
-      h = Math.imul(31, h) + seed.charCodeAt(i) | 0;
+      h = (Math.imul(31, h) + seed.charCodeAt(i)) | 0;
     }
-    return function() {
-      h = Math.imul(h ^ h >>> 16, 2246822507);
-      h = Math.imul(h ^ h >>> 13, 3266489909);
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507);
+      h = Math.imul(h ^ (h >>> 13), 3266489909);
       return ((h ^= h >>> 16) >>> 0) / 4294967296;
     };
   };
 
   const hourlyData = useMemo(() => {
     if (!userData || series.length === 0) return [];
-    
+
     const rng = seedRandom(userData.login + stats.total);
-    
+
     const hours = Array.from({ length: 24 }, (_, h) => {
       let base = 0.1;
-      if (h >= 9 && h <= 12) base = 0.65; // Morning push
-      else if (h >= 13 && h <= 17) base = 0.8; // Afternoon peak
-      else if (h >= 18 && h <= 23) base = 0.9; // Evening/Night coding
-      else if (h === 0 || h === 1) base = 0.45; // Night owl
+      if (h >= 9 && h <= 12)
+        base = 0.65; // Morning push
+      else if (h >= 13 && h <= 17)
+        base = 0.8; // Afternoon peak
+      else if (h >= 18 && h <= 23)
+        base = 0.9; // Evening/Night coding
+      else if (h === 0 || h === 1)
+        base = 0.45; // Night owl
       else base = 0.05; // Late night sleep
-      
+
       const variance = (rng() - 0.5) * 0.25;
-      const count = Math.max(0, Math.round((base + variance) * (stats.total / 14) * 1.6));
-      
+      const count = Math.max(
+        0,
+        Math.round((base + variance) * (stats.total / 14) * 1.6),
+      );
+
       return {
         hour: h,
-        label: h === 0 ? "12 AM" : h === 12 ? "12 PM" : h > 12 ? `${h - 12} PM` : `${h} AM`,
+        label:
+          h === 0
+            ? "12 AM"
+            : h === 12
+              ? "12 PM"
+              : h > 12
+                ? `${h - 12} PM`
+                : `${h} AM`,
         count,
       };
     });
-    
+
     const max = Math.max(...hours.map((h) => h.count), 1);
-    return hours.map(h => ({
+    return hours.map((h) => ({
       ...h,
-      percent: (h.count / max) * 100
+      percent: (h.count / max) * 100,
     }));
   }, [userData, stats.total, series]);
 
   const peakPeriod = useMemo(() => {
     if (hourlyData.length === 0) return "";
-    
+
     const periods = [
       { name: "Morning (8 AM - 12 PM)", count: 0 },
       { name: "Afternoon (12 PM - 5 PM)", count: 0 },
@@ -317,7 +356,7 @@ export default function UserProfile() {
       { name: "Night (9 PM - 1 AM)", count: 0 },
       { name: "Late Night (1 AM - 8 AM)", count: 0 },
     ];
-    
+
     hourlyData.forEach((h) => {
       const hour = h.hour;
       if (hour >= 8 && hour < 12) periods[0].count += h.count;
@@ -326,7 +365,7 @@ export default function UserProfile() {
       else if (hour >= 21 || hour < 1) periods[3].count += h.count;
       else periods[4].count += h.count;
     });
-    
+
     const sorted = [...periods].sort((a, b) => b.count - a.count);
     return sorted[0].name;
   }, [hourlyData]);
@@ -388,6 +427,7 @@ export default function UserProfile() {
               <aside className="flex flex-col gap-6">
                 <div className="panel h-[280px] skeleton" />
                 <div className="panel h-[560px] skeleton" />
+                <div className="panel h-[260px] skeleton" />
               </aside>
             </section>
           </main>
@@ -493,13 +533,13 @@ export default function UserProfile() {
               value={
                 stats.best.date
                   ? new Date(stats.best.date + "T00:00:00Z").toLocaleDateString(
-                    undefined,
-                    {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    },
-                  )
+                      undefined,
+                      {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      },
+                    )
                   : "—"
               }
               subValue={
@@ -512,12 +552,13 @@ export default function UserProfile() {
               <div className="kpi">
                 <div className="label">Growth rate</div>
                 <strong
-                  className={`flex items-center gap-1.5 ${growthRate > 0
+                  className={`flex items-center gap-1.5 ${
+                    growthRate > 0
                       ? "text-emerald-500"
                       : growthRate < 0
                         ? "text-rose-500"
                         : "opacity-60"
-                    }`}
+                  }`}
                 >
                   {growthRate > 0 ? "+" : ""}
                   {growthRate.toFixed(1)}%
@@ -852,7 +893,7 @@ export default function UserProfile() {
                       const y =
                         150 -
                         (cumulativeData[activeIndex].count / maxCumulative) *
-                        150;
+                          150;
                       return (
                         <g>
                           <line
@@ -927,8 +968,12 @@ export default function UserProfile() {
                 </div>
                 {peakDay && leastDay && (
                   <div className="text-right">
-                    <div className="text-primary font-bold text-sm">Peak: {peakDay}s</div>
-                    <div className="text-rose-500 font-bold text-xs mt-0.5">Low: {leastDay}s</div>
+                    <div className="text-primary font-bold text-sm">
+                      Peak: {peakDay}s
+                    </div>
+                    <div className="text-rose-500 font-bold text-xs mt-0.5">
+                      Low: {leastDay}s
+                    </div>
                   </div>
                 )}
               </div>
@@ -979,25 +1024,32 @@ export default function UserProfile() {
                     const barWidth = 46;
                     const x = i * slotWidth + (slotWidth - barWidth) / 2;
                     const chartHeight = 140;
-                    const barHeight = (d.count / (Math.max(...dayOfWeekData.map(item => item.count), 1))) * chartHeight;
+                    const barHeight =
+                      (d.count /
+                        Math.max(
+                          ...dayOfWeekData.map((item) => item.count),
+                          1,
+                        )) *
+                      chartHeight;
                     const y = chartHeight - barHeight;
                     const rx = 6;
-                    
-                    const pathD = barHeight > rx 
-                      ? `M ${x} ${y + rx}
+
+                    const pathD =
+                      barHeight > rx
+                        ? `M ${x} ${y + rx}
                          A ${rx} ${rx} 0 0 1 ${x + rx} ${y}
                          H ${x + barWidth - rx}
                          A ${rx} ${rx} 0 0 1 ${x + barWidth} ${y + rx}
                          V ${chartHeight}
                          H ${x}
                          Z`
-                      : barHeight > 0
-                        ? `M ${x} ${chartHeight}
+                        : barHeight > 0
+                          ? `M ${x} ${chartHeight}
                            V ${y}
                            H ${x + barWidth}
                            V ${chartHeight}
                            Z`
-                        : "";
+                          : "";
 
                     return (
                       <g key={i}>
@@ -1022,7 +1074,7 @@ export default function UserProfile() {
                             }}
                           />
                         )}
-                        
+
                         {/* X-Axis Labels */}
                         <text
                           x={i * slotWidth + slotWidth / 2}
@@ -1048,8 +1100,12 @@ export default function UserProfile() {
                 </div>
                 {peakPeriod && (
                   <div className="text-right">
-                    <div className="text-primary font-bold text-sm">Peak Period</div>
-                    <div className="text-xs opacity-60 mt-0.5">{peakPeriod}</div>
+                    <div className="text-primary font-bold text-sm">
+                      Peak Period
+                    </div>
+                    <div className="text-xs opacity-60 mt-0.5">
+                      {peakPeriod}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1103,22 +1159,23 @@ export default function UserProfile() {
                     const barHeight = (d.percent / 100) * chartHeight;
                     const y = chartHeight - barHeight;
                     const rx = 4;
-                    
-                    const pathD = barHeight > rx 
-                      ? `M ${x} ${y + rx}
+
+                    const pathD =
+                      barHeight > rx
+                        ? `M ${x} ${y + rx}
                          A ${rx} ${rx} 0 0 1 ${x + rx} ${y}
                          H ${x + barWidth - rx}
                          A ${rx} ${rx} 0 0 1 ${x + barWidth} ${y + rx}
                          V ${chartHeight}
                          H ${x}
                          Z`
-                      : barHeight > 0
-                        ? `M ${x} ${chartHeight}
+                        : barHeight > 0
+                          ? `M ${x} ${chartHeight}
                            V ${y}
                            H ${x + barWidth}
                            V ${chartHeight}
                            Z`
-                        : "";
+                          : "";
 
                     return (
                       <g key={i}>
@@ -1143,7 +1200,7 @@ export default function UserProfile() {
                             }}
                           />
                         )}
-                        
+
                         {/* X-Axis Labels (Show every 4 hours to avoid crowding) */}
                         {i % 4 === 0 && (
                           <text
@@ -1235,6 +1292,46 @@ export default function UserProfile() {
                   className="btn btn-secondary w-full justify-center mt-6 !min-h-0 !py-2.5 !text-xs font-bold"
                 >
                   View all repositories
+                </Link>
+              )}
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Top Contributed Accounts</h2>
+              </div>
+              <div className="account-list flex flex-col gap-4 mt-2">
+                {topAccounts.length > 0 ? (
+                  topAccounts.slice(0, 5).map((acc, i) => (
+                    <div key={i} className="account-item flex flex-col gap-1.5">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-bold">@{acc.name}</span>
+                        <span className="font-mono text-primary font-bold">
+                          {acc.count} commits
+                        </span>
+                      </div>
+                      <div className="h-2 rounded-full bg-surface-offset overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-primary"
+                          style={{
+                            width: `${acc.percent}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="muted p-4 text-sm">
+                    No account data available.
+                  </div>
+                )}
+              </div>
+              {topAccounts.length > 0 && (
+                <Link
+                  href={`/user/${username}/accounts`}
+                  className="btn btn-secondary w-full justify-center mt-6 !min-h-0 !py-2.5 !text-xs font-bold"
+                >
+                  View all contributed accounts
                 </Link>
               )}
             </div>
