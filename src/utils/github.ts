@@ -764,20 +764,9 @@ export async function fetchOrgRepos(
     }
   }
 
-  // Sort repos by contribution activity (stars count + forks count + size weight)
-  const sorted = [...rawRepos].sort((a, b) => {
-    const scoreA =
-      (a.stargazers_count || 0) * 10 + (a.forks_count || 0) * 5 + (a.size || 0);
-    const scoreB =
-      (b.stargazers_count || 0) * 10 + (b.forks_count || 0) * 5 + (b.size || 0);
-    return scoreB - scoreA;
-  });
-
-  const topItems = sorted.slice(0, count);
-
-  // Fetch exact commit count for top repos via GraphQL
-  const enrichedItems = await Promise.all(
-    topItems.map(async (repo) => {
+  // 1. Fetch exact commit count for all org repos via GraphQL
+  const enrichedAll = await Promise.all(
+    rawRepos.map(async (repo) => {
       try {
         const query = `
           query($owner: String!, $name: String!) {
@@ -822,8 +811,23 @@ export async function fetchOrgRepos(
     }),
   );
 
+  // 2. Sort repos by ranking score: (stars * 10) + (forks * 5) + totalCommits
+  const sorted = [...enrichedAll].sort((a, b) => {
+    const scoreA =
+      (a.stargazers_count || 0) * 10 +
+      (a.forks_count || 0) * 5 +
+      (a.totalCommits || 0);
+    const scoreB =
+      (b.stargazers_count || 0) * 10 +
+      (b.forks_count || 0) * 5 +
+      (b.totalCommits || 0);
+    return scoreB - scoreA;
+  });
+
+  const topItems = sorted.slice(0, count);
+
   return {
-    total_count: enrichedItems.length,
-    items: enrichedItems,
+    total_count: topItems.length,
+    items: topItems,
   } as RepoSearchResult;
 }
