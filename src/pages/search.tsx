@@ -358,8 +358,42 @@ export default function SearchPage() {
             ) : (
               !loading &&
               query && (
-                <div className="text-center py-16 opacity-60">
-                  No repositories found for "{query}". Try another search term.
+                <div className="text-center py-16">
+                  <p className="opacity-60 mb-4">No repositories found for "{query}".</p>
+                  <div className="inline-flex flex-col items-center gap-3 p-5 rounded-2xl bg-surface-2 border border-white/10 max-w-md mx-auto shadow-lg">
+                    <div className="flex items-center gap-2 text-amber-400 text-xs font-semibold">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                      <span>Looking for a private repository?</span>
+                    </div>
+                    <p className="text-xs text-text-muted leading-relaxed">
+                      GitHub's Search API excludes private repos. If you have access, add your Personal Access Token (PAT) with <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded">repo</code> scope in the header.
+                    </p>
+                    <div className="flex gap-2.5 mt-1 flex-wrap justify-center">
+                      <a
+                        href={query.includes("/") ? `/repo/${query.trim()}` : `/repo/infornics/${query.trim()}`}
+                        className="btn btn-primary text-xs px-4 py-2 inline-flex items-center gap-2"
+                      >
+                        <span>View Repo Stats ({query.includes("/") ? query.trim() : `infornics/${query.trim()}`}) →</span>
+                      </a>
+                      <button
+                        onClick={() => {
+                          const el = document.querySelector<HTMLButtonElement>('button[title*="Personal Access Token"]');
+                          if (el) el.click();
+                        }}
+                        className="btn btn-secondary text-xs px-3.5 py-2 inline-flex items-center gap-1.5"
+                      >
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M21 2l-2 2m-1.5 1.5l-3 3m-5 5l-4 4-2-2 4-4m2.5-2.5l3-3m-6 6l-3-3" />
+                          <circle cx="16.5" cy="7.5" r="4.5" />
+                        </svg>
+                        <span>Add PAT</span>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )
             )}

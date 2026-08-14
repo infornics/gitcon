@@ -671,6 +671,11 @@ export interface UserSearchResult {
     avatar_url: string;
     html_url: string;
     type: string;
+    name?: string;
+    totalContributions?: number;
+    longestStreak?: number;
+    currentStreak?: number;
+    followers?: number;
   }>;
 }
 
@@ -755,18 +760,61 @@ export async function searchGithubRepos(
 ): Promise<RepoSearchResult> {
   const token = getGithubToken();
   const encodedQuery = encodeURIComponent(query);
-  const response = await revineFetch(
-    `https://api.github.com/search/repositories?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
-    {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  try {
+    const response = (await revineFetch(
+      `https://api.github.com/search/repositories?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
+      {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        cacheTTL: 300000, // 5 min cache
+        persist: true,
       },
-      cacheTTL: 300000, // 5 min cache
-      persist: true,
-    },
-  );
+    )) as RepoSearchResult;
 
-  return response as RepoSearchResult;
+    let items = response?.items || [];
+
+    // GitHub Search API does not index private repos.
+    // If authenticated with a PAT, query user's accessible repos and filter by query match
+    if (token) {
+      try {
+        const userReposData = await revineFetch(
+          `https://api.github.com/user/repos?per_page=100&sort=updated`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            cacheTTL: 600000,
+            persist: true,
+          },
+        );
+        if (Array.isArray(userReposData)) {
+          const qLower = query.toLowerCase().trim();
+          const matchingPrivate = userReposData.filter(
+            (r: any) =>
+              r.full_name.toLowerCase().includes(qLower) ||
+              r.name.toLowerCase().includes(qLower) ||
+              (r.description && r.description.toLowerCase().includes(qLower)),
+          );
+
+          // Merge matching user repos at top if not already present
+          const existingIds = new Set(items.map((i) => i.id));
+          const newItems = matchingPrivate.filter((r: any) => !existingIds.has(r.id));
+          items = [...newItems, ...items];
+        }
+      } catch (e) {}
+    }
+
+    return {
+      total_count: items.length,
+      items: items.slice((page - 1) * perPage, page * perPage),
+    };
+  } catch (err) {
+    return {
+      total_count: 0,
+      items: [],
+    };
+  }
 }
 
 export async function fetchTopStarredRepos(
@@ -813,7 +861,7 @@ export async function fetchOrgRepos(
   let rawRepos: any[] = [];
   try {
     const data = await revineFetch(
-      `https://api.github.com/users/${org}/repos?type=public&per_page=100`,
+      `https://api.github.com/users/${org}/repos?type=all&per_page=100`,
       {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -826,7 +874,7 @@ export async function fetchOrgRepos(
   } catch (err) {
     try {
       const data = await revineFetch(
-        `https://api.github.com/orgs/${org}/repos?type=public&per_page=100`,
+        `https://api.github.com/orgs/${org}/repos?type=all&per_page=100`,
         {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
