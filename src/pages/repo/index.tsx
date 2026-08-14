@@ -1,55 +1,26 @@
-import { parseRepoInput } from "@/utils/github";
-import { useState } from "react";
+import { fetchTopStarredRepos, parseRepoInput, RepoSearchResult } from "@/utils/github";
+import { useEffect, useState } from "react";
 import { Link } from "revine";
-
-const FEATURED_REPOS = [
-  {
-    owner: "facebook",
-    name: "react",
-    desc: "The library for web and native user interfaces",
-    category: "Framework",
-    iconColor: "#61dafb",
-  },
-  {
-    owner: "vercel",
-    name: "next.js",
-    desc: "The React Framework for the Web",
-    category: "Full-Stack",
-    iconColor: "#000000",
-  },
-  {
-    owner: "tailwindlabs",
-    name: "tailwindcss",
-    desc: "A utility-first CSS framework for rapid UI development",
-    category: "CSS",
-    iconColor: "#38bdf8",
-  },
-  {
-    owner: "torvalds",
-    name: "linux",
-    desc: "Linux kernel source tree",
-    category: "Kernel",
-    iconColor: "#f59e0b",
-  },
-  {
-    owner: "microsoft",
-    name: "vscode",
-    desc: "Visual Studio Code editor",
-    category: "IDE",
-    iconColor: "#007acc",
-  },
-  {
-    owner: "denoland",
-    name: "deno",
-    desc: "A modern runtime for JavaScript and TypeScript",
-    category: "Runtime",
-    iconColor: "#ffffff",
-  },
-];
 
 export default function RepoLanding() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [topRepos, setTopRepos] = useState<RepoSearchResult["items"]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadTopRepos() {
+      try {
+        const res = await fetchTopStarredRepos(6);
+        setTopRepos(res.items || []);
+      } catch (err) {
+        console.error("Failed to load top repos:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadTopRepos();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,48 +59,65 @@ export default function RepoLanding() {
               Popular Repositories
             </h2>
             <p className="text-sm opacity-60">
-              Explore analytics for top open-source projects
+              Top 6 most starred open-source projects on GitHub
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURED_REPOS.map((repo) => (
-            <Link
-              key={`${repo.owner}/${repo.name}`}
-              href={`/repo/${repo.owner}/${repo.name}`}
-              className="panel p-6 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 group flex flex-col justify-between text-inherit no-underline"
-            >
-              <div>
-                <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
-                    {repo.category}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="panel p-6 skeleton h-48 rounded-2xl" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {topRepos.map((repo) => (
+              <Link
+                key={repo.id}
+                href={`/repo/${repo.owner.login}/${repo.name}`}
+                className="panel p-6 hover:scale-[1.02] hover:border-primary/30 transition-all duration-300 group flex flex-col justify-between text-inherit no-underline"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    {repo.language ? (
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        {repo.language}
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-surface-offset text-text-muted">
+                        Repo
+                      </span>
+                    )}
+                    <span className="text-xs font-mono font-bold text-primary flex items-center gap-1">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
+                      {repo.stargazers_count.toLocaleString()}
+                    </span>
+                  </div>
+                  <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1 truncate">
+                    {repo.owner.login} / {repo.name}
+                  </strong>
+                  <p className="text-xs opacity-70 line-clamp-2 leading-relaxed">
+                    {repo.description || "No description provided."}
+                  </p>
+                </div>
+
+                <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-mono opacity-60">
+                  <span className="truncate">
+                    github.com/{repo.owner.login}/{repo.name}
                   </span>
-                  <span className="text-xs opacity-40 group-hover:text-primary transition-colors">
+                  <span className="group-hover:text-primary transition-colors shrink-0">
                     View Stats →
                   </span>
                 </div>
-                <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1">
-                  {repo.owner} / {repo.name}
-                </strong>
-                <p className="text-xs opacity-70 line-clamp-2 leading-relaxed">
-                  {repo.desc}
-                </p>
-              </div>
-
-              <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2 text-xs font-mono opacity-60">
-                <span
-                  className="w-2.5 h-2.5 rounded-full"
-                  style={{ backgroundColor: repo.iconColor }}
-                />
-                <span>
-                  github.com/{repo.owner}/{repo.name}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </main>
   );
 }
+

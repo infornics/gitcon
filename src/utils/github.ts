@@ -492,4 +492,21 @@ export async function searchGithubRepos(query: string, page = 1, perPage = 10): 
   return response as RepoSearchResult;
 }
 
+export async function fetchTopStarredRepos(count = 6): Promise<RepoSearchResult> {
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const response = await revineFetch(
+    `https://api.github.com/search/repositories?q=stars:>10000&sort=stars&order=desc&per_page=${count}`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      cacheTTL: 3600000, // 1 hour cache
+      persist: true,
+    }
+  );
+
+  return response as RepoSearchResult;
+}
+
+
 
