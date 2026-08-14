@@ -184,7 +184,7 @@ export default function RepoDetail() {
             {/* Conscore Badge Below Repo URL */}
             <div className="mt-3 flex items-center">
               <div className="px-3.5 py-1.5 rounded-full text-sm font-mono font-extrabold bg-primary/15 text-primary border border-primary/40 inline-flex items-center gap-2 shadow-sm shadow-primary/10 hover:border-primary/60 transition-colors">
-                <span className="tracking-wide">Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
+                <span className="tracking-wide font-normal"><span className="text-lg">{(repo.conScore ?? 0).toLocaleString()}</span>&nbsp;conscore</span>
                 <button
                   onClick={() => setShowConscoreModal(true)}
                   className="hover:opacity-100 opacity-80 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
