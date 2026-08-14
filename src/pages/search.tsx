@@ -64,24 +64,6 @@ export default function SearchPage() {
 
   return (
     <main className="py-8">
-      {/* Search Header Strip */}
-      <div className="panel mb-8 p-6">
-        <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Search GitHub users or repositories..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="w-full h-12 px-4 py-3 rounded-full border border-white/10 bg-surface-2 text-text text-sm focus:outline-none focus:border-primary"
-            />
-          </div>
-          <button type="submit" className="btn btn-primary h-12 px-6 rounded-full shrink-0 justify-center">
-            Search
-          </button>
-        </form>
-      </div>
-
       {/* Tabs Header */}
       <div className="flex justify-between items-center flex-wrap gap-4 mb-6 border-b border-white/5 pb-4">
         <div className="flex gap-3">
