@@ -79,22 +79,6 @@ export default function Header() {
         </div>
       </Link>
 
-      <div className="flex items-center gap-2">
-        <a
-          href="/#leaderboard"
-          onClick={handleLeaderboardClick}
-          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100 cursor-pointer"
-        >
-          Leaderboard
-        </a>
-        <Link
-          href="/repo"
-          className="text-xs font-semibold px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
-        >
-          Repo Stats
-        </Link>
-      </div>
-
       <form className="header-search" onSubmit={handleSearch}>
         <input
           id="global-search-input"
@@ -118,6 +102,22 @@ export default function Header() {
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
       </form>
+
+      <div className="flex items-center gap-2">
+        <a
+          href="/#leaderboard"
+          onClick={handleLeaderboardClick}
+          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100 cursor-pointer"
+        >
+          Leaderboard
+        </a>
+        <Link
+          href="/repo"
+          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100"
+        >
+          Repo Stats
+        </Link>
+      </div>
 
       <div className="flex items-center gap-3">
         <a
