@@ -294,7 +294,7 @@ export default function Header() {
                 repo
               </code>{" "}
               scope to view private repositories you have access to. Your token
-              is stored locally in your browser and never leaves your client.
+              is stored locally in your browser only.
             </p>
 
             <form onSubmit={handleSaveToken} className="space-y-4">
