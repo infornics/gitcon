@@ -182,18 +182,18 @@ export default function RepoDetail() {
             </a>
 
             {/* Conscore Badge Below Repo URL */}
-            <div className="mt-2.5 flex items-center">
-              <div className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/25 inline-flex items-center gap-1.5 shadow-xs">
-                <span>Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
+            <div className="mt-3 flex items-center">
+              <div className="px-3.5 py-1.5 rounded-full text-sm font-mono font-extrabold bg-primary/15 text-primary border border-primary/40 inline-flex items-center gap-2 shadow-sm shadow-primary/10 hover:border-primary/60 transition-colors">
+                <span className="tracking-wide">Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
                 <button
                   onClick={() => setShowConscoreModal(true)}
-                  className="hover:opacity-100 opacity-70 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
+                  className="hover:opacity-100 opacity-80 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
                   title="View Conscore calculation breakdown"
                   aria-label="View Conscore calculation breakdown"
                 >
                   <svg
-                    width="13"
-                    height="13"
+                    width="15"
+                    height="15"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
