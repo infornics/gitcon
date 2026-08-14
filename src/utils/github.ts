@@ -764,40 +764,30 @@ export async function fetchOrgRepos(
     }
   }
 
-  // 1. Fetch exact commit count for all org repos via GraphQL
+  // 1. Fetch exact commit count for all org repos using REST commits link header pagination
   const enrichedAll = await Promise.all(
     rawRepos.map(async (repo) => {
       try {
-        const query = `
-          query($owner: String!, $name: String!) {
-            repository(owner: $owner, name: $name) {
-              defaultBranchRef {
-                target {
-                  ... on Commit {
-                    history {
-                      totalCount
-                    }
-                  }
-                }
-              }
-            }
-          }
-        `;
-        const res = await revineFetch("https://api.github.com/graphql", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        const res = await fetch(
+          `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?per_page=1`,
+          {
+            headers: {
+              "User-Agent": "Gitcon",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
           },
-          body: JSON.stringify({
-            query,
-            variables: { owner: repo.owner.login, name: repo.name },
-          }),
-          cacheTTL: 1800000,
-          persist: true,
-        });
-        const totalCommits =
-          res.data?.repository?.defaultBranchRef?.target?.history?.totalCount || 0;
+        );
+        let totalCommits = 0;
+        if (res.ok) {
+          const link = res.headers.get("link");
+          if (link) {
+            const match = link.match(/page=(\d+)>; rel="last"/);
+            totalCommits = match ? parseInt(match[1], 10) : 1;
+          } else {
+            const body = await res.json();
+            totalCommits = Array.isArray(body) ? body.length : 0;
+          }
+        }
         return {
           ...repo,
           totalCommits,
