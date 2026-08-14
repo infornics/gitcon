@@ -195,7 +195,7 @@ export default function Home() {
           </aside>
         </section>
 
-        <section className="mt-20">
+        <section className="mt-20 scroll-mt-24" id="leaderboard">
           <Leaderboard />
         </section>
 

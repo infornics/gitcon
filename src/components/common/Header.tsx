@@ -43,6 +43,18 @@ export default function Header() {
     }
   };
 
+  const handleLeaderboardClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (window.location.pathname === "/") {
+      const el = document.getElementById("leaderboard");
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth" });
+      }
+    } else {
+      window.location.href = "/#leaderboard";
+    }
+  };
+
   return (
     <header className={scrolled ? "scrolled" : ""}>
       <Link className="brand" href="/" aria-label="Gitcon home">
@@ -68,12 +80,13 @@ export default function Header() {
       </Link>
 
       <div className="flex items-center gap-2">
-        <Link
-          href="/"
-          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100"
+        <a
+          href="/#leaderboard"
+          onClick={handleLeaderboardClick}
+          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100 cursor-pointer"
         >
-          Users
-        </Link>
+          Leaderboard
+        </a>
         <Link
           href="/repo"
           className="text-xs font-semibold px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
