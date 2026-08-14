@@ -160,7 +160,7 @@ export default function RepoDetail() {
               href={repo.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5 mt-1"
+              className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5 mt-1 block"
               title="View repository on GitHub"
             >
               github.com/{repo.owner.login}/{repo.name}
@@ -180,6 +180,34 @@ export default function RepoDetail() {
                 <line x1="10" y1="14" x2="21" y2="3" />
               </svg>
             </a>
+
+            {/* Conscore Badge Below Repo URL */}
+            <div className="mt-2.5 flex items-center">
+              <div className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/25 inline-flex items-center gap-1.5 shadow-xs">
+                <span>Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
+                <button
+                  onClick={() => setShowConscoreModal(true)}
+                  className="hover:opacity-100 opacity-70 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
+                  title="View Conscore calculation breakdown"
+                  aria-label="View Conscore calculation breakdown"
+                >
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -231,32 +259,6 @@ export default function RepoDetail() {
                 {repo.defaultBranchRef.name}
               </span>
             )}
-
-            {/* Conscore Badge */}
-            <div className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/25 inline-flex items-center gap-1.5 shadow-xs">
-              <span>Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
-              <button
-                onClick={() => setShowConscoreModal(true)}
-                className="hover:opacity-100 opacity-70 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
-                title="View Conscore calculation breakdown"
-                aria-label="View Conscore calculation breakdown"
-              >
-                <svg
-                  width="13"
-                  height="13"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <line x1="12" y1="16" x2="12" y2="12" />
-                  <line x1="12" y1="8" x2="12.01" y2="8" />
-                </svg>
-              </button>
-            </div>
           </div>
 
           <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
