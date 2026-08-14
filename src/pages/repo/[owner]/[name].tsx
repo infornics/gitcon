@@ -1,18 +1,27 @@
+import { StatCard } from "@/components/StatCard";
+import {
+  fetchRepoContributors,
+  fetchRepoStats,
+  GithubRepoData,
+  parseRepoInput,
+  RepoContributor,
+} from "@/utils/github";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "revine";
-import { fetchRepoStats, GithubRepoData, parseRepoInput } from "@/utils/github";
-import { StatCard } from "@/components/StatCard";
 
 export default function RepoDetail() {
   const { owner, name } = useParams<{ owner: string; name: string }>();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [repo, setRepo] = useState<GithubRepoData | null>(null);
+  const [contributors, setContributors] = useState<RepoContributor[]>([]);
+  const [loadingContributors, setLoadingContributors] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (owner && name) {
       loadRepo(owner, name);
+      loadContributors(owner, name);
     }
   }, [owner, name]);
 
@@ -26,6 +35,18 @@ export default function RepoDetail() {
       setError(err.message || "Failed to load repository statistics.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadContributors(rOwner: string, rName: string) {
+    setLoadingContributors(true);
+    try {
+      const list = await fetchRepoContributors(rOwner, rName, 12);
+      setContributors(list);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingContributors(false);
     }
   }
 
@@ -70,7 +91,14 @@ export default function RepoDetail() {
       <main className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center max-w-md">
           <div className="p-4 rounded-full bg-rose-500/10 text-rose-500 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -78,7 +106,10 @@ export default function RepoDetail() {
           </div>
           <h2 className="text-2xl font-bold mb-2">Repository Not Found</h2>
           <p className="opacity-70 text-sm mb-6">{error}</p>
-          <Link href="/repo" className="btn btn-primary inline-flex items-center gap-2">
+          <Link
+            href="/repo"
+            className="btn btn-primary inline-flex items-center gap-2"
+          >
             ← Back to Repository Search
           </Link>
         </div>
@@ -94,13 +125,24 @@ export default function RepoDetail() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 text-xs opacity-60 mb-1">
-            <Link href="/repo" className="hover:underline">Repositories</Link>
+            <Link href="/repo" className="hover:underline">
+              Repositories
+            </Link>
             <span>/</span>
             <span>{repo.owner.login}</span>
           </div>
           <h1 className="text-3xl font-extrabold font-display flex items-center gap-3">
-            <img src={repo.owner.avatarUrl} alt={repo.owner.login} className="w-9 h-9 rounded-xl border border-white/10" />
-            <a href={`https://github.com/${repo.owner.login}`} target="_blank" rel="noreferrer" className="hover:underline opacity-80">
+            <img
+              src={repo.owner.avatarUrl}
+              alt={repo.owner.login}
+              className="w-9 h-9 rounded-xl border border-white/10"
+            />
+            <a
+              href={`https://github.com/${repo.owner.login}`}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:underline opacity-80"
+            >
               {repo.owner.login}
             </a>
             <span className="opacity-40">/</span>
@@ -108,7 +150,10 @@ export default function RepoDetail() {
           </h1>
         </div>
 
-        <form onSubmit={handleQuickSearch} className="flex gap-2 w-full md:w-auto">
+        <form
+          onSubmit={handleQuickSearch}
+          className="flex gap-2 w-full md:w-auto"
+        >
           <input
             type="text"
             placeholder="Inspect another repo (owner/repo)..."
@@ -116,7 +161,10 @@ export default function RepoDetail() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="px-4 py-2 rounded-full border border-white/10 bg-surface-2 text-xs w-full md:w-64 focus:outline-none focus:border-primary"
           />
-          <button type="submit" className="btn btn-secondary !py-2 !px-4 !text-xs shrink-0">
+          <button
+            type="submit"
+            className="btn btn-secondary !py-2 !px-4 !text-xs shrink-0"
+          >
             Go
           </button>
         </form>
@@ -143,7 +191,8 @@ export default function RepoDetail() {
             </div>
 
             <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
-              {repo.description || "No description provided for this repository."}
+              {repo.description ||
+                "No description provided for this repository."}
             </p>
 
             {/* Topic tags */}
@@ -184,15 +233,39 @@ export default function RepoDetail() {
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-        <StatCard label="Stars" value={repo.stargazerCount.toLocaleString()} subValue="Stargazers" />
-        <StatCard label="Forks" value={repo.forkCount.toLocaleString()} subValue="Forks count" />
-        <StatCard label="Open Issues" value={repo.openIssues.totalCount.toLocaleString()} subValue="Active issues" />
-        <StatCard label="Open PRs" value={repo.openPullRequests.totalCount.toLocaleString()} subValue="Pull requests" />
-        <StatCard label="Watchers" value={repo.watchers.totalCount.toLocaleString()} subValue="Subscribers" />
-        <StatCard label="Releases" value={repo.releases.totalCount.toLocaleString()} subValue="Published releases" />
+        <StatCard
+          label="Stars"
+          value={repo.stargazerCount.toLocaleString()}
+          subValue="Stargazers"
+        />
+        <StatCard
+          label="Forks"
+          value={repo.forkCount.toLocaleString()}
+          subValue="Forks count"
+        />
+        <StatCard
+          label="Open Issues"
+          value={repo.openIssues.totalCount.toLocaleString()}
+          subValue="Active issues"
+        />
+        <StatCard
+          label="Open PRs"
+          value={repo.openPullRequests.totalCount.toLocaleString()}
+          subValue="Pull requests"
+        />
+        <StatCard
+          label="Watchers"
+          value={repo.watchers.totalCount.toLocaleString()}
+          subValue="Subscribers"
+        />
+        <StatCard
+          label="Releases"
+          value={repo.releases.totalCount.toLocaleString()}
+          subValue="Published releases"
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Language Genomics */}
         <div className="panel lg:col-span-2">
           <div className="panel-head">
@@ -214,7 +287,10 @@ export default function RepoDetail() {
                 {languageBreakdown.map((lang) => (
                   <div
                     key={lang.name}
-                    style={{ width: `${lang.percent}%`, backgroundColor: lang.color }}
+                    style={{
+                      width: `${lang.percent}%`,
+                      backgroundColor: lang.color,
+                    }}
                     title={`${lang.name}: ${lang.percent}%`}
                     className="h-full first:rounded-l-full last:rounded-r-full hover:opacity-80 transition-opacity cursor-pointer"
                   />
@@ -224,18 +300,30 @@ export default function RepoDetail() {
               {/* Language list legend */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {languageBreakdown.map((lang) => (
-                  <div key={lang.name} className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-white/5">
+                  <div
+                    key={lang.name}
+                    className="flex items-center justify-between p-3 rounded-xl bg-surface-2 border border-white/5"
+                  >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: lang.color }} />
-                      <span className="font-bold text-sm truncate">{lang.name}</span>
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: lang.color }}
+                      />
+                      <span className="font-bold text-sm truncate">
+                        {lang.name}
+                      </span>
                     </div>
-                    <span className="font-mono text-xs opacity-70">{lang.percent}%</span>
+                    <span className="font-mono text-xs opacity-70">
+                      {lang.percent}%
+                    </span>
                   </div>
                 ))}
               </div>
             </div>
           ) : (
-            <div className="py-8 text-center text-sm opacity-50">No language data available for this repository.</div>
+            <div className="py-8 text-center text-sm opacity-50">
+              No language data available for this repository.
+            </div>
           )}
         </div>
 
@@ -248,35 +336,114 @@ export default function RepoDetail() {
 
             <div className="flex flex-col gap-4 mt-4">
               <div className="flex justify-between items-center py-2.5 border-b border-white/5 text-sm">
-                <span className="opacity-60">Total Commits (Default Branch)</span>
-                <strong className="font-mono text-primary">{commitCount ? commitCount.toLocaleString() : "N/A"}</strong>
+                <span className="opacity-60">
+                  Total Commits (Default Branch)
+                </span>
+                <strong className="font-mono text-primary">
+                  {commitCount ? commitCount.toLocaleString() : "N/A"}
+                </strong>
               </div>
 
               <div className="flex justify-between items-center py-2.5 border-b border-white/5 text-sm">
                 <span className="opacity-60">Created Date</span>
-                <span className="font-mono text-xs">{new Date(repo.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                <span className="font-mono text-xs">
+                  {new Date(repo.createdAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
 
               <div className="flex justify-between items-center py-2.5 border-b border-white/5 text-sm">
                 <span className="opacity-60">Last Updated</span>
-                <span className="font-mono text-xs">{new Date(repo.updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                <span className="font-mono text-xs">
+                  {new Date(repo.updatedAt).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
 
               <div className="flex justify-between items-center py-2.5 border-b border-white/5 text-sm">
                 <span className="opacity-60">Fork Ratio</span>
-                <span className="font-mono text-xs">{((repo.forkCount / Math.max(repo.stargazerCount, 1)) * 100).toFixed(1)}%</span>
+                <span className="font-mono text-xs">
+                  {(
+                    (repo.forkCount / Math.max(repo.stargazerCount, 1)) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </span>
               </div>
             </div>
           </div>
 
           <div className="mt-6 p-4 rounded-xl bg-surface-2/60 border border-white/5">
-            <div className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Quick Action</div>
+            <div className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
+              Quick Action
+            </div>
             <p className="text-xs opacity-70">
-              Want to see user contributions to <strong>{repo.name}</strong>? Explore the contributor profile by searching their handle.
+              Want to see user contributions to <strong>{repo.name}</strong>?
+              Explore the contributor profile by searching their handle.
             </p>
           </div>
         </div>
       </div>
+
+      {/* Contributors Section */}
+      <section className="panel p-6">
+        <div className="panel-head flex justify-between items-center mb-6">
+          <div>
+            <h2 className="text-xl font-bold font-display">Contributors</h2>
+            <p className="text-xs opacity-60">
+              Top developers contributing code to {repo.name}
+            </p>
+          </div>
+          <a
+            href={`${repo.url}/graphs/contributors`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-bold text-primary hover:underline"
+          >
+            All Contributors on GitHub ↗
+          </a>
+        </div>
+
+        {loadingContributors ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="skeleton h-24 rounded-xl" />
+            ))}
+          </div>
+        ) : contributors.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {contributors.map((c) => (
+              <Link
+                key={c.id}
+                href={`/user/${c.login}`}
+                className="flex flex-col items-center text-center p-4 rounded-xl bg-surface-2/80 hover:bg-surface-2 border border-white/5 hover:border-primary/30 transition-all duration-200 group text-inherit no-underline"
+              >
+                <img
+                  src={c.avatar_url}
+                  alt={c.login}
+                  className="w-12 h-12 rounded-full border border-white/10 mb-2.5 group-hover:scale-105 transition-transform"
+                />
+                <strong className="text-sm font-bold group-hover:text-primary transition-colors truncate w-full">
+                  @{c.login}
+                </strong>
+                <span className="text-[11px] font-mono opacity-60 mt-1">
+                  {c.contributions.toLocaleString()} commits
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-sm opacity-50">
+            No contributor data available.
+          </div>
+        )}
+      </section>
     </main>
   );
 }

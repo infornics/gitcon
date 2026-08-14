@@ -388,6 +388,35 @@ export async function fetchRepoStats(owner: string, name: string): Promise<Githu
   return payload.data.repository as GithubRepoData;
 }
 
+export interface RepoContributor {
+  id: number;
+  login: string;
+  avatar_url: string;
+  html_url: string;
+  contributions: number;
+  type: string;
+}
+
+export async function fetchRepoContributors(owner: string, name: string, limit = 12): Promise<RepoContributor[]> {
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  try {
+    const res = await revineFetch(
+      `https://api.github.com/repos/${owner}/${name}/contributors?per_page=${limit}`,
+      {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        cacheTTL: 1800000,
+        persist: true,
+      }
+    );
+    return Array.isArray(res) ? res : [];
+  } catch (err) {
+    console.error("Failed to fetch repo contributors:", err);
+    return [];
+  }
+}
+
 export interface UserSearchResult {
   total_count: number;
   items: Array<{
