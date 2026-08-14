@@ -120,7 +120,7 @@ export default function RepoDetail() {
   const commitCount = repo.defaultBranchRef?.target?.history?.totalCount;
 
   return (
-    <main className="py-8">
+    <main>
       {/* Repository Header Section (Matching User Profile Hero Layout) */}
       <section className="profile-hero mb-8">
         <div className="profile-info">
