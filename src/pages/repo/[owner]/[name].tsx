@@ -73,7 +73,7 @@ export default function RepoDetail() {
     return (
       <main className="py-8">
         <div className="flex flex-col gap-6">
-          <div className="panel skeleton h-[280px] rounded-2xl" />
+          <div className="panel skeleton h-70 rounded-2xl" />
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="panel skeleton h-28" />
             <div className="panel skeleton h-28" />
@@ -149,7 +149,7 @@ export default function RepoDetail() {
       </div>
 
       {/* Main Overview Panel */}
-      <div className="panel p-8 mb-8 border-primary/20 bg-gradient-to-br from-surface to-surface-2">
+      <div className="panel p-8 mb-8 border-primary/20 bg-linear-to-br from-surface to-surface-2">
         <div className="flex flex-col lg:flex-row justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-3 flex-wrap">
@@ -398,9 +398,9 @@ export default function RepoDetail() {
                 <tr>
                   <th className="text-center w-16">#</th>
                   <th>Contributor</th>
-                  <th className="!text-center">Commits</th>
-                  <th className="!text-center">Lines Added / Deleted</th>
-                  <th className="!text-center">Files Affected</th>
+                  <th className="text-center!">Commits</th>
+                  <th className="text-center!">Lines Added / Deleted</th>
+                  <th className="text-center!">Files Affected</th>
                   <th>Primary Language</th>
                 </tr>
               </thead>
@@ -416,13 +416,13 @@ export default function RepoDetail() {
                         <div className="skeleton h-4 w-28 rounded" />
                       </div>
                     </td>
-                    <td className="!text-center">
+                    <td className="text-center!">
                       <div className="skeleton h-5 w-16 mx-auto rounded" />
                     </td>
-                    <td className="!text-center">
+                    <td className="text-center!">
                       <div className="skeleton h-5 w-24 mx-auto rounded" />
                     </td>
-                    <td className="!text-center">
+                    <td className="text-center!">
                       <div className="skeleton h-5 w-16 mx-auto rounded" />
                     </td>
                     <td>
@@ -440,9 +440,9 @@ export default function RepoDetail() {
                 <tr>
                   <th className="text-center w-16">#</th>
                   <th>Contributor</th>
-                  <th className="!text-center">Commits</th>
-                  <th className="!text-center">Lines Added / Deleted</th>
-                  <th className="!text-center">Files Affected</th>
+                  <th className="text-center!">Commits</th>
+                  <th className="text-center!">Lines Added / Deleted</th>
+                  <th className="text-center!">Files Affected</th>
                   <th>Primary Language</th>
                 </tr>
               </thead>
@@ -469,10 +469,10 @@ export default function RepoDetail() {
                         </div>
                       </div>
                     </td>
-                    <td className="!text-center font-mono font-bold text-primary">
+                    <td className="text-center! font-mono font-bold text-primary">
                       {c.contributions.toLocaleString()}
                     </td>
-                    <td className="!text-center font-mono text-xs">
+                    <td className="text-center! font-mono text-xs">
                       {c.additions || c.deletions ? (
                         <span className="flex items-center justify-center gap-2">
                           <span className="text-emerald-500 font-bold">
@@ -487,7 +487,7 @@ export default function RepoDetail() {
                         <span className="opacity-40">—</span>
                       )}
                     </td>
-                    <td className="!text-center font-mono opacity-80">
+                    <td className="text-center! font-mono opacity-80">
                       {(
                         c.filesTouchedApprox || c.contributions
                       ).toLocaleString()}
