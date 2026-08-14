@@ -388,3 +388,67 @@ export async function fetchRepoStats(owner: string, name: string): Promise<Githu
   return payload.data.repository as GithubRepoData;
 }
 
+export interface UserSearchResult {
+  total_count: number;
+  items: Array<{
+    login: string;
+    id: number;
+    avatar_url: string;
+    html_url: string;
+    type: string;
+  }>;
+}
+
+export interface RepoSearchResult {
+  total_count: number;
+  items: Array<{
+    id: number;
+    name: string;
+    full_name: string;
+    owner: {
+      login: string;
+      avatar_url: string;
+    };
+    description: string | null;
+    stargazers_count: number;
+    forks_count: number;
+    language: string | null;
+    updated_at: string;
+  }>;
+}
+
+export async function searchGithubUsers(query: string, page = 1, perPage = 10): Promise<UserSearchResult> {
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const encodedQuery = encodeURIComponent(query);
+  const response = await revineFetch(
+    `https://api.github.com/search/users?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      cacheTTL: 300000, // 5 min cache
+      persist: true,
+    }
+  );
+
+  return response as UserSearchResult;
+}
+
+export async function searchGithubRepos(query: string, page = 1, perPage = 10): Promise<RepoSearchResult> {
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const encodedQuery = encodeURIComponent(query);
+  const response = await revineFetch(
+    `https://api.github.com/search/repositories?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
+    {
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      cacheTTL: 300000, // 5 min cache
+      persist: true,
+    }
+  );
+
+  return response as RepoSearchResult;
+}
+
+

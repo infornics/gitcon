@@ -35,12 +35,7 @@ export default function Header() {
     e.preventDefault();
     const val = query.trim();
     if (!val) return;
-    const repoMatch = parseRepoInput(val);
-    if (repoMatch) {
-      window.location.href = `/repo/${repoMatch.owner}/${repoMatch.name}`;
-    } else {
-      window.location.href = `/user/${val}`;
-    }
+    window.location.href = `/search?q=${encodeURIComponent(val)}`;
   };
 
   const handleLeaderboardClick = (e: React.MouseEvent) => {
