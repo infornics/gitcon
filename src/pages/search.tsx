@@ -68,10 +68,10 @@ export default function SearchPage() {
                 setActiveTab("users");
                 setPage(1);
               }}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 border ${
                 activeTab === "users"
-                  ? "bg-primary text-text-inverse shadow-md"
-                  : "bg-surface-2 text-text-muted hover:text-text border border-white/5"
+                  ? "bg-primary-highlight text-primary border-primary/30 shadow-sm"
+                  : "bg-surface-2 text-text-muted hover:text-text border-white/5 hover:border-white/10"
               }`}
             >
               <svg
@@ -89,7 +89,11 @@ export default function SearchPage() {
               </svg>
               <span>Users</span>
               {userResults && (
-                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  activeTab === "users"
+                    ? "bg-primary/15 text-primary"
+                    : "bg-surface-offset text-text-muted"
+                }`}>
                   {userResults.total_count.toLocaleString()}
                 </span>
               )}
@@ -100,10 +104,10 @@ export default function SearchPage() {
                 setActiveTab("repos");
                 setPage(1);
               }}
-              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 ${
+              className={`px-5 py-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-2 border ${
                 activeTab === "repos"
-                  ? "bg-primary text-text-inverse shadow-md"
-                  : "bg-surface-2 text-text-muted hover:text-text border border-white/5"
+                  ? "bg-primary-highlight text-primary border-primary/30 shadow-sm"
+                  : "bg-surface-2 text-text-muted hover:text-text border-white/5 hover:border-white/10"
               }`}
             >
               <svg
@@ -122,7 +126,11 @@ export default function SearchPage() {
               </svg>
               <span>Repositories</span>
               {repoResults && (
-                <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-mono">
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  activeTab === "repos"
+                    ? "bg-primary/15 text-primary"
+                    : "bg-surface-offset text-text-muted"
+                }`}>
                   {repoResults.total_count.toLocaleString()}
                 </span>
               )}
