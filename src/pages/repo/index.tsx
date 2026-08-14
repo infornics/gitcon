@@ -112,7 +112,7 @@ export default function RepoLanding() {
                         Repo
                       </span>
                     )}
-                    <span className="text-xs font-mono font-bold text-primary flex items-center gap-1">
+                    <span className="text-xs font-mono font-bold text-primary flex items-center gap-1.5" title="Total Commits">
                       <svg
                         width="12"
                         height="12"
@@ -123,9 +123,11 @@ export default function RepoLanding() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        <circle cx="12" cy="12" r="4" />
+                        <line x1="1.05" y1="12" x2="8" y2="12" />
+                        <line x1="16" y1="12" x2="22.95" y2="12" />
                       </svg>
-                      {repo.stargazers_count.toLocaleString()}
+                      {(repo.totalCommits || 0).toLocaleString()} commits
                     </span>
                   </div>
                   <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1 truncate">

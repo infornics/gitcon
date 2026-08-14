@@ -603,6 +603,7 @@ export interface RepoSearchResult {
     forks_count: number;
     language: string | null;
     updated_at: string;
+    totalCommits?: number;
   }>;
 }
 
@@ -774,8 +775,55 @@ export async function fetchOrgRepos(
 
   const topItems = sorted.slice(0, count);
 
+  // Fetch exact commit count for top repos via GraphQL
+  const enrichedItems = await Promise.all(
+    topItems.map(async (repo) => {
+      try {
+        const query = `
+          query($owner: String!, $name: String!) {
+            repository(owner: $owner, name: $name) {
+              defaultBranchRef {
+                target {
+                  ... on Commit {
+                    history {
+                      totalCount
+                    }
+                  }
+                }
+              }
+            }
+          }
+        `;
+        const res = await revineFetch("https://api.github.com/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            query,
+            variables: { owner: repo.owner.login, name: repo.name },
+          }),
+          cacheTTL: 1800000,
+          persist: true,
+        });
+        const totalCommits =
+          res.data?.repository?.defaultBranchRef?.target?.history?.totalCount || 0;
+        return {
+          ...repo,
+          totalCommits,
+        };
+      } catch (err) {
+        return {
+          ...repo,
+          totalCommits: 0,
+        };
+      }
+    }),
+  );
+
   return {
-    total_count: topItems.length,
-    items: topItems,
+    total_count: enrichedItems.length,
+    items: enrichedItems,
   } as RepoSearchResult;
 }
