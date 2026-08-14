@@ -443,29 +443,57 @@ export async function fetchRepoContributors(
     // 2. Fetch repo stats/contributors for exact additions & deletions on THIS repo
     let statsData: any[] = [];
     try {
-      for (let attempt = 0; attempt < 4; attempt++) {
-        const statsRes = await fetch(
-          `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
-          {
-            headers: {
-              ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            },
+      // First try reading from cache
+      const cached = await revineFetch(
+        `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
+        {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-        );
-        if (statsRes.status === 200) {
-          const json = await statsRes.json();
-          if (Array.isArray(json) && json.length > 0) {
-            statsData = json;
-            break;
-          }
-        }
-        // Wait 1.5s for GitHub background worker to complete calculations if 202 is returned
-        await new Promise((r) => setTimeout(r, 1500));
-      }
-    } catch (e) {
-      console.warn(
-        "Stats API unavailable or computing, using fallback contributor metrics.",
+          cacheTTL: 3600000,
+          persist: true,
+        },
       );
+      if (Array.isArray(cached) && cached.length > 0) {
+        statsData = cached;
+      }
+    } catch (e) {}
+
+    // If cache was empty or uncomputed 202, poll live endpoint until 200 OK array is returned
+    if (statsData.length === 0) {
+      try {
+        for (let attempt = 0; attempt < 5; attempt++) {
+          const statsRes = await fetch(
+            `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
+            {
+              headers: {
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+            },
+          );
+          if (statsRes.status === 200) {
+            const json = await statsRes.json();
+            if (Array.isArray(json) && json.length > 0) {
+              statsData = json;
+              // Now that we have valid computed data, update cache permanently
+              revineFetch(
+                `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
+                {
+                  headers: {
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                  },
+                  cacheTTL: 3600000,
+                  persist: true,
+                },
+              ).catch(() => {});
+              break;
+            }
+          }
+          await new Promise((r) => setTimeout(r, 1200));
+        }
+      } catch (e) {
+        console.warn("Stats API background calculation in progress.");
+      }
     }
 
     const statsMap = new Map<
