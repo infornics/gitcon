@@ -313,13 +313,14 @@ export function calculateConScore(repo: {
   commitsPast3Months?: number;
   pushedAt?: string;
   updatedAt?: string;
-
 }) {
   const stars = repo.stargazerCount || 0;
   const forks = repo.forkCount || 0;
   const totalCommits = repo.defaultBranchRef?.target?.history?.totalCount || 0;
   const recentCommits = repo.commitsPast3Months || 0;
-  const lastActiveTs = new Date(repo.pushedAt || repo.updatedAt || Date.now()).getTime();
+  const lastActiveTs = new Date(
+    repo.pushedAt || repo.updatedAt || Date.now(),
+  ).getTime();
   const diffMs = Math.max(0, Date.now() - lastActiveTs);
   const daysSinceLastActive = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   return stars + forks + totalCommits + recentCommits - daysSinceLastActive;
@@ -808,7 +809,9 @@ export async function searchGithubRepos(
 
           // Merge matching user repos at top if not already present
           const existingIds = new Set(items.map((i) => i.id));
-          const newItems = matchingPrivate.filter((r: any) => !existingIds.has(r.id));
+          const newItems = matchingPrivate.filter(
+            (r: any) => !existingIds.has(r.id),
+          );
           items = [...newItems, ...items];
         }
       } catch (e) {}
