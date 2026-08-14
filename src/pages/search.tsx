@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "revine";
 import {
-  searchGithubUsers,
-  searchGithubRepos,
-  UserSearchResult,
   RepoSearchResult,
+  searchGithubRepos,
+  searchGithubUsers,
+  UserSearchResult,
 } from "@/utils/github";
+import { useEffect, useState } from "react";
+import { useLocation } from "revine";
 
 export default function SearchPage() {
   const location = useLocation();
@@ -51,7 +51,10 @@ export default function SearchPage() {
     }
   }
 
-  const currentTotal = activeTab === "users" ? userResults?.total_count || 0 : repoResults?.total_count || 0;
+  const currentTotal =
+    activeTab === "users"
+      ? userResults?.total_count || 0
+      : repoResults?.total_count || 0;
   const totalPages = Math.min(Math.ceil(currentTotal / 10), 100);
 
   return (
@@ -71,7 +74,16 @@ export default function SearchPage() {
                   : "bg-surface-2 text-text-muted hover:text-text border border-white/5"
               }`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
@@ -94,7 +106,16 @@ export default function SearchPage() {
                   : "bg-surface-2 text-text-muted hover:text-text border border-white/5"
               }`}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                 <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -110,7 +131,8 @@ export default function SearchPage() {
 
           {currentTotal > 0 && (
             <div className="text-xs opacity-60 font-mono">
-              Showing {((page - 1) * 10) + 1}–{Math.min(page * 10, currentTotal)} of {currentTotal.toLocaleString()} results
+              Showing {(page - 1) * 10 + 1}–{Math.min(page * 10, currentTotal)}{" "}
+              of {currentTotal.toLocaleString()} results
             </div>
           )}
         </div>
@@ -128,32 +150,40 @@ export default function SearchPage() {
             <table className="leaderboard-table">
               <thead>
                 <tr>
-                  <th className="text-center w-16">#</th>
-                  <th>{activeTab === "users" ? "Developer" : "Repository"}</th>
-                  <th>{activeTab === "users" ? "Type" : "Language"}</th>
-                  <th className="!text-right">Action</th>
+                  <th className="text-center w-16">Rank</th>
+                  <th>Developer</th>
+                  <th className="!text-center">Contributions</th>
+                  <th className="!text-center">Longest Streak</th>
+                  <th className="!text-center">Current Streak</th>
+                  <th className="!text-center">Followers</th>
                 </tr>
               </thead>
               <tbody>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <tr key={i}>
-                    <td className="text-center">
-                      <div className="skeleton h-5 w-6 mx-auto rounded" />
+                    <td className="rank text-center">
+                      <div className="skeleton h-6 w-8 mx-auto rounded" />
                     </td>
                     <td>
                       <div className="flex items-center gap-3">
                         <div className="skeleton w-10 h-10 rounded-full shrink-0" />
                         <div className="flex flex-col gap-1.5">
-                          <div className="skeleton h-4 w-32 rounded" />
-                          <div className="skeleton h-3 w-24 rounded" />
+                          <div className="skeleton h-4 w-28 rounded" />
+                          <div className="skeleton h-3 w-20 rounded" />
                         </div>
                       </div>
                     </td>
-                    <td>
-                      <div className="skeleton h-4 w-20 rounded" />
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-16 mx-auto rounded" />
                     </td>
-                    <td className="!text-right">
-                      <div className="skeleton h-4 w-6 ml-auto rounded" />
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-20 mx-auto rounded" />
+                    </td>
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-20 mx-auto rounded" />
+                    </td>
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-16 mx-auto rounded" />
                     </td>
                   </tr>
                 ))}
@@ -170,10 +200,12 @@ export default function SearchPage() {
                 <table className="leaderboard-table">
                   <thead>
                     <tr>
-                      <th className="text-center w-16">#</th>
+                      <th className="text-center w-16">Rank</th>
                       <th>Developer</th>
-                      <th>Type</th>
-                      <th className="!text-right">Action</th>
+                      <th className="!text-center">Contributions</th>
+                      <th className="!text-center">Longest Streak</th>
+                      <th className="!text-center">Current Streak</th>
+                      <th className="!text-center">Followers</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,9 +215,23 @@ export default function SearchPage() {
                         <tr
                           key={user.id}
                           className="cursor-pointer"
-                          onClick={() => window.location.href = `/user/${user.login}`}
+                          onClick={() =>
+                            (window.location.href = `/user/${user.login}`)
+                          }
                         >
-                          <td className="rank text-center font-mono">{rowNum}</td>
+                          <td
+                            className={`rank text-center ${
+                              rowNum === 1
+                                ? "gold"
+                                : rowNum === 2
+                                  ? "silver"
+                                  : rowNum === 3
+                                    ? "bronze"
+                                    : ""
+                            }`}
+                          >
+                            {rowNum}
+                          </td>
                           <td>
                             <div className="flex items-center gap-3">
                               <img
@@ -194,29 +240,26 @@ export default function SearchPage() {
                                 className="w-10 h-10 rounded-full border border-white/5 shrink-0"
                               />
                               <div>
-                                <div className="font-bold">{user.name || user.login}</div>
-                                <div className="text-xs opacity-60">@{user.login}</div>
+                                <div className="font-bold">
+                                  {user.name || user.login}
+                                </div>
+                                <div className="text-xs opacity-60">
+                                  @{user.login}
+                                </div>
                               </div>
                             </div>
                           </td>
-                          <td className="font-mono text-xs uppercase tracking-wider opacity-60">
-                            {user.type}
+                          <td className="!text-center font-mono font-bold text-primary">
+                            {(user.totalContributions || 0).toLocaleString()}
                           </td>
-                          <td className="!text-right">
-                            <svg
-                              width="16"
-                              height="16"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="opacity-40 hover:opacity-100 transition-all inline-block ml-auto"
-                            >
-                              <line x1="5" y1="12" x2="19" y2="12" />
-                              <polyline points="12 5 19 12 12 19" />
-                            </svg>
+                          <td className="!text-center font-mono">
+                            {user.longestStreak || 0} days
+                          </td>
+                          <td className="!text-center font-mono">
+                            {user.currentStreak || 0} days
+                          </td>
+                          <td className="!text-center font-mono font-bold text-primary">
+                            {(user.followers || 0).toLocaleString()}
                           </td>
                         </tr>
                       );
@@ -225,7 +268,8 @@ export default function SearchPage() {
                 </table>
               </div>
             ) : (
-              !loading && query && (
+              !loading &&
+              query && (
                 <div className="text-center py-16 opacity-60">
                   No users found for "{query}". Try another search term.
                 </div>
@@ -257,9 +301,13 @@ export default function SearchPage() {
                         <tr
                           key={repo.id}
                           className="cursor-pointer"
-                          onClick={() => window.location.href = `/repo/${repo.owner.login}/${repo.name}`}
+                          onClick={() =>
+                            (window.location.href = `/repo/${repo.owner.login}/${repo.name}`)
+                          }
                         >
-                          <td className="rank text-center font-mono">{rowNum}</td>
+                          <td className="rank text-center font-mono">
+                            {rowNum}
+                          </td>
                           <td>
                             <div className="flex flex-col min-w-0 max-w-lg">
                               <strong className="font-bold text-base hover:text-primary transition-colors truncate">
@@ -310,7 +358,8 @@ export default function SearchPage() {
                 </table>
               </div>
             ) : (
-              !loading && query && (
+              !loading &&
+              query && (
                 <div className="text-center py-16 opacity-60">
                   No repositories found for "{query}". Try another search term.
                 </div>

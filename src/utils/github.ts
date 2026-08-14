@@ -397,6 +397,10 @@ export interface UserSearchResult {
     html_url: string;
     type: string;
     name?: string;
+    totalContributions?: number;
+    longestStreak?: number;
+    currentStreak?: number;
+    followers?: number;
   }>;
 }
 
@@ -435,25 +439,31 @@ export async function searchGithubUsers(query: string, page = 1, perPage = 10): 
   const rawData = response as UserSearchResult;
   if (!rawData.items || rawData.items.length === 0) return rawData;
 
-  // Enrich top results with full user profile name
+  // Enrich top results with full user profile stats & contribution data
   const enrichedItems = await Promise.all(
     rawData.items.map(async (item) => {
       try {
-        const uDetail = await revineFetch(`https://api.github.com/users/${item.login}`, {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          cacheTTL: 3600000,
-          persist: true,
-        });
+        const fullUser = await fetchContributions(item.login, 365);
+        const merged = fullUser.contributionsCollection.contributionCalendar.weeks.flatMap(
+          (w) => w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount }))
+        );
+        const stats = calculateStats(merged);
         return {
           ...item,
-          name: uDetail.name || item.login,
+          name: fullUser.name || item.login,
+          totalContributions: fullUser.contributionsCollection.contributionCalendar.totalContributions,
+          longestStreak: stats.longest,
+          currentStreak: stats.current,
+          followers: fullUser.followers?.totalCount || 0,
         };
       } catch (e) {
         return {
           ...item,
           name: item.login,
+          totalContributions: 0,
+          longestStreak: 0,
+          currentStreak: 0,
+          followers: 0,
         };
       }
     })
