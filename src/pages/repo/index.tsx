@@ -129,7 +129,7 @@ export default function RepoLanding() {
                     </span>
                   </div>
                   <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1 truncate">
-                    {repo.owner.login} / {repo.name}
+                    {repo.name}
                   </strong>
                   <p className="text-xs opacity-70 line-clamp-2 leading-relaxed">
                     {repo.description || "No description provided."}
@@ -139,9 +139,6 @@ export default function RepoLanding() {
                 <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-mono opacity-60">
                   <span className="truncate">
                     github.com/{repo.owner.login}/{repo.name}
-                  </span>
-                  <span className="group-hover:text-primary transition-colors shrink-0">
-                    View Stats →
                   </span>
                 </div>
               </Link>
@@ -205,7 +202,7 @@ export default function RepoLanding() {
                     </span>
                   </div>
                   <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1 truncate">
-                    {repo.owner.login} / {repo.name}
+                    {repo.name}
                   </strong>
                   <p className="text-xs opacity-70 line-clamp-2 leading-relaxed">
                     {repo.description || "No description provided."}
@@ -215,9 +212,6 @@ export default function RepoLanding() {
                 <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-mono opacity-60">
                   <span className="truncate">
                     github.com/{repo.owner.login}/{repo.name}
-                  </span>
-                  <span className="group-hover:text-primary transition-colors shrink-0">
-                    View Stats →
                   </span>
                 </div>
               </Link>
@@ -284,7 +278,7 @@ export default function RepoLanding() {
                     </span>
                   </div>
                   <strong className="text-xl font-bold font-display group-hover:text-primary transition-colors block mb-1 truncate">
-                    {repo.owner.login} / {repo.name}
+                    {repo.name}
                   </strong>
                   <p className="text-xs opacity-70 line-clamp-2 leading-relaxed">
                     {repo.description || "No description provided."}
@@ -294,9 +288,6 @@ export default function RepoLanding() {
                 <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-mono opacity-60">
                   <span className="truncate">
                     github.com/{repo.owner.login}/{repo.name}
-                  </span>
-                  <span className="group-hover:text-primary transition-colors shrink-0">
-                    View Stats →
                   </span>
                 </div>
               </Link>
