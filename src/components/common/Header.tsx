@@ -39,9 +39,12 @@ export default function Header() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const q = params.get("q");
-      if (q !== null) setQuery(q);
+      if (window.location.pathname === "/search") {
+        const params = new URLSearchParams(window.location.search);
+        setQuery(params.get("q") || "");
+      } else {
+        setQuery("");
+      }
     }
   }, []);
 
