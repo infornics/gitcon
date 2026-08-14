@@ -604,6 +604,7 @@ export interface RepoSearchResult {
     language: string | null;
     updated_at: string;
     totalCommits?: number;
+    commitsPast3Months?: number;
   }>;
 }
 
@@ -764,11 +765,16 @@ export async function fetchOrgRepos(
     }
   }
 
-  // 1. Fetch exact commit count for all org repos using REST commits link header pagination
+  // 1. Fetch total commits and commits in past 3 months for all org repos
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+  const sinceISO = threeMonthsAgo.toISOString();
+
   const enrichedAll = await Promise.all(
     rawRepos.map(async (repo) => {
       try {
-        const res = await fetch(
+        // Fetch total commits
+        const resTotal = await fetch(
           `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?per_page=1`,
           {
             headers: {
@@ -778,35 +784,66 @@ export async function fetchOrgRepos(
           },
         );
         let totalCommits = 0;
-        if (res.ok) {
-          const link = res.headers.get("link");
+        if (resTotal.ok) {
+          const link = resTotal.headers.get("link");
           if (link) {
             const match = link.match(/page=(\d+)>; rel="last"/);
             totalCommits = match ? parseInt(match[1], 10) : 1;
           } else {
-            const body = await res.json();
+            const body = await resTotal.json();
             totalCommits = Array.isArray(body) ? body.length : 0;
           }
         }
+
+        // Fetch commits in past 3 months
+        const resRecent = await fetch(
+          `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?since=${sinceISO}&per_page=1`,
+          {
+            headers: {
+              "User-Agent": "Gitcon",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+          },
+        );
+        let commitsPast3Months = 0;
+        if (resRecent.ok) {
+          const link = resRecent.headers.get("link");
+          if (link) {
+            const match = link.match(/page=(\d+)>; rel="last"/);
+            commitsPast3Months = match ? parseInt(match[1], 10) : 1;
+          } else {
+            const body = await resRecent.json();
+            commitsPast3Months = Array.isArray(body) ? body.length : 0;
+          }
+        }
+
         return {
           ...repo,
           totalCommits,
+          commitsPast3Months,
         };
       } catch (err) {
         return {
           ...repo,
           totalCommits: 0,
+          commitsPast3Months: 0,
         };
       }
     }),
   );
 
-  // 2. Sort repos by raw activity score: stars + forks + totalCommits (no multipliers)
+  // 2. Sort repos by raw activity score: stars + forks + totalCommits + commitsPast3Months
   const sorted = [...enrichedAll].sort((a, b) => {
     const scoreA =
-      (a.stargazers_count || 0) + (a.forks_count || 0) + (a.totalCommits || 0);
+      (a.stargazers_count || 0) +
+      (a.forks_count || 0) +
+      (a.totalCommits || 0) +
+      (a.commitsPast3Months || 0);
     const scoreB =
-      (b.stargazers_count || 0) + (b.forks_count || 0) + (b.totalCommits || 0);
+      (b.stargazers_count || 0) +
+      (b.forks_count || 0) +
+      (b.totalCommits || 0) +
+      (b.commitsPast3Months || 0);
     return scoreB - scoreA;
   });
 
