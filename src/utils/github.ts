@@ -233,3 +233,158 @@ export async function fetchGlobalLeaderboard(count = 10, extraUsers: string[] = 
 
   return results.filter((r): r is GithubUserData => r !== null);
 }
+
+export interface GithubRepoData {
+  name: string;
+  nameWithOwner: string;
+  description: string | null;
+  url: string;
+  stargazerCount: number;
+  forkCount: number;
+  watchers: { totalCount: number };
+  openIssues: { totalCount: number };
+  openPullRequests: { totalCount: number };
+  licenseInfo: { name: string; nickname: string | null } | null;
+  primaryLanguage: { name: string; color: string } | null;
+  languages: {
+    totalSize: number;
+    edges: Array<{
+      size: number;
+      node: { name: string; color: string };
+    }>;
+  };
+  repositoryTopics: {
+    nodes: Array<{ topic: { name: string } }>;
+  };
+  defaultBranchRef: {
+    name: string;
+    target: {
+      history?: { totalCount: number };
+    };
+  } | null;
+  releases: { totalCount: number };
+  createdAt: string;
+  updatedAt: string;
+  owner: {
+    login: string;
+    avatarUrl: string;
+  };
+}
+
+export function parseRepoInput(input: string): { owner: string; name: string } | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+
+  // Handles https://github.com/owner/repo or github.com/owner/repo
+  const urlMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?github\.com\/([^\/]+)\/([^\/]+)/i);
+  if (urlMatch) {
+    return { owner: urlMatch[1], name: urlMatch[2].replace(/\.git$/i, "") };
+  }
+
+  // Handles owner/repo format
+  const slashParts = trimmed.split("/");
+  if (slashParts.length === 2 && slashParts[0].trim() && slashParts[1].trim()) {
+    return { owner: slashParts[0].trim(), name: slashParts[1].trim().replace(/\.git$/i, "") };
+  }
+
+  return null;
+}
+
+export async function fetchRepoStats(owner: string, name: string): Promise<GithubRepoData> {
+  const query = `
+    query($owner: String!, $name: String!) {
+      repository(owner: $owner, name: $name) {
+        name
+        nameWithOwner
+        description
+        url
+        stargazerCount
+        forkCount
+        watchers {
+          totalCount
+        }
+        openIssues: issues(states: OPEN) {
+          totalCount
+        }
+        openPullRequests: pullRequests(states: OPEN) {
+          totalCount
+        }
+        licenseInfo {
+          name
+          nickname
+        }
+        primaryLanguage {
+          name
+          color
+        }
+        languages(first: 10, orderBy: {field: SIZE, direction: DESC}) {
+          totalSize
+          edges {
+            size
+            node {
+              name
+              color
+            }
+          }
+        }
+        repositoryTopics(first: 12) {
+          nodes {
+            topic {
+              name
+            }
+          }
+        }
+        defaultBranchRef {
+          name
+          target {
+            ... on Commit {
+              history {
+                totalCount
+              }
+            }
+          }
+        }
+        releases {
+          totalCount
+        }
+        createdAt
+        updatedAt
+        owner {
+          login
+          avatarUrl(size: 160)
+        }
+      }
+    }
+  `;
+
+  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  let response;
+  try {
+    response = await revineFetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        query,
+        variables: { owner, name },
+      }),
+      cacheTTL: 600000,
+      persist: true,
+    });
+  } catch (err: any) {
+    if (err.status === 403 || err.status === 401) {
+      throw new Error(
+        "GitHub API blocked the request. Try adding a REVINE_PUBLIC_GITHUB_TOKEN to your environment if you hit rate limits.",
+      );
+    }
+    throw err;
+  }
+
+  const payload = response;
+  if (payload.errors?.length) throw new Error(payload.errors[0].message);
+  if (!payload.data?.repository) throw new Error(`Repository "${owner}/${name}" not found on GitHub.`);
+  return payload.data.repository as GithubRepoData;
+}
+

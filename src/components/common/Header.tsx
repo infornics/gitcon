@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "revine";
+import { parseRepoInput } from "@/utils/github";
 
 export default function Header() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -32,8 +33,13 @@ export default function Header() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
-      window.location.href = `/user/${query.trim()}`;
+    const val = query.trim();
+    if (!val) return;
+    const repoMatch = parseRepoInput(val);
+    if (repoMatch) {
+      window.location.href = `/repo/${repoMatch.owner}/${repoMatch.name}`;
+    } else {
+      window.location.href = `/user/${val}`;
     }
   };
 
@@ -61,14 +67,29 @@ export default function Header() {
         </div>
       </Link>
 
+      <div className="flex items-center gap-2">
+        <Link
+          href="/"
+          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100"
+        >
+          Users
+        </Link>
+        <Link
+          href="/repo"
+          className="text-xs font-semibold px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
+        >
+          Repo Stats
+        </Link>
+      </div>
+
       <form className="header-search" onSubmit={handleSearch}>
         <input
           id="global-search-input"
           type="text"
-          placeholder="Search GitHub username..."
+          placeholder="Search user or owner/repo..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          aria-label="Search GitHub username"
+          aria-label="Search GitHub username or repository"
         />
         <svg
           width="16"
@@ -141,3 +162,4 @@ export default function Header() {
     </header>
   );
 }
+

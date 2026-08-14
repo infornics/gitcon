@@ -199,6 +199,22 @@ export default function Home() {
           <Leaderboard />
         </section>
 
+        <section className="mt-16 p-8 rounded-2xl bg-gradient-to-r from-primary/10 via-surface-2 to-surface border border-primary/20 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wider text-primary mb-2">New Feature</div>
+            <h2 className="text-2xl font-bold font-display">Repository Stats Analyzer</h2>
+            <p className="text-sm opacity-70 mt-1 max-w-xl">
+              Inspect open-source repositories in real time. Analyze stars, forks, open issues, language breakdown, and project metadata.
+            </p>
+          </div>
+          <Link
+            href="/repo"
+            className="btn btn-primary shrink-0 text-sm font-bold px-6 py-3 rounded-full"
+          >
+            Explore Repo Stats →
+          </Link>
+        </section>
+
         <section className="workspace-wide mt-20" id="tracker">
           <Rhythm />
 
