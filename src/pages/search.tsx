@@ -150,7 +150,7 @@ export default function SearchPage() {
             <table className="leaderboard-table">
               <thead>
                 <tr>
-                  <th className="text-center w-16">Rank</th>
+                  <th className="text-center w-16">#</th>
                   <th>Developer</th>
                   <th className="!text-center">Contributions</th>
                   <th className="!text-center">Longest Streak</th>
@@ -161,7 +161,7 @@ export default function SearchPage() {
               <tbody>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <tr key={i}>
-                    <td className="rank text-center">
+                    <td className="text-center font-mono opacity-50 font-bold">
                       <div className="skeleton h-6 w-8 mx-auto rounded" />
                     </td>
                     <td>
@@ -200,7 +200,7 @@ export default function SearchPage() {
                 <table className="leaderboard-table">
                   <thead>
                     <tr>
-                      <th className="text-center w-16">Rank</th>
+                      <th className="text-center w-16">#</th>
                       <th>Developer</th>
                       <th className="!text-center">Contributions</th>
                       <th className="!text-center">Longest Streak</th>
@@ -219,17 +219,7 @@ export default function SearchPage() {
                             (window.location.href = `/user/${user.login}`)
                           }
                         >
-                          <td
-                            className={`rank text-center ${
-                              rowNum === 1
-                                ? "gold"
-                                : rowNum === 2
-                                  ? "silver"
-                                  : rowNum === 3
-                                    ? "bronze"
-                                    : ""
-                            }`}
-                          >
+                          <td className="text-center font-mono opacity-60 font-bold text-sm">
                             {rowNum}
                           </td>
                           <td>
@@ -305,7 +295,7 @@ export default function SearchPage() {
                             (window.location.href = `/repo/${repo.owner.login}/${repo.name}`)
                           }
                         >
-                          <td className="rank text-center font-mono">
+                          <td className="text-center font-mono opacity-60 font-bold text-sm">
                             {rowNum}
                           </td>
                           <td>
