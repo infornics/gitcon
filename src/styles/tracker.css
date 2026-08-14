@@ -237,7 +237,7 @@ h1.tracker-title {
   font-size: var(--text-2xl);
   line-height: 0.98;
   letter-spacing: -0.04em;
-  max-width: 11ch;
+  max-width: 20ch;
   margin-bottom: var(--space-4);
 }
 .hero p {
