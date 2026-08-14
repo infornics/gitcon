@@ -378,16 +378,6 @@ export default function RepoDetail() {
               </div>
             </div>
           </div>
-
-          <div className="mt-6 p-4 rounded-xl bg-surface-2/60 border border-white/5">
-            <div className="text-xs font-bold uppercase tracking-wider text-primary mb-1">
-              Quick Action
-            </div>
-            <p className="text-xs opacity-70">
-              Want to see user contributions to <strong>{repo.name}</strong>?
-              Explore the contributor profile by searching their handle.
-            </p>
-          </div>
         </div>
       </div>
 
@@ -512,7 +502,9 @@ export default function RepoDetail() {
                       )}
                     </td>
                     <td className="!text-center font-mono opacity-80">
-                      {(c.filesTouchedApprox || c.contributions).toLocaleString()}
+                      {(
+                        c.filesTouchedApprox || c.contributions
+                      ).toLocaleString()}
                     </td>
                     <td>
                       {repo.primaryLanguage?.name ? (
