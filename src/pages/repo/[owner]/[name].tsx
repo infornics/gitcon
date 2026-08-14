@@ -121,32 +121,66 @@ export default function RepoDetail() {
 
   return (
     <main className="py-8">
-      {/* Header strip */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-extrabold font-display flex items-center gap-3">
-          <img
-            src={repo.owner.avatarUrl}
-            alt={repo.owner.login}
-            className="w-9 h-9 rounded-xl border border-white/10"
-          />
+      {/* Repository Header Section (Matching User Profile Hero Layout) */}
+      <section className="profile-hero mb-8">
+        <div className="profile-info">
           <Link
             href={`/user/${repo.owner.login}`}
-            className="hover:underline opacity-80 text-inherit no-underline"
+            className="block shrink-0"
+            title={`View ${repo.owner.login}'s profile`}
           >
-            {repo.owner.login}
+            <img
+              src={repo.owner.avatarUrl}
+              alt={repo.owner.login}
+              className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
+            />
           </Link>
-          <span className="opacity-40">/</span>
-          <a
-            href={repo.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-            title="View on GitHub"
-          >
-            {repo.name}
-          </a>
-        </h1>
-      </div>
+          <div>
+            <h1 className="profile-name flex items-center gap-2">
+              <Link
+                href={`/user/${repo.owner.login}`}
+                className="hover:text-primary transition-colors text-inherit no-underline"
+              >
+                {repo.owner.login}
+              </Link>
+              <span className="opacity-40">/</span>
+              <a
+                href={repo.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline"
+                title="View repository on GitHub"
+              >
+                {repo.name}
+              </a>
+            </h1>
+            <a
+              href={repo.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5 mt-1"
+              title="View repository on GitHub"
+            >
+              github.com/{repo.owner.login}/{repo.name}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="opacity-60"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* Main Overview Panel */}
       <div className="panel p-8 mb-8 border-primary/20 bg-linear-to-br from-surface to-surface-2">
