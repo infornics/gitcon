@@ -411,7 +411,6 @@ export default function RepoDetail() {
                   <th className="!text-center">Lines Added / Deleted</th>
                   <th className="!text-center">Files Affected</th>
                   <th>Primary Language</th>
-                  <th className="!text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -438,9 +437,6 @@ export default function RepoDetail() {
                     <td>
                       <div className="skeleton h-5 w-20 rounded" />
                     </td>
-                    <td className="!text-right">
-                      <div className="skeleton h-4 w-6 ml-auto rounded" />
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -457,7 +453,6 @@ export default function RepoDetail() {
                   <th className="!text-center">Lines Added / Deleted</th>
                   <th className="!text-center">Files Affected</th>
                   <th>Primary Language</th>
-                  <th className="!text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -514,22 +509,6 @@ export default function RepoDetail() {
                       ) : (
                         <span className="text-xs opacity-40">—</span>
                       )}
-                    </td>
-                    <td className="!text-right">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="opacity-40 hover:opacity-100 transition-all inline-block ml-auto"
-                      >
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
                     </td>
                   </tr>
                 ))}
