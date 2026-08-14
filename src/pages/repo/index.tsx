@@ -1,13 +1,25 @@
-import { fetchOrgRepos, fetchTopForkedRepos, fetchTopStarredRepos, parseRepoInput, RepoSearchResult } from "@/utils/github";
+import {
+  fetchOrgRepos,
+  fetchTopForkedRepos,
+  fetchTopStarredRepos,
+  parseRepoInput,
+  RepoSearchResult,
+} from "@/utils/github";
 import { useEffect, useState } from "react";
 import { Link } from "revine";
 
 export default function RepoLanding() {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [infornicsRepos, setInfornicsRepos] = useState<RepoSearchResult["items"]>([]);
-  const [topStarredRepos, setTopStarredRepos] = useState<RepoSearchResult["items"]>([]);
-  const [topForkedRepos, setTopForkedRepos] = useState<RepoSearchResult["items"]>([]);
+  const [infornicsRepos, setInfornicsRepos] = useState<
+    RepoSearchResult["items"]
+  >([]);
+  const [topStarredRepos, setTopStarredRepos] = useState<
+    RepoSearchResult["items"]
+  >([]);
+  const [topForkedRepos, setTopForkedRepos] = useState<
+    RepoSearchResult["items"]
+  >([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -61,15 +73,16 @@ export default function RepoLanding() {
         )}
       </section>
 
-      {/* Repositories you should check out for: infornics */}
+      {/* Repositories worth watching */}
       <section className="mt-12">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h2 className="text-2xl font-bold font-display">
-              Repositories you should check out for: <span className="text-primary font-mono">Infornics</span>
+              Repositories worth watching
             </h2>
             <p className="text-sm opacity-60">
-              Public repositories with highest contribution activity built and maintained by Infornics
+              Public repositories with highest contribution activity built and
+              maintained by Infornics
             </p>
           </div>
         </div>
@@ -100,7 +113,16 @@ export default function RepoLanding() {
                       </span>
                     )}
                     <span className="text-xs font-mono font-bold text-primary flex items-center gap-1">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                       </svg>
                       {repo.stargazers_count.toLocaleString()}
@@ -167,7 +189,16 @@ export default function RepoLanding() {
                       </span>
                     )}
                     <span className="text-xs font-mono font-bold text-primary flex items-center gap-1">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                       </svg>
                       {repo.stargazers_count.toLocaleString()}
@@ -234,7 +265,16 @@ export default function RepoLanding() {
                       </span>
                     )}
                     <span className="text-xs font-mono font-bold text-primary flex items-center gap-1.5">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <line x1="6" y1="3" x2="6" y2="15" />
                         <circle cx="18" cy="6" r="3" />
                         <circle cx="6" cy="18" r="3" />
