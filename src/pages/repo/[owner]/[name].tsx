@@ -121,53 +121,31 @@ export default function RepoDetail() {
 
   return (
     <main className="py-8">
-      {/* Header / Search strip */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-        <div>
-          <div className="flex items-center gap-2 text-xs opacity-60 mb-1">
-            <Link href="/repo" className="hover:underline">
-              Repositories
-            </Link>
-            <span>/</span>
-            <span>{repo.owner.login}</span>
-          </div>
-          <h1 className="text-3xl font-extrabold font-display flex items-center gap-3">
-            <img
-              src={repo.owner.avatarUrl}
-              alt={repo.owner.login}
-              className="w-9 h-9 rounded-xl border border-white/10"
-            />
-            <a
-              href={`https://github.com/${repo.owner.login}`}
-              target="_blank"
-              rel="noreferrer"
-              className="hover:underline opacity-80"
-            >
-              {repo.owner.login}
-            </a>
-            <span className="opacity-40">/</span>
-            <span className="text-primary">{repo.name}</span>
-          </h1>
-        </div>
-
-        <form
-          onSubmit={handleQuickSearch}
-          className="flex gap-2 w-full md:w-auto"
-        >
-          <input
-            type="text"
-            placeholder="Inspect another repo (owner/repo)..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-4 py-2 rounded-full border border-white/10 bg-surface-2 text-xs w-full md:w-64 focus:outline-none focus:border-primary"
+      {/* Header strip */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-extrabold font-display flex items-center gap-3">
+          <img
+            src={repo.owner.avatarUrl}
+            alt={repo.owner.login}
+            className="w-9 h-9 rounded-xl border border-white/10"
           />
-          <button
-            type="submit"
-            className="btn btn-secondary !py-2 !px-4 !text-xs shrink-0"
+          <Link
+            href={`/user/${repo.owner.login}`}
+            className="hover:underline opacity-80 text-inherit no-underline"
           >
-            Go
-          </button>
-        </form>
+            {repo.owner.login}
+          </Link>
+          <span className="opacity-40">/</span>
+          <a
+            href={repo.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+            title="View on GitHub"
+          >
+            {repo.name}
+          </a>
+        </h1>
       </div>
 
       {/* Main Overview Panel */}
@@ -211,14 +189,6 @@ export default function RepoDetail() {
           </div>
 
           <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 justify-center">
-            <a
-              href={repo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-primary justify-center text-center !py-2.5 !px-5"
-            >
-              View on GitHub ↗
-            </a>
             <a
               href={`${repo.url}/issues`}
               target="_blank"
