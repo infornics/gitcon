@@ -12,3 +12,7 @@
 }
 
 @import "./tracker.css";
+
+button {
+  cursor: pointer;
+}
