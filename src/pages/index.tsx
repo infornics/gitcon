@@ -53,6 +53,12 @@ export default function Home() {
   // Fetch initial data on mount
   useEffect(() => {
     handleLoadData("rachit-bharadwaj", 365);
+    if (window.location.hash === "#leaderboard") {
+      setTimeout(() => {
+        const el = document.getElementById("leaderboard");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 300);
+    }
   }, []);
 
   const stats = useMemo(() => calculateStats(series), [series]);
