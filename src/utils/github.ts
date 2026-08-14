@@ -396,6 +396,7 @@ export interface UserSearchResult {
     avatar_url: string;
     html_url: string;
     type: string;
+    name?: string;
   }>;
 }
 
@@ -431,7 +432,37 @@ export async function searchGithubUsers(query: string, page = 1, perPage = 10): 
     }
   );
 
-  return response as UserSearchResult;
+  const rawData = response as UserSearchResult;
+  if (!rawData.items || rawData.items.length === 0) return rawData;
+
+  // Enrich top results with full user profile name
+  const enrichedItems = await Promise.all(
+    rawData.items.map(async (item) => {
+      try {
+        const uDetail = await revineFetch(`https://api.github.com/users/${item.login}`, {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          cacheTTL: 3600000,
+          persist: true,
+        });
+        return {
+          ...item,
+          name: uDetail.name || item.login,
+        };
+      } catch (e) {
+        return {
+          ...item,
+          name: item.login,
+        };
+      }
+    })
+  );
+
+  return {
+    ...rawData,
+    items: enrichedItems,
+  };
 }
 
 export async function searchGithubRepos(query: string, page = 1, perPage = 10): Promise<RepoSearchResult> {
