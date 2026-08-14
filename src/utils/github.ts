@@ -526,18 +526,50 @@ export async function fetchTopForkedRepos(count = 6): Promise<RepoSearchResult> 
 
 export async function fetchOrgRepos(org = "infornics", count = 6): Promise<RepoSearchResult> {
   const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
-  const response = await revineFetch(
-    `https://api.github.com/search/repositories?q=user:${org}&sort=updated&order=desc&per_page=${count}`,
-    {
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
-      cacheTTL: 3600000, // 1 hour cache
-      persist: true,
+  let rawRepos: any[] = [];
+  try {
+    const data = await revineFetch(
+      `https://api.github.com/orgs/${org}/repos?type=public&per_page=100`,
+      {
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        cacheTTL: 1800000, // 30 min cache
+        persist: true,
+      }
+    );
+    rawRepos = Array.isArray(data) ? data : data.items || [];
+  } catch (e) {
+    try {
+      const data = await revineFetch(
+        `https://api.github.com/users/${org}/repos?type=public&per_page=100`,
+        {
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          cacheTTL: 1800000,
+          persist: true,
+        }
+      );
+      rawRepos = Array.isArray(data) ? data : data.items || [];
+    } catch (err) {
+      rawRepos = [];
     }
-  );
+  }
 
-  return response as RepoSearchResult;
+  // Sort repos by contribution activity (stars count + forks count + size weight)
+  const sorted = [...rawRepos].sort((a, b) => {
+    const scoreA = (a.stargazers_count || 0) * 10 + (a.forks_count || 0) * 5 + (a.size || 0);
+    const scoreB = (b.stargazers_count || 0) * 10 + (b.forks_count || 0) * 5 + (b.size || 0);
+    return scoreB - scoreA;
+  });
+
+  const topItems = sorted.slice(0, count);
+
+  return {
+    total_count: topItems.length,
+    items: topItems,
+  } as RepoSearchResult;
 }
 
 

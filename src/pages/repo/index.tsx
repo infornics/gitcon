@@ -69,7 +69,7 @@ export default function RepoLanding() {
               Repositories you should check out for: <span className="text-primary font-mono">Infornics</span>
             </h2>
             <p className="text-sm opacity-60">
-              Featured open-source projects built and maintained by Infornics
+              Public repositories with highest contribution activity built and maintained by Infornics
             </p>
           </div>
         </div>
