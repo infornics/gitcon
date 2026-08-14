@@ -589,11 +589,13 @@ export default function RepoDetail() {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    <rect x="3" y="4" width="5" height="16" rx="2"></rect>
+                    <rect x="10" y="9" width="5" height="11" rx="2"></rect>
+                    <path d="M17 14a4 4 0 1 1 4 4h-2"></path>
                   </svg>
                 </div>
                 <div>
