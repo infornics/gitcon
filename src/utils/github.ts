@@ -509,6 +509,7 @@ export interface RepoContributor {
   deletions?: number;
   netChanges?: number;
   filesTouchedApprox?: number;
+  score?: number;
 }
 
 export async function fetchRepoContributors(
@@ -627,13 +628,16 @@ export async function fetchRepoContributors(
           const stat = statsMap.get(c.login.toLowerCase());
           const additions = stat?.a || 0;
           const deletions = stat?.d || 0;
-          // Approximate files touched estimation based on commits and code changes volume
           const filesTouchedApprox = stat
             ? Math.max(
                 1,
                 Math.round(stat.c * 2.2 + (additions + deletions) / 250),
               )
-            : Math.max(1, c.contributions * 2);
+            : Math.max(1, (c.contributions || 0) * 2);
+
+          const totalCommits = c.contributions || 0;
+          const score =
+            totalCommits + additions + deletions + filesTouchedApprox;
 
           return {
             ...c,
@@ -642,21 +646,26 @@ export async function fetchRepoContributors(
             deletions,
             netChanges: additions - deletions,
             filesTouchedApprox,
+            score,
           };
         } catch (e) {
+          const totalCommits = c.contributions || 0;
           return {
             ...c,
             name: c.login,
             additions: 0,
             deletions: 0,
             netChanges: 0,
-            filesTouchedApprox: c.contributions,
+            filesTouchedApprox: totalCommits,
+            score: totalCommits,
           };
         }
       }),
     );
 
-    return enriched;
+    // Sort contributors descending by composite activity score:
+    // Formula: Commits + Lines Added + Lines Deleted (positive) + Files Affected
+    return enriched.sort((a, b) => (b.score || 0) - (a.score || 0));
   } catch (err) {
     console.error("Failed to fetch repo contributors:", err);
     return [];

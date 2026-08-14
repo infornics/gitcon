@@ -465,12 +465,10 @@ export default function RepoDetail() {
       {/* Contributors Section */}
       <section className="panel leaderboard-panel">
         <div className="panel-head flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-xl font-bold font-display">Contributors</h2>
-            <p className="text-xs opacity-60">
-              Top developers contributing code to {repo.name}
+            <h2 className="text-2xl font-bold font-display">Contributors</h2>
+            <p className="text-xs opacity-60 mt-0.5">
+              Ranked by total code impact: Commits + Additions + Deletions + Files Affected
             </p>
-          </div>
           <a
             href={`${repo.url}/graphs/contributors`}
             target="_blank"
