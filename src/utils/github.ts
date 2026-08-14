@@ -36,6 +36,31 @@ export interface GithubUserData {
   };
 }
 
+export function getGithubToken(): string {
+  if (typeof window !== "undefined") {
+    const userToken = localStorage.getItem("gitcon_pat")?.trim();
+    if (userToken) return userToken;
+  }
+  return (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+}
+
+export function setGithubToken(token: string) {
+  if (typeof window !== "undefined") {
+    if (token.trim()) {
+      localStorage.setItem("gitcon_pat", token.trim());
+    } else {
+      localStorage.removeItem("gitcon_pat");
+    }
+  }
+}
+
+export function hasCustomGithubToken(): boolean {
+  if (typeof window !== "undefined") {
+    return !!localStorage.getItem("gitcon_pat")?.trim();
+  }
+  return false;
+}
+
 export function isoDate(date: Date) {
   return date.toISOString().slice(0, 10);
 }
@@ -397,7 +422,7 @@ export async function fetchRepoStats(
     }
   `;
 
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   let response;
   try {
     response = await revineFetch("https://api.github.com/graphql", {
@@ -416,14 +441,22 @@ export async function fetchRepoStats(
   } catch (err: any) {
     if (err.status === 403 || err.status === 401) {
       throw new Error(
-        "GitHub API blocked the request. Try adding a REVINE_PUBLIC_GITHUB_TOKEN to your environment if you hit rate limits.",
+        "GitHub API access error. If this is a private repository, please click 'Access Token' in the header to add your GitHub Personal Access Token.",
       );
     }
     throw err;
   }
 
   const payload = response;
-  if (payload.errors?.length) throw new Error(payload.errors[0].message);
+  if (payload.errors?.length) {
+    const msg = payload.errors[0].message;
+    if (msg.includes("Could not resolve to a Repository")) {
+      throw new Error(
+        `Repository "${owner}/${name}" was not found or is private. If you have access, add your Personal Access Token (PAT) using the Access Token button in the header.`,
+      );
+    }
+    throw new Error(msg);
+  }
   if (!payload.data?.repository)
     throw new Error(`Repository "${owner}/${name}" not found on GitHub.`);
 
@@ -483,7 +516,7 @@ export async function fetchRepoContributors(
   name: string,
   limit = 15,
 ): Promise<RepoContributor[]> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   try {
     // 1. Fetch main contributors list
     const res = await revineFetch(
@@ -633,16 +666,11 @@ export async function fetchRepoContributors(
 export interface UserSearchResult {
   total_count: number;
   items: Array<{
-    login: string;
     id: number;
+    login: string;
     avatar_url: string;
     html_url: string;
     type: string;
-    name?: string;
-    totalContributions?: number;
-    longestStreak?: number;
-    currentStreak?: number;
-    followers?: number;
   }>;
 }
 
@@ -672,7 +700,7 @@ export async function searchGithubUsers(
   page = 1,
   perPage = 10,
 ): Promise<UserSearchResult> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   const encodedQuery = encodeURIComponent(query);
   const response = await revineFetch(
     `https://api.github.com/search/users?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
@@ -688,46 +716,35 @@ export async function searchGithubUsers(
   const rawData = response as UserSearchResult;
   if (!rawData.items || rawData.items.length === 0) return rawData;
 
-  // Enrich top results with full user profile stats & contribution data
-  const enrichedItems = await Promise.all(
-    rawData.items.map(async (item) => {
+  const detailedItems = await Promise.all(
+    rawData.items.map(async (user) => {
       try {
-        const fullUser = await fetchContributions(item.login, 365);
-        const merged =
-          fullUser.contributionsCollection.contributionCalendar.weeks.flatMap(
-            (w) =>
-              w.contributionDays.map((d) => ({
-                date: d.date,
-                count: d.contributionCount,
-              })),
-          );
-        const stats = calculateStats(merged);
+        const uDetail = await revineFetch(
+          `https://api.github.com/users/${user.login}`,
+          {
+            headers: {
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            cacheTTL: 3600000, // 1 hr cache
+            persist: true,
+          },
+        );
         return {
-          ...item,
-          name: fullUser.name || item.login,
-          totalContributions:
-            fullUser.contributionsCollection.contributionCalendar
-              .totalContributions,
-          longestStreak: stats.longest,
-          currentStreak: stats.current,
-          followers: fullUser.followers?.totalCount || 0,
+          ...user,
+          name: uDetail.name || user.login,
+          followers: uDetail.followers || 0,
+          public_repos: uDetail.public_repos || 0,
+          bio: uDetail.bio || null,
         };
-      } catch (e) {
-        return {
-          ...item,
-          name: item.login,
-          totalContributions: 0,
-          longestStreak: 0,
-          currentStreak: 0,
-          followers: 0,
-        };
+      } catch (err) {
+        return user;
       }
     }),
   );
 
   return {
     ...rawData,
-    items: enrichedItems,
+    items: detailedItems,
   };
 }
 
@@ -736,7 +753,7 @@ export async function searchGithubRepos(
   page = 1,
   perPage = 10,
 ): Promise<RepoSearchResult> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   const encodedQuery = encodeURIComponent(query);
   const response = await revineFetch(
     `https://api.github.com/search/repositories?q=${encodedQuery}&page=${page}&per_page=${perPage}`,
@@ -755,7 +772,7 @@ export async function searchGithubRepos(
 export async function fetchTopStarredRepos(
   count = 6,
 ): Promise<RepoSearchResult> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   const response = await revineFetch(
     `https://api.github.com/search/repositories?q=stars:>10000&sort=stars&order=desc&per_page=${count}`,
     {
@@ -773,7 +790,7 @@ export async function fetchTopStarredRepos(
 export async function fetchTopForkedRepos(
   count = 6,
 ): Promise<RepoSearchResult> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   const response = await revineFetch(
     `https://api.github.com/search/repositories?q=forks:>5000&sort=forks&order=desc&per_page=${count}`,
     {
@@ -789,14 +806,14 @@ export async function fetchTopForkedRepos(
 }
 
 export async function fetchOrgRepos(
-  org = "infornics",
+  org: string,
   count = 6,
 ): Promise<RepoSearchResult> {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
   let rawRepos: any[] = [];
   try {
     const data = await revineFetch(
-      `https://api.github.com/orgs/${org}/repos?type=public&per_page=100`,
+      `https://api.github.com/users/${org}/repos?type=public&per_page=100`,
       {
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -806,15 +823,15 @@ export async function fetchOrgRepos(
       },
     );
     rawRepos = Array.isArray(data) ? data : data.items || [];
-  } catch (e) {
+  } catch (err) {
     try {
       const data = await revineFetch(
-        `https://api.github.com/users/${org}/repos?type=public&per_page=100`,
+        `https://api.github.com/orgs/${org}/repos?type=public&per_page=100`,
         {
           headers: {
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
-          cacheTTL: 1800000,
+          cacheTTL: 1800000, // 30 min cache
           persist: true,
         },
       );
@@ -877,7 +894,9 @@ export async function fetchOrgRepos(
         }
 
         // Calculate days since last active activity (pushed_at or updated_at)
-        const lastActiveTimestamp = new Date(repo.pushed_at || repo.updated_at || Date.now()).getTime();
+        const lastActiveTimestamp = new Date(
+          repo.pushed_at || repo.updated_at || Date.now(),
+        ).getTime();
         const nowTimestamp = Date.now();
         const diffMs = Math.max(0, nowTimestamp - lastActiveTimestamp);
         const daysSinceLastActive = Math.floor(diffMs / (1000 * 60 * 60 * 24));

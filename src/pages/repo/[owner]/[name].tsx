@@ -105,14 +105,38 @@ export default function RepoDetail() {
               <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold mb-2">Repository Not Found</h2>
+          <h2 className="text-2xl font-bold mb-2">Repository Not Found or Private</h2>
           <p className="opacity-70 text-sm mb-6">{error}</p>
-          <Link
-            href="/repo"
-            className="btn btn-primary inline-flex items-center gap-2"
-          >
-            ← Back to Repository Search
-          </Link>
+          <div className="flex flex-col gap-3 items-center">
+            <button
+              onClick={() => {
+                const el = document.querySelector<HTMLButtonElement>('button[title*="Personal Access Token"]');
+                if (el) el.click();
+              }}
+              className="btn btn-primary inline-flex items-center gap-2 text-xs"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 2l-2 2m-1.5 1.5l-3 3m-5 5l-4 4-2-2 4-4m2.5-2.5l3-3m-6 6l-3-3" />
+                <circle cx="16.5" cy="7.5" r="4.5" />
+              </svg>
+              <span>Add Personal Access Token (PAT)</span>
+            </button>
+            <Link
+              href="/repo"
+              className="text-xs text-text-muted hover:text-white transition-colors underline"
+            >
+              ← Back to Repository Search
+            </Link>
+          </div>
         </div>
       </main>
     );
