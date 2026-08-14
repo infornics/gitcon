@@ -68,8 +68,8 @@ export default function RepoLanding() {
     <main className="py-10">
       <section className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto py-16 px-4">
         <div className="eyebrow">Deep-dive repository analytics</div>
-        <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl tracking-tight max-w-3xl mt-4 mb-4 leading-tight">
-          Inspect stats for any GitHub repository.
+        <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-7xl tracking-tight max-w-3xl mt-4 mb-4 leading-tight">
+          Stats for any GitHub repository
         </h1>
         <p className="text-base sm:text-lg text-text-muted max-w-2xl mx-auto mb-8">
           Analyze stars, forks, open issues, language breakdown, pull requests,
