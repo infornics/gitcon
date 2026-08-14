@@ -28,16 +28,16 @@ export default function RepoLanding() {
 
   return (
     <main className="py-10">
-      <section className="hero flex-col text-center max-w-4xl mx-auto py-12">
-        <div className="eyebrow mx-auto">Deep-dive repository analytics</div>
-        <h1 className="tracker-title text-4xl sm:text-5xl font-extrabold max-w-2xl mx-auto leading-tight">
+      <section className="flex flex-col items-center justify-center text-center max-w-4xl mx-auto py-16 px-4">
+        <div className="eyebrow">Deep-dive repository analytics</div>
+        <h1 className="font-display font-bold text-4xl sm:text-5xl lg:text-6xl tracking-tight max-w-3xl mt-4 mb-4 leading-tight">
           Inspect stats for any GitHub repository.
         </h1>
-        <p className="text-lg opacity-70 max-w-xl mx-auto mt-4">
+        <p className="text-base sm:text-lg text-text-muted max-w-2xl mx-auto mb-8">
           Analyze stars, forks, open issues, language breakdown, pull requests, and activity health metrics in seconds.
         </p>
 
-        <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto mt-8 flex flex-col sm:flex-row gap-3">
+        <form onSubmit={handleSubmit} className="w-full max-w-xl mx-auto flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
               type="text"
@@ -47,7 +47,7 @@ export default function RepoLanding() {
                 setInput(e.target.value);
                 setError(null);
               }}
-              className="w-full h-12 px-4 py-3 rounded-full border border-white/10 bg-surface-2 text-text text-sm focus:outline-none focus:border-primary shadow-sm"
+              className="w-full h-12 px-5 py-3 rounded-full border border-white/10 bg-surface-2 text-text text-sm focus:outline-none focus:border-primary shadow-sm"
             />
           </div>
           <button type="submit" className="btn btn-primary h-12 px-6 rounded-full shrink-0 justify-center">
@@ -55,7 +55,7 @@ export default function RepoLanding() {
           </button>
         </form>
 
-        {error && <div className="text-rose-500 text-sm mt-3 font-medium">{error}</div>}
+        {error && <div className="text-rose-500 text-sm mt-4 font-medium">{error}</div>}
       </section>
 
       <section className="mt-16">
