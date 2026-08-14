@@ -269,6 +269,9 @@ export interface GithubRepoData {
       history?: { totalCount: number };
     };
   } | null;
+  pushedAt?: string;
+  commitsPast3Months?: number;
+  conScore?: number;
   releases: { totalCount: number };
   createdAt: string;
   updatedAt: string;
@@ -276,6 +279,25 @@ export interface GithubRepoData {
     login: string;
     avatarUrl: string;
   };
+}
+
+export function calculateConScore(repo: {
+  stargazerCount: number;
+  forkCount: number;
+  defaultBranchRef?: { target?: { history?: { totalCount: number } } } | null;
+  commitsPast3Months?: number;
+  pushedAt?: string;
+  updatedAt?: string;
+
+}) {
+  const stars = repo.stargazerCount || 0;
+  const forks = repo.forkCount || 0;
+  const totalCommits = repo.defaultBranchRef?.target?.history?.totalCount || 0;
+  const recentCommits = repo.commitsPast3Months || 0;
+  const lastActiveTs = new Date(repo.pushedAt || repo.updatedAt || Date.now()).getTime();
+  const diffMs = Math.max(0, Date.now() - lastActiveTs);
+  const daysSinceLastActive = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  return stars + forks + totalCommits + recentCommits - daysSinceLastActive;
 }
 
 export function parseRepoInput(
@@ -364,6 +386,7 @@ export async function fetchRepoStats(
         releases {
           totalCount
         }
+        pushedAt
         createdAt
         updatedAt
         owner {
@@ -403,7 +426,42 @@ export async function fetchRepoStats(
   if (payload.errors?.length) throw new Error(payload.errors[0].message);
   if (!payload.data?.repository)
     throw new Error(`Repository "${owner}/${name}" not found on GitHub.`);
-  return payload.data.repository as GithubRepoData;
+
+  const repoObj = payload.data.repository;
+
+  // Fetch past 3 months commits for Conscore
+  let commitsPast3Months = 0;
+  try {
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+    const sinceISO = threeMonthsAgo.toISOString();
+    const resRecent = await fetch(
+      `https://api.github.com/repos/${owner}/${name}/commits?since=${sinceISO}&per_page=1`,
+      {
+        headers: {
+          "User-Agent": "Gitcon",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      },
+    );
+    if (resRecent.ok) {
+      const link = resRecent.headers.get("link");
+      if (link) {
+        const match = link.match(/page=(\d+)>; rel="last"/);
+        commitsPast3Months = match ? parseInt(match[1], 10) : 1;
+      } else {
+        const body = await resRecent.json();
+        commitsPast3Months = Array.isArray(body) ? body.length : 0;
+      }
+    }
+  } catch (e) {
+    commitsPast3Months = 0;
+  }
+
+  repoObj.commitsPast3Months = commitsPast3Months;
+  repoObj.conScore = calculateConScore(repoObj);
+
+  return repoObj as GithubRepoData;
 }
 
 export interface RepoContributor {

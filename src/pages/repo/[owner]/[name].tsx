@@ -17,6 +17,7 @@ export default function RepoDetail() {
   const [contributors, setContributors] = useState<RepoContributor[]>([]);
   const [loadingContributors, setLoadingContributors] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showConscoreModal, setShowConscoreModal] = useState(false);
 
   useEffect(() => {
     if (owner && name) {
@@ -230,6 +231,32 @@ export default function RepoDetail() {
                 {repo.defaultBranchRef.name}
               </span>
             )}
+
+            {/* Conscore Badge */}
+            <div className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/25 inline-flex items-center gap-1.5 shadow-xs">
+              <span>Conscore: {(repo.conScore ?? 0).toLocaleString()}</span>
+              <button
+                onClick={() => setShowConscoreModal(true)}
+                className="hover:opacity-100 opacity-70 transition-opacity p-0.5 rounded-full hover:bg-primary/20 cursor-pointer"
+                title="View Conscore calculation breakdown"
+                aria-label="View Conscore calculation breakdown"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+              </button>
+            </div>
           </div>
 
           <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
@@ -543,6 +570,105 @@ export default function RepoDetail() {
           </div>
         )}
       </section>
+
+      {/* Conscore Info Modal */}
+      {showConscoreModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
+          <div className="bg-surface border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold font-display">Conscore</h3>
+                  <p className="text-xs text-text-muted">Repository Momentum Score</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowConscoreModal(false)}
+                className="p-1 rounded-lg text-text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="space-y-4 text-sm text-text-muted">
+              <p className="leading-relaxed">
+                <strong>Conscore</strong> measures the activity momentum and overall health of a GitHub repository by combining popularity, lifetime velocity, recent contributions, and activity recency.
+              </p>
+
+              <div className="p-4 rounded-xl bg-surface-2 border border-white/5 font-mono text-xs text-primary space-y-1">
+                <div>Conscore = Stars + Forks + Total Commits</div>
+                <div className="pl-14">+ Commits (Past 3 Months)</div>
+                <div className="pl-14">- Days Since Last Active</div>
+              </div>
+
+              <div className="space-y-2 pt-2 text-xs">
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-primary font-bold">+1</span> Stargazers
+                  </span>
+                  <span className="font-mono text-text-muted">+{repo.stargazerCount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-primary font-bold">+1</span> Forks
+                  </span>
+                  <span className="font-mono text-text-muted">+{repo.forkCount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-primary font-bold">+1</span> Lifetime Commits
+                  </span>
+                  <span className="font-mono text-text-muted">+{commitCount?.toLocaleString() || 0}</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-primary font-bold">+1</span> Commits (Past 90 Days)
+                  </span>
+                  <span className="font-mono text-text-muted">+{repo.commitsPast3Months?.toLocaleString() || 0}</span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-rose-400 font-bold">-1</span> Days Inactive
+                  </span>
+                  <span className="font-mono text-rose-400">
+                    -{Math.floor(Math.max(0, Date.now() - new Date(repo.pushedAt || repo.updatedAt || Date.now()).getTime()) / (1000 * 60 * 60 * 24)).toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center pt-2 text-sm font-bold text-white">
+                  <span>Calculated Conscore</span>
+                  <span className="font-mono text-primary text-base">{(repo.conScore ?? 0).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowConscoreModal(false)}
+                className="btn btn-primary text-xs px-4 py-2"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
