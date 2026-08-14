@@ -123,7 +123,8 @@ export default function RepoDetail() {
     <main>
       {/* Repository Header Section (Matching User Profile Hero Layout) */}
       <section className="profile-hero mb-8">
-        <div className="profile-info">
+        <div className="profile-hero-inner">
+          <div className="profile-info">
           <Link
             href={`/user/${repo.owner.login}`}
             className="block shrink-0"
@@ -180,81 +181,77 @@ export default function RepoDetail() {
             </a>
           </div>
         </div>
-      </section>
 
-      {/* Main Overview Panel */}
-      <div className="panel p-8 mb-8 border-primary/20 bg-linear-to-br from-surface to-surface-2">
-        <div className="flex flex-col lg:flex-row justify-between gap-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-3 flex-wrap">
-              <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-                {repo.primaryLanguage?.name || "Code"}
+        {/* Badges, description & topics — now inline with title on the right */}
+        <div className="flex-1 lg:max-w-xl">
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+              {repo.primaryLanguage?.name || "Code"}
+            </span>
+            {repo.licenseInfo && (
+              <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5 inline-flex items-center gap-1.5">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-70"
+                >
+                  <path d="M12 3v18" />
+                  <path d="M5 7h14" />
+                  <path d="M4 14l3-7 3 7a3 3 0 0 1-6 0z" />
+                  <path d="M14 14l3-7 3 7a3 3 0 0 1-6 0z" />
+                </svg>
+                {repo.licenseInfo.nickname || repo.licenseInfo.name}
               </span>
-              {repo.licenseInfo && (
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5 inline-flex items-center gap-1.5">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="opacity-70"
-                  >
-                    <path d="M12 3v18" />
-                    <path d="M5 7h14" />
-                    <path d="M4 14l3-7 3 7a3 3 0 0 1-6 0z" />
-                    <path d="M14 14l3-7 3 7a3 3 0 0 1-6 0z" />
-                  </svg>
-                  {repo.licenseInfo.nickname || repo.licenseInfo.name}
-                </span>
-              )}
-              {repo.defaultBranchRef && (
-                <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2 border border-white/5 inline-flex items-center gap-1.5">
-                  <svg
-                    width="12"
-                    height="12"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="opacity-70 text-primary"
-                  >
-                    <line x1="6" y1="3" x2="6" y2="15" />
-                    <circle cx="18" cy="6" r="3" />
-                    <circle cx="6" cy="18" r="3" />
-                    <path d="M18 9a9 9 0 0 1-9 9" />
-                  </svg>
-                  {repo.defaultBranchRef.name}
-                </span>
-              )}
-            </div>
-
-            <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
-              {repo.description ||
-                "No description provided for this repository."}
-            </p>
-
-            {/* Topic tags */}
-            {repo.repositoryTopics.nodes.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {repo.repositoryTopics.nodes.map((node) => (
-                  <span
-                    key={node.topic.name}
-                    className="text-xs px-2.5 py-1 rounded-md bg-surface-offset text-text-muted font-medium hover:text-primary transition-colors cursor-default"
-                  >
-                    #{node.topic.name}
-                  </span>
-                ))}
-              </div>
+            )}
+            {repo.defaultBranchRef && (
+              <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2 border border-white/5 inline-flex items-center gap-1.5">
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-70 text-primary"
+                >
+                  <line x1="6" y1="3" x2="6" y2="15" />
+                  <circle cx="18" cy="6" r="3" />
+                  <circle cx="6" cy="18" r="3" />
+                  <path d="M18 9a9 9 0 0 1-9 9" />
+                </svg>
+                {repo.defaultBranchRef.name}
+              </span>
             )}
           </div>
+
+          <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
+            {repo.description || "No description provided for this repository."}
+          </p>
+
+          {/* Topic tags */}
+          {repo.repositoryTopics.nodes.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {repo.repositoryTopics.nodes.map((node) => (
+                <span
+                  key={node.topic.name}
+                  className="text-xs px-2.5 py-1 rounded-md bg-surface-offset text-text-muted font-medium hover:text-primary transition-colors cursor-default"
+                >
+                  #{node.topic.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
+        </div>
+      </section>
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
