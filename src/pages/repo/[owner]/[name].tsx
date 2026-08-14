@@ -126,162 +126,165 @@ export default function RepoDetail() {
       <section className="profile-hero mb-8">
         <div className="profile-hero-inner">
           <div className="profile-info">
-          <Link
-            href={`/user/${repo.owner.login}`}
-            className="block shrink-0"
-            title={`View ${repo.owner.login}'s profile`}
-          >
-            <img
-              src={repo.owner.avatarUrl}
-              alt={repo.owner.login}
-              className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
-            />
-          </Link>
-          <div>
-            <h1 className="profile-name flex items-center gap-2">
-              <Link
-                href={`/user/${repo.owner.login}`}
-                className="hover:text-primary transition-colors text-inherit no-underline"
-              >
-                {repo.owner.login}
-              </Link>
-              <span className="opacity-40">/</span>
+            <Link
+              href={`/user/${repo.owner.login}`}
+              className="block shrink-0"
+              title={`View ${repo.owner.login}'s profile`}
+            >
+              <img
+                src={repo.owner.avatarUrl}
+                alt={repo.owner.login}
+                className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
+              />
+            </Link>
+            <div>
+              <h1 className="profile-name flex items-center gap-2">
+                <Link
+                  href={`/user/${repo.owner.login}`}
+                  className="hover:text-primary transition-colors text-inherit no-underline"
+                >
+                  {repo.owner.login}
+                </Link>
+                <span className="opacity-40">/</span>
+                <a
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                  title="View repository on GitHub"
+                >
+                  {repo.name}
+                </a>
+              </h1>
               <a
                 href={repo.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline"
+                className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5 mt-1 block"
                 title="View repository on GitHub"
               >
-                {repo.name}
+                github.com/{repo.owner.login}/{repo.name}
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="opacity-60"
+                >
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
               </a>
-            </h1>
-            <a
-              href={repo.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5 mt-1 block"
-              title="View repository on GitHub"
-            >
-              github.com/{repo.owner.login}/{repo.name}
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="opacity-60"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-            </a>
 
-            {/* Conscore Badge Below Repo URL */}
-            <div className="mt-3 flex items-center">
-              <button
-                onClick={() => setShowConscoreModal(true)}
-                className="px-3.5 py-1.5 rounded-full text-sm font-mono font-extrabold bg-primary/15 text-primary border border-primary/40 inline-flex items-center gap-2 shadow-sm shadow-primary/10 hover:border-primary/60 hover:bg-primary/20 transition-all cursor-pointer group text-left"
-                title="View Conscore calculation breakdown"
-                aria-label="View Conscore calculation breakdown"
-              >
-                <span className="tracking-wide font-normal">
-                  <span className="text-lg font-bold">{(repo.conScore ?? 0).toLocaleString()}</span>
-                  &nbsp;conscore
-                </span>
-                <span className="opacity-80 group-hover:opacity-100 transition-opacity">
+              {/* Conscore Badge Below Repo URL */}
+              <div className="mt-3 flex items-center">
+                <button
+                  onClick={() => setShowConscoreModal(true)}
+                  className="px-3.5 py-1.5 rounded-full text-sm font-mono font-extrabold bg-primary/15 text-primary border border-primary/40 inline-flex items-center gap-2 shadow-sm shadow-primary/10 hover:border-primary/60 hover:bg-primary/20 transition-all cursor-pointer group text-left"
+                  title="View Conscore calculation breakdown"
+                  aria-label="View Conscore calculation breakdown"
+                >
+                  <span className="tracking-wide font-normal">
+                    <span className="text-lg font-bold">
+                      {(repo.conScore ?? 0).toLocaleString()}
+                    </span>
+                    &nbsp;conscore
+                  </span>
+                  <span className="opacity-80 group-hover:opacity-100 transition-opacity">
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Badges, description & topics — now inline with title on the right */}
+          <div className="flex-1 lg:max-w-xl">
+            <div className="flex items-center gap-3 mb-3 flex-wrap">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                {repo.primaryLanguage?.name || "Code"}
+              </span>
+              {repo.licenseInfo && (
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5 inline-flex items-center gap-1.5">
                   <svg
-                    width="15"
-                    height="15"
+                    width="12"
+                    height="12"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2.5"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    className="opacity-70"
                   >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                    <path d="M12 3v18" />
+                    <path d="M5 7h14" />
+                    <path d="M4 14l3-7 3 7a3 3 0 0 1-6 0z" />
+                    <path d="M14 14l3-7 3 7a3 3 0 0 1-6 0z" />
                   </svg>
+                  {repo.licenseInfo.nickname || repo.licenseInfo.name}
                 </span>
-              </button>
+              )}
+              {repo.defaultBranchRef && (
+                <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2 border border-white/5 inline-flex items-center gap-1.5">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-70 text-primary"
+                  >
+                    <line x1="6" y1="3" x2="6" y2="15" />
+                    <circle cx="18" cy="6" r="3" />
+                    <circle cx="6" cy="18" r="3" />
+                    <path d="M18 9a9 9 0 0 1-9 9" />
+                  </svg>
+                  {repo.defaultBranchRef.name}
+                </span>
+              )}
             </div>
-          </div>
-        </div>
 
-        {/* Badges, description & topics — now inline with title on the right */}
-        <div className="flex-1 lg:max-w-xl">
-          <div className="flex items-center gap-3 mb-3 flex-wrap">
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
-              {repo.primaryLanguage?.name || "Code"}
-            </span>
-            {repo.licenseInfo && (
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5 inline-flex items-center gap-1.5">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="opacity-70"
-                >
-                  <path d="M12 3v18" />
-                  <path d="M5 7h14" />
-                  <path d="M4 14l3-7 3 7a3 3 0 0 1-6 0z" />
-                  <path d="M14 14l3-7 3 7a3 3 0 0 1-6 0z" />
-                </svg>
-                {repo.licenseInfo.nickname || repo.licenseInfo.name}
-              </span>
-            )}
-            {repo.defaultBranchRef && (
-              <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2 border border-white/5 inline-flex items-center gap-1.5">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="opacity-70 text-primary"
-                >
-                  <line x1="6" y1="3" x2="6" y2="15" />
-                  <circle cx="18" cy="6" r="3" />
-                  <circle cx="6" cy="18" r="3" />
-                  <path d="M18 9a9 9 0 0 1-9 9" />
-                </svg>
-                {repo.defaultBranchRef.name}
-              </span>
+            <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
+              {repo.description ||
+                "No description provided for this repository."}
+            </p>
+
+            {/* Topic tags */}
+            {repo.repositoryTopics.nodes.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {repo.repositoryTopics.nodes.map((node) => (
+                  <span
+                    key={node.topic.name}
+                    className="text-xs px-2.5 py-1 rounded-md bg-surface-offset text-text-muted font-medium hover:text-primary transition-colors cursor-default"
+                  >
+                    #{node.topic.name}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
-
-          <p className="text-base text-text-muted leading-relaxed max-w-3xl mb-6">
-            {repo.description || "No description provided for this repository."}
-          </p>
-
-          {/* Topic tags */}
-          {repo.repositoryTopics.nodes.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {repo.repositoryTopics.nodes.map((node) => (
-                <span
-                  key={node.topic.name}
-                  className="text-xs px-2.5 py-1 rounded-md bg-surface-offset text-text-muted font-medium hover:text-primary transition-colors cursor-default"
-                >
-                  #{node.topic.name}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
         </div>
       </section>
 
@@ -606,14 +609,23 @@ export default function RepoDetail() {
                 </div>
                 <div>
                   <h3 className="text-xl font-bold font-display">Conscore</h3>
-                  <p className="text-xs text-text-muted">Repository Momentum Score</p>
+                  <p className="text-xs text-text-muted">
+                    Repository Momentum Score
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowConscoreModal(false)}
                 className="p-1 rounded-lg text-text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -622,7 +634,9 @@ export default function RepoDetail() {
 
             <div className="space-y-4 text-sm text-text-muted">
               <p className="leading-relaxed">
-                <strong>Conscore</strong> measures the activity momentum and overall health of a GitHub repository by combining popularity, lifetime velocity, recent contributions, and activity recency.
+                <strong>Conscore</strong> measures the activity momentum and
+                overall health of a GitHub repository by combining popularity,
+                lifetime velocity, recent contributions, and activity recency.
               </p>
 
               <div className="p-4 rounded-xl bg-surface-2 border border-white/5 font-mono text-xs text-primary space-y-1">
@@ -634,50 +648,65 @@ export default function RepoDetail() {
               <div className="space-y-2 pt-2 text-xs">
                 <div className="flex justify-between items-center py-1.5 border-b border-white/5">
                   <span className="font-medium text-white flex items-center gap-1.5">
-                    <span className="text-primary font-bold">+1</span> Stargazers
+                    <span className="text-primary font-bold">+1</span>{" "}
+                    Stargazers
                   </span>
-                  <span className="font-mono text-text-muted">+{repo.stargazerCount.toLocaleString()}</span>
+                  <span className="font-mono text-text-muted">
+                    +{repo.stargazerCount.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-white/5">
                   <span className="font-medium text-white flex items-center gap-1.5">
                     <span className="text-primary font-bold">+1</span> Forks
                   </span>
-                  <span className="font-mono text-text-muted">+{repo.forkCount.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
-                  <span className="font-medium text-white flex items-center gap-1.5">
-                    <span className="text-primary font-bold">+1</span> Lifetime Commits
+                  <span className="font-mono text-text-muted">
+                    +{repo.forkCount.toLocaleString()}
                   </span>
-                  <span className="font-mono text-text-muted">+{commitCount?.toLocaleString() || 0}</span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-white/5">
                   <span className="font-medium text-white flex items-center gap-1.5">
-                    <span className="text-primary font-bold">+1</span> Commits (Past 90 Days)
+                    <span className="text-primary font-bold">+1</span> Lifetime
+                    Commits
                   </span>
-                  <span className="font-mono text-text-muted">+{repo.commitsPast3Months?.toLocaleString() || 0}</span>
+                  <span className="font-mono text-text-muted">
+                    +{commitCount?.toLocaleString() || 0}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center py-1.5 border-b border-white/5">
                   <span className="font-medium text-white flex items-center gap-1.5">
-                    <span className="text-rose-400 font-bold">-1</span> Days Inactive
+                    <span className="text-primary font-bold">+1</span> Commits
+                    (Past 90 Days)
+                  </span>
+                  <span className="font-mono text-text-muted">
+                    +{repo.commitsPast3Months?.toLocaleString() || 0}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center py-1.5 border-b border-white/5">
+                  <span className="font-medium text-white flex items-center gap-1.5">
+                    <span className="text-rose-400 font-bold">-1</span> Days
+                    Inactive
                   </span>
                   <span className="font-mono text-rose-400">
-                    -{Math.floor(Math.max(0, Date.now() - new Date(repo.pushedAt || repo.updatedAt || Date.now()).getTime()) / (1000 * 60 * 60 * 24)).toLocaleString()}
+                    -
+                    {Math.floor(
+                      Math.max(
+                        0,
+                        Date.now() -
+                          new Date(
+                            repo.pushedAt || repo.updatedAt || Date.now(),
+                          ).getTime(),
+                      ) /
+                        (1000 * 60 * 60 * 24),
+                    ).toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between items-center pt-2 text-sm font-bold text-white">
+                <div className="flex justify-between items-center pt-2 text-sm text-white">
                   <span>Calculated Conscore</span>
-                  <span className="font-mono text-primary text-base">{(repo.conScore ?? 0).toLocaleString()}</span>
+                  <span className="font-mono text-primary text-base">
+                    {(repo.conScore ?? 0).toLocaleString()}
+                  </span>
                 </div>
               </div>
-            </div>
-
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setShowConscoreModal(false)}
-                className="btn btn-primary text-xs px-4 py-2"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
