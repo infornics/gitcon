@@ -801,15 +801,15 @@ export async function fetchOrgRepos(
     }),
   );
 
-  // 2. Sort repos by ranking score: (stars * 10) + (forks * 5) + totalCommits
+  // 2. Sort repos by raw activity score: stars + forks + totalCommits (no multipliers)
   const sorted = [...enrichedAll].sort((a, b) => {
     const scoreA =
-      (a.stargazers_count || 0) * 10 +
-      (a.forks_count || 0) * 5 +
+      (a.stargazers_count || 0) +
+      (a.forks_count || 0) +
       (a.totalCommits || 0);
     const scoreB =
-      (b.stargazers_count || 0) * 10 +
-      (b.forks_count || 0) * 5 +
+      (b.stargazers_count || 0) +
+      (b.forks_count || 0) +
       (b.totalCommits || 0);
     return scoreB - scoreA;
   });
