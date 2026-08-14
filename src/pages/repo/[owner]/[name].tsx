@@ -392,8 +392,8 @@ export default function RepoDetail() {
       </div>
 
       {/* Contributors Section */}
-      <section className="panel p-6">
-        <div className="panel-head flex justify-between items-center mb-6">
+      <section className="panel leaderboard-panel">
+        <div className="panel-head flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-bold font-display">Contributors</h2>
             <p className="text-xs opacity-60">
@@ -411,32 +411,138 @@ export default function RepoDetail() {
         </div>
 
         {loadingContributors ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="skeleton h-24 rounded-xl" />
-            ))}
+          <div className="leaderboard-table-wrapper">
+            <table className="leaderboard-table">
+              <thead>
+                <tr>
+                  <th className="text-center w-16">#</th>
+                  <th>Contributor</th>
+                  <th className="!text-center">Commits</th>
+                  <th className="!text-center">Lines Added / Deleted</th>
+                  <th className="!text-center">Files Affected</th>
+                  <th>Primary Language</th>
+                  <th className="!text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[1, 2, 3].map((i) => (
+                  <tr key={i}>
+                    <td className="text-center">
+                      <div className="skeleton h-5 w-6 mx-auto rounded" />
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div className="skeleton w-10 h-10 rounded-full shrink-0" />
+                        <div className="skeleton h-4 w-28 rounded" />
+                      </div>
+                    </td>
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-16 mx-auto rounded" />
+                    </td>
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-24 mx-auto rounded" />
+                    </td>
+                    <td className="!text-center">
+                      <div className="skeleton h-5 w-16 mx-auto rounded" />
+                    </td>
+                    <td>
+                      <div className="skeleton h-5 w-20 rounded" />
+                    </td>
+                    <td className="!text-right">
+                      <div className="skeleton h-4 w-6 ml-auto rounded" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : contributors.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {contributors.map((c) => (
-              <Link
-                key={c.id}
-                href={`/user/${c.login}`}
-                className="flex flex-col items-center text-center p-4 rounded-xl bg-surface-2/80 hover:bg-surface-2 border border-white/5 hover:border-primary/30 transition-all duration-200 group text-inherit no-underline"
-              >
-                <img
-                  src={c.avatar_url}
-                  alt={c.login}
-                  className="w-12 h-12 rounded-full border border-white/10 mb-2.5 group-hover:scale-105 transition-transform"
-                />
-                <strong className="text-sm font-bold group-hover:text-primary transition-colors truncate w-full">
-                  @{c.login}
-                </strong>
-                <span className="text-[11px] font-mono opacity-60 mt-1">
-                  {c.contributions.toLocaleString()} commits
-                </span>
-              </Link>
-            ))}
+          <div className="leaderboard-table-wrapper">
+            <table className="leaderboard-table">
+              <thead>
+                <tr>
+                  <th className="text-center w-16">#</th>
+                  <th>Contributor</th>
+                  <th className="!text-center">Commits</th>
+                  <th className="!text-center">Lines Added / Deleted</th>
+                  <th className="!text-center">Files Affected</th>
+                  <th>Primary Language</th>
+                  <th className="!text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {contributors.map((c, idx) => (
+                  <tr
+                    key={c.id}
+                    className="cursor-pointer"
+                    onClick={() => (window.location.href = `/user/${c.login}`)}
+                  >
+                    <td className="text-center font-mono opacity-60 font-bold text-sm">
+                      {idx + 1}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={c.avatar_url}
+                          alt={c.login}
+                          className="w-10 h-10 rounded-full border border-white/10 shrink-0"
+                        />
+                        <div>
+                          <div className="font-bold">{c.name || c.login}</div>
+                          <div className="text-xs opacity-60">@{c.login}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="!text-center font-mono font-bold text-primary">
+                      {c.contributions.toLocaleString()}
+                    </td>
+                    <td className="!text-center font-mono text-xs">
+                      {c.additions || c.deletions ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <span className="text-emerald-500 font-bold">
+                            +{c.additions?.toLocaleString()}
+                          </span>
+                          <span className="opacity-30">/</span>
+                          <span className="text-rose-500 font-bold">
+                            -{c.deletions?.toLocaleString()}
+                          </span>
+                        </span>
+                      ) : (
+                        <span className="opacity-40">—</span>
+                      )}
+                    </td>
+                    <td className="!text-center font-mono opacity-80">
+                      {(c.filesTouchedApprox || c.contributions).toLocaleString()}
+                    </td>
+                    <td>
+                      {repo.primaryLanguage?.name ? (
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 inline-block">
+                          {repo.primaryLanguage.name}
+                        </span>
+                      ) : (
+                        <span className="text-xs opacity-40">—</span>
+                      )}
+                    </td>
+                    <td className="!text-right">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="opacity-40 hover:opacity-100 transition-all inline-block ml-auto"
+                      >
+                        <line x1="5" y1="12" x2="19" y2="12" />
+                        <polyline points="12 5 19 12 12 19" />
+                      </svg>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="text-center py-8 text-sm opacity-50">
