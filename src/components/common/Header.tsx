@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "revine";
 import { parseRepoInput, hasCustomGithubToken, setGithubToken } from "@/utils/github";
+import { HiKey } from "react-icons/hi2";
 
 export default function Header() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -173,19 +174,7 @@ export default function Header() {
           }`}
           title="Configure Personal Access Token (PAT) for Private Repos"
         >
-          <svg
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M21 2l-2 2m-1.5 1.5l-3 3m-5 5l-4 4-2-2 4-4m2.5-2.5l3-3m-6 6l-3-3" />
-            <circle cx="16.5" cy="7.5" r="4.5" />
-          </svg>
+          <HiKey className="w-3.5 h-3.5" />
           <span>{hasToken ? "PAT Active" : "Access Token"}</span>
         </button>
       </div>
@@ -270,19 +259,7 @@ export default function Header() {
             <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
               <div className="flex items-center gap-2">
                 <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M21 2l-2 2m-1.5 1.5l-3 3m-5 5l-4 4-2-2 4-4m2.5-2.5l3-3m-6 6l-3-3" />
-                    <circle cx="16.5" cy="7.5" r="4.5" />
-                  </svg>
+                  <HiKey className="w-5 h-5" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold font-display text-white">GitHub Access Token</h3>
