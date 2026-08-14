@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { Link } from "revine";
-import { parseRepoInput, hasCustomGithubToken, setGithubToken } from "@/utils/github";
+import { hasCustomGithubToken, setGithubToken } from "@/utils/github";
+import { useEffect, useState } from "react";
 import { HiKey } from "react-icons/hi2";
+import { Link } from "revine";
 
 export default function Header() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
@@ -262,15 +262,26 @@ export default function Header() {
                   <HiKey className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-bold font-display text-white">GitHub Access Token</h3>
-                  <p className="text-xs text-text-muted">Unlock Private Repository Statistics</p>
+                  <h3 className="text-lg font-bold font-display text-white">
+                    GitHub Access Token
+                  </h3>
+                  <p className="text-xs text-text-muted">
+                    Unlock Private Repository Statistics
+                  </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowTokenModal(false)}
                 className="p-1 rounded-lg text-text-muted hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
@@ -278,7 +289,12 @@ export default function Header() {
             </div>
 
             <p className="text-xs text-text-muted leading-relaxed mb-4">
-              Provide your GitHub Personal Access Token (PAT) with <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded">repo</code> scope to view private repositories you have access to. Your token is stored locally in your browser and never leaves your client.
+              Provide your GitHub Personal Access Token (PAT) with{" "}
+              <code className="text-primary font-mono bg-primary/10 px-1 py-0.5 rounded">
+                repo
+              </code>{" "}
+              scope to view private repositories you have access to. Your token
+              is stored locally in your browser and never leaves your client.
             </p>
 
             <form onSubmit={handleSaveToken} className="space-y-4">
@@ -310,7 +326,9 @@ export default function Header() {
                   >
                     Remove Saved Token
                   </button>
-                ) : <span />}
+                ) : (
+                  <span />
+                )}
 
                 <div className="flex items-center gap-2">
                   <button
