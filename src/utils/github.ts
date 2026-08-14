@@ -804,13 +804,9 @@ export async function fetchOrgRepos(
   // 2. Sort repos by raw activity score: stars + forks + totalCommits (no multipliers)
   const sorted = [...enrichedAll].sort((a, b) => {
     const scoreA =
-      (a.stargazers_count || 0) +
-      (a.forks_count || 0) +
-      (a.totalCommits || 0);
+      (a.stargazers_count || 0) + (a.forks_count || 0) + (a.totalCommits || 0);
     const scoreB =
-      (b.stargazers_count || 0) +
-      (b.forks_count || 0) +
-      (b.totalCommits || 0);
+      (b.stargazers_count || 0) + (b.forks_count || 0) + (b.totalCommits || 0);
     return scoreB - scoreA;
   });
 
