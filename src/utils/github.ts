@@ -605,6 +605,7 @@ export interface RepoSearchResult {
     updated_at: string;
     totalCommits?: number;
     commitsPast3Months?: number;
+    daysSinceLastActive?: number;
   }>;
 }
 
@@ -817,33 +818,44 @@ export async function fetchOrgRepos(
           }
         }
 
+        // Calculate days since last active activity (pushed_at or updated_at)
+        const lastActiveTimestamp = new Date(repo.pushed_at || repo.updated_at || Date.now()).getTime();
+        const nowTimestamp = Date.now();
+        const diffMs = Math.max(0, nowTimestamp - lastActiveTimestamp);
+        const daysSinceLastActive = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
         return {
           ...repo,
           totalCommits,
           commitsPast3Months,
+          daysSinceLastActive,
         };
       } catch (err) {
         return {
           ...repo,
           totalCommits: 0,
           commitsPast3Months: 0,
+          daysSinceLastActive: 0,
         };
       }
     }),
   );
 
-  // 2. Sort repos by raw activity score: stars + forks + totalCommits + commitsPast3Months
+  // 2. Sort repos by raw activity score minus daysSinceLastActive
+  // Formula: Stars + Forks + TotalCommits + CommitsPast3Months - DaysSinceLastActive
   const sorted = [...enrichedAll].sort((a, b) => {
     const scoreA =
       (a.stargazers_count || 0) +
       (a.forks_count || 0) +
       (a.totalCommits || 0) +
-      (a.commitsPast3Months || 0);
+      (a.commitsPast3Months || 0) -
+      (a.daysSinceLastActive || 0);
     const scoreB =
       (b.stargazers_count || 0) +
       (b.forks_count || 0) +
       (b.totalCommits || 0) +
-      (b.commitsPast3Months || 0);
+      (b.commitsPast3Months || 0) -
+      (b.daysSinceLastActive || 0);
     return scoreB - scoreA;
   });
 
