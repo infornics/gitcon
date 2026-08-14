@@ -157,13 +157,45 @@ export default function RepoDetail() {
                 {repo.primaryLanguage?.name || "Code"}
               </span>
               {repo.licenseInfo && (
-                <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5">
-                  ⚖️ {repo.licenseInfo.nickname || repo.licenseInfo.name}
+                <span className="px-3 py-1 rounded-full text-xs font-medium bg-surface-2 text-text-muted border border-white/5 inline-flex items-center gap-1.5">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-70"
+                  >
+                    <path d="M12 3v18" />
+                    <path d="M5 7h14" />
+                    <path d="M4 14l3-7 3 7a3 3 0 0 1-6 0z" />
+                    <path d="M14 14l3-7 3 7a3 3 0 0 1-6 0z" />
+                  </svg>
+                  {repo.licenseInfo.nickname || repo.licenseInfo.name}
                 </span>
               )}
               {repo.defaultBranchRef && (
-                <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2">
-                  🌿 {repo.defaultBranchRef.name}
+                <span className="px-3 py-1 rounded-full text-xs font-mono text-text-muted bg-surface-2 border border-white/5 inline-flex items-center gap-1.5">
+                  <svg
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-70 text-primary"
+                  >
+                    <line x1="6" y1="3" x2="6" y2="15" />
+                    <circle cx="18" cy="6" r="3" />
+                    <circle cx="6" cy="18" r="3" />
+                    <path d="M18 9a9 9 0 0 1-9 9" />
+                  </svg>
+                  {repo.defaultBranchRef.name}
                 </span>
               )}
             </div>
@@ -175,7 +207,7 @@ export default function RepoDetail() {
 
             {/* Topic tags */}
             {repo.repositoryTopics.nodes.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-6">
+              <div className="flex flex-wrap gap-2">
                 {repo.repositoryTopics.nodes.map((node) => (
                   <span
                     key={node.topic.name}
@@ -186,17 +218,6 @@ export default function RepoDetail() {
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0 justify-center">
-            <a
-              href={`${repo.url}/issues`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary justify-center text-center !py-2.5 !px-5"
-            >
-              Issues & PRs ↗
-            </a>
           </div>
         </div>
       </div>
