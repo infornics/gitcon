@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -103,7 +105,8 @@
     --cell-l4: #58aab0;
   }
 }
-html, body {
+html,
+body {
   overflow-x: clip;
   margin: 0;
   padding: 0;
@@ -150,13 +153,19 @@ header {
   flex-wrap: wrap;
   background: transparent;
   border-bottom: 1px solid transparent;
-  transition: background 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, padding 0.3s ease;
+  transition:
+    background 0.3s ease,
+    backdrop-filter 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    padding 0.3s ease;
 }
 header.scrolled {
   background: color-mix(in oklab, var(--color-bg) 75%, transparent);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid color-mix(in oklab, var(--color-border) 40%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-border) 40%, transparent);
   box-shadow: var(--shadow-sm);
   padding: var(--space-3) 0;
 }
@@ -797,7 +806,6 @@ input.tracker-input {
   }
 }
 
-
 /* Footer */
 .app-footer {
   margin-top: var(--space-20);
@@ -1050,7 +1058,7 @@ input.tracker-input {
   .leaderboard-table td:nth-child(5) {
     display: none;
   }
-  .leaderboard-table th, 
+  .leaderboard-table th,
   .leaderboard-table td {
     padding: var(--space-3) var(--space-4);
   }
