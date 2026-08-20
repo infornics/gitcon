@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "revine";
-import { fetchContributions } from "../../../utils/github";
+import {
+  fetchContributions,
+  fetchUserPrivateRepos,
+  getGithubToken,
+} from "../../../utils/github";
 
 interface Repository {
   name: string;
   owner: string;
   count: number;
+  isPrivate?: boolean;
 }
 
 export default function UserRepositories() {
@@ -25,15 +30,43 @@ export default function UserRepositories() {
     setError(null);
     try {
       const user = await fetchContributions(uname, 365);
-      const extractedRepos = (
+      const token = getGithubToken();
+      let extractedRepos = (
         user.contributionsCollection.commitContributionsByRepository || []
-      )
-        .map((item) => ({
-          name: item.repository.name,
-          owner: item.repository.owner.login,
-          count: item.contributions.totalCount,
-        }))
-        .sort((a, b) => b.count - a.count);
+      ).map((item) => ({
+        name: item.repository.name,
+        owner: item.repository.owner.login,
+        count: item.contributions.totalCount,
+        isPrivate: item.repository.isPrivate,
+      }));
+
+      if (token) {
+        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        const repoMap = new Map<string, Repository>();
+        extractedRepos.forEach((r) =>
+          repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
+        );
+
+        privateRepos.forEach((pr) => {
+          const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
+          const existing = repoMap.get(key);
+          if (existing) {
+            existing.isPrivate = pr.isPrivate || existing.isPrivate;
+            existing.count = Math.max(existing.count, pr.count);
+          } else {
+            repoMap.set(key, {
+              name: pr.name,
+              owner: pr.owner,
+              count: pr.count,
+              isPrivate: pr.isPrivate,
+            });
+          }
+        });
+
+        extractedRepos = Array.from(repoMap.values());
+      }
+
+      extractedRepos.sort((a, b) => b.count - a.count);
 
       setRepos(extractedRepos);
     } catch (err: any) {
@@ -147,8 +180,13 @@ export default function UserRepositories() {
 
                         <div className="flex justify-between items-end mt-2">
                           <div className="flex flex-col min-w-0">
-                            <strong className="text-lg font-bold truncate group-hover:text-primary transition-colors tracking-tight">
+                            <strong className="text-lg font-bold truncate group-hover:text-primary transition-colors tracking-tight inline-flex items-center gap-2">
                               {repo.name}
+                              {repo.isPrivate && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                                  Private
+                                </span>
+                              )}
                             </strong>
                             <span className="text-xs opacity-60 truncate mt-0.5">
                               {repo.owner}
@@ -192,8 +230,13 @@ export default function UserRepositories() {
                       className="p-5 rounded-xl bg-surface-2 border border-white/5 flex justify-between items-center hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 group text-inherit no-underline"
                     >
                       <div className="flex flex-col min-w-0">
-                        <strong className="text-base truncate group-hover:text-primary transition-colors">
+                        <strong className="text-base truncate group-hover:text-primary transition-colors inline-flex items-center gap-2">
                           {repo.name}
+                          {repo.isPrivate && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                              Private
+                            </span>
+                          )}
                         </strong>
                         <span className="text-xs opacity-60 truncate">
                           {repo.owner}

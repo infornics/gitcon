@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "revine";
-import { fetchContributions } from "../../../utils/github";
+import {
+  fetchContributions,
+  fetchUserPrivateRepos,
+  getGithubToken,
+} from "../../../utils/github";
 
 interface Account {
   name: string;
@@ -25,6 +29,7 @@ export default function UserAccounts() {
     setError(null);
     try {
       const user = await fetchContributions(uname, 365);
+      const token = getGithubToken();
       const accountsMap = new Map<string, number>();
 
       const repoContributions =
@@ -35,6 +40,18 @@ export default function UserAccounts() {
         const current = accountsMap.get(owner) || 0;
         accountsMap.set(owner, current + item.contributions.totalCount);
       });
+
+      if (token) {
+        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        privateRepos.forEach((pr) => {
+          if (pr.owner) {
+            const current = accountsMap.get(pr.owner) || 0;
+            if (pr.count > current) {
+              accountsMap.set(pr.owner, pr.count);
+            }
+          }
+        });
+      }
 
       const sortedAccounts = Array.from(accountsMap.entries())
         .map(([name, count]) => ({ name, count }))

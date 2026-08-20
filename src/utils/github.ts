@@ -23,6 +23,7 @@ export interface GithubUserData {
     commitContributionsByRepository: Array<{
       repository: {
         name: string;
+        isPrivate?: boolean;
         owner: { login: string };
         languages: {
           edges: Array<{
@@ -36,8 +37,23 @@ export interface GithubUserData {
   };
 }
 
+export function clearRevineCache() {
+  if (typeof window !== "undefined") {
+    try {
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith("revine_cache_"))
+        .forEach((key) => localStorage.removeItem(key));
+    } catch (e) {}
+  }
+}
+
 export function getGithubToken(): string {
   if (typeof window !== "undefined") {
+    // One-time cache purge for PAT users to remove legacy cached public data
+    if (!localStorage.getItem("gitcon_cache_purged_v2")) {
+      clearRevineCache();
+      localStorage.setItem("gitcon_cache_purged_v2", "true");
+    }
     const userToken = localStorage.getItem("gitcon_pat")?.trim();
     if (userToken) return userToken;
   }
@@ -51,6 +67,7 @@ export function setGithubToken(token: string) {
     } else {
       localStorage.removeItem("gitcon_pat");
     }
+    clearRevineCache();
   }
 }
 
@@ -145,8 +162,44 @@ export function calculateStats(days: Array<{ date: string; count: number }>) {
 
 export async function fetchContributions(username: string, daysBack: number) {
   const { start, end } = buildDateSeries(daysBack);
+  const token = getGithubToken();
+  const includeViewer = !!token;
+
   const query = `
-    query($username: String!, $from: DateTime!, $to: DateTime!) {
+    query($username: String!, $from: DateTime!, $to: DateTime!, $includeViewer: Boolean!) {
+      viewer @include(if: $includeViewer) {
+        name
+        login
+        avatarUrl(size: 160)
+        followers {
+          totalCount
+        }
+        contributionsCollection(from: $from, to: $to) {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                contributionCount
+                date
+              }
+            }
+          }
+          commitContributionsByRepository(maxRepositories: 100) {
+            repository { 
+              name 
+              isPrivate
+              owner { login } 
+              languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
+                edges {
+                  size
+                  node { name color }
+                }
+              }
+            }
+            contributions(first: 1) { totalCount }
+          }
+        }
+      }
       user(login: $username) {
         name
         login
@@ -167,6 +220,7 @@ export async function fetchContributions(username: string, daysBack: number) {
           commitContributionsByRepository(maxRepositories: 100) {
             repository { 
               name 
+              isPrivate
               owner { login } 
               languages(first: 5, orderBy: {field: SIZE, direction: DESC}) {
                 edges {
@@ -181,7 +235,7 @@ export async function fetchContributions(username: string, daysBack: number) {
       }
     }
   `;
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+
   let response;
   try {
     response = await revineFetch("https://api.github.com/graphql", {
@@ -196,15 +250,17 @@ export async function fetchContributions(username: string, daysBack: number) {
           username,
           from: start.toISOString(),
           to: end.toISOString(),
+          includeViewer,
         },
       }),
-      cacheTTL: 600000, // 10 minutes cache
-      persist: true, // Persist to localStorage
+      cacheTTL: hasCustomGithubToken() ? 300000 : 600000, // 5 min for PAT, 10 min for public
+      persist: !hasCustomGithubToken(), // Do not persist PAT response permanently in localStorage
+      revalidate: hasCustomGithubToken(), // Force revalidation when PAT is active
     });
   } catch (err: any) {
     if (err.status === 403 || err.status === 401) {
       throw new Error(
-        "GitHub API blocked the request. Try adding a REVINE_PUBLIC_GITHUB_TOKEN to your environment if you hit rate limits.",
+        "GitHub API access error. Please check your Personal Access Token (PAT) via Access Token button in header.",
       );
     }
     throw err;
@@ -212,8 +268,20 @@ export async function fetchContributions(username: string, daysBack: number) {
 
   const payload = response;
   if (payload.errors?.length) throw new Error(payload.errors[0].message);
-  if (!payload.data?.user) throw new Error("GitHub user not found.");
-  return payload.data.user as GithubUserData;
+
+  const viewer = payload.data?.viewer;
+  const user = payload.data?.user;
+
+  if (
+    viewer &&
+    (viewer.login.toLowerCase() === username.toLowerCase() ||
+      (!user && includeViewer))
+  ) {
+    return viewer as GithubUserData;
+  }
+
+  if (!user) throw new Error("GitHub user not found.");
+  return user as GithubUserData;
 }
 export function mergeSeries(daysBack: number, apiWeeks: ContributionWeek[]) {
   const { dates } = buildDateSeries(daysBack);
@@ -228,7 +296,7 @@ export async function fetchGlobalLeaderboard(
   count = 10,
   extraUsers: string[] = [],
 ) {
-  const token = (import.meta as any).env.REVINE_PUBLIC_GITHUB_TOKEN || "";
+  const token = getGithubToken();
 
   // 1. Discover top users by followers (proxy for "global top developers")
   let searchData;
@@ -1003,3 +1071,81 @@ export async function fetchOrgRepos(
     items: topItems,
   } as RepoSearchResult;
 }
+
+export interface UserPrivateRepo {
+  name: string;
+  owner: string;
+  count: number;
+  isPrivate: boolean;
+  language: string | null;
+}
+
+export async function fetchUserPrivateRepos(
+  username: string,
+  token: string,
+): Promise<UserPrivateRepo[]> {
+  if (!token) return [];
+  try {
+    const res = await revineFetch(
+      `https://api.github.com/user/repos?per_page=100&sort=updated&type=all`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        cacheTTL: 300000,
+        persist: true,
+      },
+    );
+
+    if (!Array.isArray(res)) return [];
+
+    // Filter to repositories accessible by PAT
+    const userRepos = res.filter(
+      (r: any) =>
+        r.private ||
+        (r.owner?.login &&
+          r.owner.login.toLowerCase() === username.toLowerCase()),
+    );
+
+    const enriched = await Promise.all(
+      userRepos.map(async (repo: any) => {
+        let count = 0;
+        try {
+          const resCommits = await fetch(
+            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=1`,
+            {
+              headers: {
+                "User-Agent": "Gitcon",
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+          if (resCommits.ok) {
+            const link = resCommits.headers.get("link");
+            if (link) {
+              const match = link.match(/page=(\d+)>; rel="last"/);
+              count = match ? parseInt(match[1], 10) : 1;
+            } else {
+              const body = await resCommits.json();
+              count = Array.isArray(body) ? body.length : 0;
+            }
+          }
+        } catch (e) {}
+
+        return {
+          name: repo.name,
+          owner: repo.owner.login,
+          count,
+          isPrivate: repo.private || false,
+          language: repo.language || null,
+        };
+      }),
+    );
+
+    return enriched;
+  } catch (err) {
+    console.error("Failed to fetch user private repos:", err);
+    return [];
+  }
+}
+

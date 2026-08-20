@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "revine";
-import { fetchContributions } from "../../../utils/github";
+import {
+  fetchContributions,
+  fetchUserPrivateRepos,
+  getGithubToken,
+} from "../../../utils/github";
 
 interface Language {
   name: string;
@@ -35,6 +39,7 @@ export default function UserLanguages() {
     setError(null);
     try {
       const user = await fetchContributions(uname, 365);
+      const token = getGithubToken();
       const langMap = new Map<string, { size: number; color: string }>();
       let computedTotalSize = 0;
 
@@ -48,6 +53,17 @@ export default function UserLanguages() {
           });
         },
       );
+
+      if (token) {
+        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        privateRepos.forEach((pr) => {
+          if (pr.language && !langMap.has(pr.language)) {
+            const size = (pr.count || 1) * 1024;
+            langMap.set(pr.language, { size, color: "#38bdf8" });
+            computedTotalSize += size;
+          }
+        });
+      }
 
       const extractedLangs = Array.from(langMap.entries())
         .map(([name, { size, color }]) => ({

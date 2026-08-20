@@ -5,7 +5,10 @@ import { StatCard } from "../../components/StatCard";
 import {
   calculateStats,
   fetchContributions,
+  fetchUserPrivateRepos,
+  getGithubToken,
   GithubUserData,
+  hasCustomGithubToken,
   mergeSeries,
 } from "../../utils/github";
 
@@ -33,7 +36,7 @@ export default function UserProfile() {
     [],
   );
   const [repos, setRepos] = useState<
-    Array<{ name: string; owner: string; count: number }>
+    Array<{ name: string; owner: string; count: number; isPrivate?: boolean }>
   >([]);
   const [languages, setLanguages] = useState<
     Array<{ name: string; color: string; percent: number }>
@@ -80,15 +83,44 @@ export default function UserProfile() {
         days,
         user.contributionsCollection.contributionCalendar.weeks,
       );
-      const extractedRepos = (
+      const token = getGithubToken();
+      let extractedRepos = (
         user.contributionsCollection.commitContributionsByRepository || []
       )
         .map((item) => ({
           name: item.repository.name,
           owner: item.repository.owner.login,
           count: item.contributions.totalCount,
-        }))
-        .sort((a, b) => b.count - a.count);
+          isPrivate: item.repository.isPrivate,
+        }));
+
+      if (token) {
+        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        const repoMap = new Map<string, typeof extractedRepos[0]>();
+        extractedRepos.forEach((r) =>
+          repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
+        );
+
+        privateRepos.forEach((pr) => {
+          const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
+          const existing = repoMap.get(key);
+          if (existing) {
+            existing.isPrivate = pr.isPrivate || existing.isPrivate;
+            existing.count = Math.max(existing.count, pr.count);
+          } else {
+            repoMap.set(key, {
+              name: pr.name,
+              owner: pr.owner,
+              count: pr.count,
+              isPrivate: pr.isPrivate,
+            });
+          }
+        });
+
+        extractedRepos = Array.from(repoMap.values());
+      }
+
+      extractedRepos.sort((a, b) => b.count - a.count);
 
       const langMap = new Map<string, { size: number; color: string }>();
       let totalSize = 0;
@@ -485,9 +517,19 @@ export default function UserProfile() {
               </a>
             )}
             <div>
-              <h1 className="profile-name">
-                {userData?.name || userData?.login}
-              </h1>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="profile-name">
+                  {userData?.name || userData?.login}
+                </h1>
+                {hasCustomGithubToken() && (
+                  <span
+                    className="inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0"
+                    title="PAT active: Private repository data included"
+                  >
+                    🔒 PAT Active
+                  </span>
+                )}
+              </div>
               <a
                 href={`https://github.com/${userData?.login}`}
                 target="_blank"
@@ -1288,7 +1330,14 @@ export default function UserProfile() {
                       className="repo-item hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 cursor-pointer text-inherit no-underline"
                     >
                       <div>
-                        <strong>{repo.name}</strong>
+                        <strong className="inline-flex items-center gap-1.5">
+                          {repo.name}
+                          {repo.isPrivate && (
+                            <span className="px-1.5 py-0.2 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                              Private
+                            </span>
+                          )}
+                        </strong>
                         <span>{repo.owner}</span>
                       </div>
                       <strong>{repo.count}</strong>
