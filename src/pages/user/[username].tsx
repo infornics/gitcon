@@ -8,7 +8,6 @@ import {
   fetchUserPrivateRepos,
   getGithubToken,
   GithubUserData,
-  hasCustomGithubToken,
   mergeSeries,
 } from "../../utils/github";
 
@@ -86,17 +85,16 @@ export default function UserProfile() {
       const token = getGithubToken();
       let extractedRepos = (
         user.contributionsCollection.commitContributionsByRepository || []
-      )
-        .map((item) => ({
-          name: item.repository.name,
-          owner: item.repository.owner.login,
-          count: item.contributions.totalCount,
-          isPrivate: item.repository.isPrivate,
-        }));
+      ).map((item) => ({
+        name: item.repository.name,
+        owner: item.repository.owner.login,
+        count: item.contributions.totalCount,
+        isPrivate: item.repository.isPrivate,
+      }));
 
       if (token) {
         const privateRepos = await fetchUserPrivateRepos(uname, token);
-        const repoMap = new Map<string, typeof extractedRepos[0]>();
+        const repoMap = new Map<string, (typeof extractedRepos)[0]>();
         extractedRepos.forEach((r) =>
           repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
         );
@@ -521,16 +519,8 @@ export default function UserProfile() {
                 <h1 className="profile-name">
                   {userData?.name || userData?.login}
                 </h1>
-                {hasCustomGithubToken() && (
-                  <span
-                    className="inline-flex items-center gap-1 text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0"
-                    title="PAT active: Private repository data included"
-                  >
-                    🔒 PAT Active
-                  </span>
-                )}
               </div>
-              <a
+              <Link
                 href={`https://github.com/${userData?.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -553,7 +543,7 @@ export default function UserProfile() {
                   <polyline points="15 3 21 3 21 9" />
                   <line x1="10" y1="14" x2="21" y2="3" />
                 </svg>
-              </a>
+              </Link>
             </div>
           </div>
 
