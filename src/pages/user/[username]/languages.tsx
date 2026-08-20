@@ -4,6 +4,7 @@ import {
   fetchContributions,
   fetchUserPrivateRepos,
   getGithubToken,
+  getLangColor,
 } from "../../../utils/github";
 
 interface Language {
@@ -57,10 +58,29 @@ export default function UserLanguages() {
       if (token) {
         const privateRepos = await fetchUserPrivateRepos(uname, token);
         privateRepos.forEach((pr) => {
-          if (pr.language && !langMap.has(pr.language)) {
-            const size = (pr.count || 1) * 1024;
-            langMap.set(pr.language, { size, color: "#38bdf8" });
-            computedTotalSize += size;
+          if (pr.languages && pr.languages.length > 0) {
+            pr.languages.forEach((l) => {
+              const current = langMap.get(l.name) || {
+                size: 0,
+                color: l.color,
+              };
+              langMap.set(l.name, {
+                size: current.size + l.size,
+                color: current.color || l.color,
+              });
+              computedTotalSize += l.size;
+            });
+          } else if (pr.language) {
+            const fallbackSize = (pr.count || 1) * 2048;
+            const current = langMap.get(pr.language) || {
+              size: 0,
+              color: getLangColor(pr.language),
+            };
+            langMap.set(pr.language, {
+              size: current.size + fallbackSize,
+              color: current.color,
+            });
+            computedTotalSize += fallbackSize;
           }
         });
       }

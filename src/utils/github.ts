@@ -1072,12 +1072,45 @@ export async function fetchOrgRepos(
   } as RepoSearchResult;
 }
 
+export const GITHUB_LANG_COLORS: Record<string, string> = {
+  TypeScript: "#3178c6",
+  JavaScript: "#f1e05a",
+  Python: "#3572A5",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  Go: "#00ADD8",
+  Rust: "#dea584",
+  Java: "#b07219",
+  "C++": "#f34b7d",
+  C: "#555555",
+  "C#": "#178600",
+  PHP: "#4F5D95",
+  Ruby: "#701516",
+  Vue: "#41b883",
+  Svelte: "#ff3e00",
+  Shell: "#89e051",
+  Dart: "#00B4AB",
+  Kotlin: "#A97BFF",
+  Swift: "#F05138",
+  Scala: "#c22d40",
+  Elixir: "#6e4a7e",
+  Haskell: "#5e5086",
+  Lua: "#000080",
+  R: "#198CE7",
+  Zig: "#ec915c",
+};
+
+export function getLangColor(lang: string, fallback = "#38bdf8"): string {
+  return GITHUB_LANG_COLORS[lang] || fallback;
+}
+
 export interface UserPrivateRepo {
   name: string;
   owner: string;
   count: number;
   isPrivate: boolean;
   language: string | null;
+  languages?: Array<{ name: string; size: number; color: string }>;
 }
 
 export async function fetchUserPrivateRepos(
@@ -1132,12 +1165,39 @@ export async function fetchUserPrivateRepos(
           }
         } catch (e) {}
 
+        let languagesArr: Array<{ name: string; size: number; color: string }> =
+          [];
+        try {
+          const resLangs = await revineFetch(
+            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/languages`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+              cacheTTL: 3600000,
+              persist: true,
+            },
+          );
+          if (
+            resLangs &&
+            typeof resLangs === "object" &&
+            !Array.isArray(resLangs)
+          ) {
+            languagesArr = Object.entries(resLangs).map(([langName, size]) => ({
+              name: langName,
+              size: Number(size) || 0,
+              color: getLangColor(langName),
+            }));
+          }
+        } catch (e) {}
+
         return {
           name: repo.name,
           owner: repo.owner.login,
           count,
           isPrivate: repo.private || false,
           language: repo.language || null,
+          languages: languagesArr,
         };
       }),
     );

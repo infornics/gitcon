@@ -7,6 +7,7 @@ import {
   fetchContributions,
   fetchUserPrivateRepos,
   getGithubToken,
+  getLangColor,
   GithubUserData,
   mergeSeries,
 } from "../../utils/github";
@@ -92,14 +93,15 @@ export default function UserProfile() {
         isPrivate: item.repository.isPrivate,
       }));
 
+      let fetchedPrivateRepos: Awaited<ReturnType<typeof fetchUserPrivateRepos>> = [];
       if (token) {
-        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        fetchedPrivateRepos = await fetchUserPrivateRepos(uname, token);
         const repoMap = new Map<string, (typeof extractedRepos)[0]>();
         extractedRepos.forEach((r) =>
           repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
         );
 
-        privateRepos.forEach((pr) => {
+        fetchedPrivateRepos.forEach((pr) => {
           const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
           const existing = repoMap.get(key);
           if (existing) {
@@ -132,6 +134,35 @@ export default function UserProfile() {
           });
         },
       );
+
+      if (token && fetchedPrivateRepos.length > 0) {
+        fetchedPrivateRepos.forEach((pr) => {
+          if (pr.languages && pr.languages.length > 0) {
+            pr.languages.forEach((l) => {
+              const current = langMap.get(l.name) || {
+                size: 0,
+                color: l.color,
+              };
+              langMap.set(l.name, {
+                size: current.size + l.size,
+                color: current.color || l.color,
+              });
+              totalSize += l.size;
+            });
+          } else if (pr.language) {
+            const fallbackSize = (pr.count || 1) * 2048;
+            const current = langMap.get(pr.language) || {
+              size: 0,
+              color: getLangColor(pr.language),
+            };
+            langMap.set(pr.language, {
+              size: current.size + fallbackSize,
+              color: current.color,
+            });
+            totalSize += fallbackSize;
+          }
+        });
+      }
 
       const extractedLangs = Array.from(langMap.entries())
         .map(([name, { size, color }]) => ({
