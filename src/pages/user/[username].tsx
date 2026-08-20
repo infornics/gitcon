@@ -1357,16 +1357,16 @@ export default function UserProfile() {
                           </strong>
                           {repo.isPrivate && (
                             <span
-                              className="inline-flex items-center gap-1 text-[9px] font-sans font-medium text-amber-400/90 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full shrink-0 leading-none"
-                              title="Private Repository"
+                              className="inline-flex items-center justify-center p-1 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 opacity-80 hover:opacity-100 transition-opacity"
+                              title="Private repository"
                             >
                               <svg
-                                width="9"
-                                height="9"
+                                width="11"
+                                height="11"
                                 viewBox="0 0 24 24"
                                 fill="none"
                                 stroke="currentColor"
-                                strokeWidth="2.5"
+                                strokeWidth="2.2"
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                               >
@@ -1380,7 +1380,6 @@ export default function UserProfile() {
                                 />
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                               </svg>
-                              Private
                             </span>
                           )}
                         </div>
