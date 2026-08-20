@@ -1356,7 +1356,30 @@ export default function UserProfile() {
                             {repo.name}
                           </strong>
                           {repo.isPrivate && (
-                            <span className="px-1.5 py-0.5 text-[9px] font-sans font-semibold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 leading-none inline-flex items-center">
+                            <span
+                              className="inline-flex items-center gap-1 text-[9px] font-sans font-medium text-amber-400/90 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded-full shrink-0 leading-none"
+                              title="Private Repository"
+                            >
+                              <svg
+                                width="9"
+                                height="9"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect
+                                  x="3"
+                                  y="11"
+                                  width="18"
+                                  height="11"
+                                  rx="2"
+                                  ry="2"
+                                />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                              </svg>
                               Private
                             </span>
                           )}
