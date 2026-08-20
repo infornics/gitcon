@@ -1325,7 +1325,7 @@ export default function UserProfile() {
                             {repo.name}
                           </strong>
                           {repo.isPrivate && (
-                            <span className="px-1.5 py-0.5 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                            <span className="px-1.5 py-0.5 text-[9px] font-sans font-semibold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0 leading-none inline-flex items-center">
                               Private
                             </span>
                           )}
