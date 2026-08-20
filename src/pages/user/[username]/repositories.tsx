@@ -31,7 +31,7 @@ export default function UserRepositories() {
     try {
       const user = await fetchContributions(uname, 365);
       const token = getGithubToken();
-      let extractedRepos = (
+      let extractedRepos: Repository[] = (
         user.contributionsCollection.commitContributionsByRepository || []
       ).map((item) => ({
         name: item.repository.name,
