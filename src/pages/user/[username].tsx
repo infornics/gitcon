@@ -1317,20 +1317,26 @@ export default function UserProfile() {
                       href={`https://github.com/${repo.owner}/${repo.name}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="repo-item hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 cursor-pointer text-inherit no-underline"
+                      className="repo-item hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 cursor-pointer text-inherit no-underline min-w-0"
                     >
-                      <div>
-                        <strong className="inline-flex items-center gap-1.5">
-                          {repo.name}
+                      <div className="flex flex-col min-w-0 flex-1 pr-1">
+                        <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
+                          <strong className="truncate text-sm font-bold max-w-full">
+                            {repo.name}
+                          </strong>
                           {repo.isPrivate && (
-                            <span className="px-1.5 py-0.2 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            <span className="px-1.5 py-0.5 text-[10px] font-mono font-normal rounded bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
                               Private
                             </span>
                           )}
-                        </strong>
-                        <span>{repo.owner}</span>
+                        </div>
+                        <span className="text-xs opacity-60 truncate mt-0.5">
+                          {repo.owner}
+                        </span>
                       </div>
-                      <strong>{repo.count}</strong>
+                      <strong className="shrink-0 font-mono text-sm">
+                        {repo.count}
+                      </strong>
                     </a>
                   ))
                 ) : (

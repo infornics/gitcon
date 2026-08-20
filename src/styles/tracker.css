@@ -559,21 +559,25 @@ input.tracker-input {
   display: grid;
   gap: var(--space-3);
   margin-top: var(--space-4);
+  min-width: 0;
 }
 .repo-item {
   display: flex;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: center;
   padding: var(--space-4);
   border-radius: var(--radius-lg);
   background: var(--color-surface-2);
   border: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
+  min-width: 0;
+  overflow: hidden;
 }
 .repo-item > div {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1;
 }
 .repo-item strong {
   overflow: hidden;
