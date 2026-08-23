@@ -154,11 +154,9 @@ export default function UserRepositories() {
                             };
 
                     return (
-                      <a
+                      <Link
                         key={i}
-                        href={`https://github.com/${repo.owner}/${repo.name}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        href={`/repo/${repo.owner}/${repo.name}`}
                         className="p-6 rounded-2xl border flex flex-col gap-4 hover:scale-[1.02] transition-all duration-300 group text-inherit no-underline"
                         style={{
                           background: `radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 6%, var(--color-surface-2)), var(--color-surface-2))`,
@@ -231,7 +229,7 @@ export default function UserRepositories() {
                             <line x1="10" y1="14" x2="21" y2="3" />
                           </svg>
                         </div>
-                      </a>
+                      </Link>
                     );
                   })}
                 </div>
@@ -244,11 +242,9 @@ export default function UserRepositories() {
                 <div className="label mb-4 opacity-75">Other Repositories</div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {repos.slice(3).map((repo, i) => (
-                    <a
+                    <Link
                       key={i}
-                      href={`https://github.com/${repo.owner}/${repo.name}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/repo/${repo.owner}/${repo.name}`}
                       className="p-5 rounded-xl bg-surface-2 border border-white/5 flex justify-between items-center hover:border-primary/20 hover:scale-[1.01] transition-all duration-300 group text-inherit no-underline"
                     >
                       <div className="flex flex-col min-w-0">
@@ -311,7 +307,7 @@ export default function UserRepositories() {
                           <line x1="10" y1="14" x2="21" y2="3" />
                         </svg>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
