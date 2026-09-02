@@ -120,6 +120,24 @@ const renderAchievementIcon = (type: string, size = 15, className = "") => {
           <polyline points="8 6 2 12 8 18" />
         </svg>
       );
+    case "diamond":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M6 3h12l4 6-10 12L2 9z" />
+          <path d="M11 3 8 9l4 12 4-12-3-6" />
+          <path d="M2 9h20" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -770,6 +788,28 @@ export default function UserProfile() {
         rewardCategory: "Volume Milestone",
       },
       {
+        id: "five-k",
+        iconType: "diamond",
+        title: "5K Milestone",
+        shortDesc: "Reached 5,000+ total contributions",
+        fullDesc:
+          "Accumulate 5,000 or more total contributions over the selected yearly tracking period.",
+        unlocked: stats.total >= 5000,
+        badgeSubtitle:
+          stats.total >= 5000
+            ? `${stats.total.toLocaleString()} commits`
+            : `${stats.total.toLocaleString()}/5K commits`,
+        progress: `${Math.min(stats.total, 5000).toLocaleString()}/5,000`,
+        progressPercent: Math.min(
+          100,
+          Math.round((stats.total / 5000) * 100),
+        ),
+        currentValue: `${stats.total.toLocaleString()} total contributions`,
+        targetValue: "5,000 contributions",
+        metricLabel: "Total Contribution Volume",
+        rewardCategory: "Elite Milestone",
+      },
+      {
         id: "multi-repo",
         iconType: "repo",
         title: "Code Explorer",
@@ -856,10 +896,17 @@ export default function UserProfile() {
                     <div className="skeleton h-6 w-32 rounded-md" />
                   </div>
                 </div>
-                <div className="flex gap-2 flex-wrap items-center">
-                  <div className="skeleton h-8 w-28 rounded-full" />
-                  <div className="skeleton h-8 w-28 rounded-full" />
-                  <div className="skeleton h-8 w-28 rounded-full" />
+                <div className="profile-header-badges-stack">
+                  <div className="header-badges-row">
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                  </div>
+                  <div className="header-badges-row">
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                    <div className="skeleton h-8 w-28 rounded-full" />
+                  </div>
                 </div>
               </div>
               <div className="profile-stats-grid">
@@ -991,7 +1038,7 @@ export default function UserProfile() {
                 ))}
               </div>
               <div className="header-badges-row">
-                {achievements.slice(3, 5).map((ach) => (
+                {achievements.slice(3, 6).map((ach) => (
                   <button
                     key={ach.id}
                     type="button"
