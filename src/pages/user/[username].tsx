@@ -653,8 +653,9 @@ export default function UserProfile() {
       };
     }
 
-    const totalDays = series.length;
-    const activeDays = series.filter((d) => d.count > 0).length;
+    const normalizedSeries = series.length > 365 ? series.slice(-365) : series;
+    const totalDays = Math.min(series.length, 365);
+    const activeDays = normalizedSeries.filter((d) => d.count > 0).length;
     const restDays = totalDays - activeDays;
     const activeRatio = totalDays > 0 ? (activeDays / totalDays) * 100 : 0;
     const activeAverage = activeDays > 0 ? stats.total / activeDays : 0;
@@ -662,7 +663,7 @@ export default function UserProfile() {
     let weekdayCount = 0;
     let weekendCount = 0;
 
-    series.forEach((d) => {
+    normalizedSeries.forEach((d) => {
       const day = new Date(d.date + "T00:00:00Z").getUTCDay();
       if (day === 0 || day === 6) {
         weekendCount += d.count;
