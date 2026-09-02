@@ -1208,8 +1208,8 @@ input.tracker-input {
 /* Sidebar Habit & Consistency Card */
 .habit-stat-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
   margin-bottom: var(--space-4);
 }
 
@@ -1221,6 +1221,10 @@ input.tracker-input {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.habit-stat-box.full-width {
+  grid-column: 1 / -1;
 }
 
 .weekday-split-wrap {

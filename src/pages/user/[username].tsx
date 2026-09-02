@@ -1793,19 +1793,19 @@ export default function UserProfile() {
                 </div>
 
                 <div className="habit-stat-box">
-                  <span className="text-xs opacity-60">Active Day Avg</span>
-                  <strong className="text-base font-mono font-bold">
-                    {consistencyStats.activeAverage.toFixed(1)}
-                  </strong>
-                  <span className="text-[11px] opacity-50">Commits / active day</span>
-                </div>
-
-                <div className="habit-stat-box">
                   <span className="text-xs opacity-60">Rest Days</span>
                   <strong className="text-base font-mono font-bold">
                     {consistencyStats.restDays}
                   </strong>
                   <span className="text-[11px] opacity-50">Zero-commit days</span>
+                </div>
+
+                <div className="habit-stat-box full-width">
+                  <span className="text-xs opacity-60">Active Day Avg</span>
+                  <strong className="text-base font-mono font-bold">
+                    {consistencyStats.activeAverage.toFixed(1)}
+                  </strong>
+                  <span className="text-[11px] opacity-50">Commits / active day</span>
                 </div>
               </div>
 
