@@ -436,6 +436,50 @@ export default function UserProfile() {
     return sorted[0].name;
   }, [hourlyData]);
 
+  const topDays = useMemo(() => {
+    if (series.length === 0) return [];
+    const dayNames = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+    const activeDays = series.filter((d) => d.count > 0);
+    const sorted = [...activeDays].sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return b.date.localeCompare(a.date);
+    });
+    const top = sorted.slice(0, 10);
+    const maxCount = top[0]?.count || 1;
+
+    return top.map((d) => {
+      const dateObj = new Date(d.date + "T00:00:00Z");
+      return {
+        date: d.date,
+        count: d.count,
+        dayName: dayNames[dateObj.getUTCDay()],
+        formattedDate: dateObj.toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          timeZone: "UTC",
+        }),
+        relativePercent: (d.count / maxCount) * 100,
+        shareOfTotal:
+          stats.total > 0
+            ? ((d.count / stats.total) * 100).toFixed(1)
+            : "0",
+      };
+    });
+  }, [series, stats.total]);
+
+  const topDaysTotal = useMemo(() => {
+    return topDays.reduce((acc, curr) => acc + curr.count, 0);
+  }, [topDays]);
+
   const showTooltip = (
     day: { date: string; count: number },
     x: number,
@@ -491,6 +535,7 @@ export default function UserProfile() {
                 <div className="panel h-[250px] skeleton" />
                 <div className="panel h-[250px] skeleton" />
                 <div className="panel h-[250px] skeleton" />
+                <div className="panel h-[420px] skeleton" />
               </div>
               <aside className="flex flex-col gap-6">
                 <div className="panel h-[280px] skeleton" />
@@ -1293,6 +1338,120 @@ export default function UserProfile() {
                   })}
                 </svg>
               </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head flex justify-between items-center flex-wrap gap-2">
+                <div>
+                  <h2>Top Contribution Days</h2>
+                  <p>Highest volume contribution days in the selected period.</p>
+                </div>
+                {topDays.length > 0 && (
+                  <div className="text-right">
+                    <div className="text-primary font-bold text-sm">
+                      {topDaysTotal.toLocaleString()} Commits
+                    </div>
+                    <div className="text-xs opacity-60 mt-0.5">
+                      {stats.total > 0
+                        ? `${((topDaysTotal / stats.total) * 100).toFixed(1)}% of total`
+                        : ""}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {topDays.length > 0 ? (
+                <div className="top-days-table-wrapper">
+                  <table className="top-days-table">
+                    <thead>
+                      <tr>
+                        <th className="text-center w-12">#</th>
+                        <th>Date</th>
+                        <th className="hide-mobile">Day of Week</th>
+                        <th>Activity Intensity</th>
+                        <th className="text-right">Contributions</th>
+                        <th className="text-right hide-mobile">% of Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {topDays.map((item, idx) => {
+                        const rank = idx + 1;
+                        const rankClass =
+                          rank === 1
+                            ? "gold"
+                            : rank === 2
+                              ? "silver"
+                              : rank === 3
+                                ? "bronze"
+                                : "regular";
+
+                        return (
+                          <tr key={item.date}>
+                            <td className="rank-cell text-center">
+                              <span className={`rank-badge ${rankClass}`}>
+                                {rank}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="flex flex-col">
+                                <span className="font-bold text-sm">
+                                  {item.formattedDate}
+                                </span>
+                                <span className="font-mono text-xs opacity-50">
+                                  {item.date}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="hide-mobile">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-surface-offset text-text-muted">
+                                {item.dayName}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-3 min-w-[120px] max-w-[220px]">
+                                <div className="flex-1 h-2 rounded-full bg-surface-offset overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full transition-all duration-500"
+                                    style={{
+                                      width: `${item.relativePercent}%`,
+                                      background:
+                                        rank === 1
+                                          ? "linear-gradient(90deg, var(--color-primary), #ffd700)"
+                                          : rank === 2
+                                            ? "linear-gradient(90deg, var(--color-primary), #c0c0c0)"
+                                            : rank === 3
+                                              ? "linear-gradient(90deg, var(--color-primary), #cd7f32)"
+                                              : "var(--color-primary)",
+                                    }}
+                                  />
+                                </div>
+                                <span className="text-xs opacity-60 font-mono w-9 text-right shrink-0">
+                                  {Math.round(item.relativePercent)}%
+                                </span>
+                              </div>
+                            </td>
+                            <td className="text-right">
+                              <span className="font-mono font-bold text-primary text-sm">
+                                {item.count.toLocaleString()}
+                              </span>
+                              <span className="text-xs opacity-50 ml-1 hidden sm:inline">
+                                {item.count === 1 ? "commit" : "commits"}
+                              </span>
+                            </td>
+                            <td className="text-right font-mono text-xs opacity-60 hide-mobile">
+                              {item.shareOfTotal}%
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="muted p-6 text-center text-sm">
+                  No contribution activity recorded in this period.
+                </div>
+              )}
             </div>
           </div>
 

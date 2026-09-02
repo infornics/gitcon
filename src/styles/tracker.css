@@ -1108,3 +1108,100 @@ input.tracker-input {
   color: var(--color-text-faint);
   font-family: var(--font-mono);
 }
+
+/* Top Contribution Days Table */
+.top-days-table-wrapper {
+  overflow-x: auto;
+  margin-top: var(--space-4);
+  -webkit-overflow-scrolling: touch;
+}
+
+.top-days-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: var(--text-sm);
+}
+
+.top-days-table th {
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-text) 8%, transparent);
+  white-space: nowrap;
+}
+
+.top-days-table td {
+  padding: var(--space-3) var(--space-4);
+  vertical-align: middle;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--color-text) 4%, transparent);
+  transition: background 0.2s ease;
+}
+
+.top-days-table tr:last-child td {
+  border-bottom: none;
+}
+
+.top-days-table tr:hover td {
+  background: color-mix(in oklab, var(--color-primary) 4%, transparent);
+}
+
+.top-days-table .rank-cell {
+  width: 52px;
+}
+
+.top-days-table .rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--text-xs);
+}
+
+.top-days-table .rank-badge.gold {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.15);
+}
+
+.top-days-table .rank-badge.silver {
+  background: rgba(192, 192, 192, 0.15);
+  color: #c0c0c0;
+  border: 1px solid rgba(192, 192, 192, 0.3);
+  box-shadow: 0 0 12px rgba(192, 192, 192, 0.15);
+}
+
+.top-days-table .rank-badge.bronze {
+  background: rgba(205, 127, 50, 0.15);
+  color: #cd7f32;
+  border: 1px solid rgba(205, 127, 50, 0.3);
+  box-shadow: 0 0 12px rgba(205, 127, 50, 0.15);
+}
+
+.top-days-table .rank-badge.regular {
+  background: color-mix(in oklab, var(--color-surface-offset) 80%, transparent);
+  color: var(--color-text-muted);
+  border: 1px solid color-mix(in oklab, var(--color-text) 6%, transparent);
+}
+
+@media (max-width: 640px) {
+  .top-days-table th,
+  .top-days-table td {
+    padding: var(--space-2) var(--space-3);
+  }
+  .top-days-table .hide-mobile {
+    display: none;
+  }
+}
+
