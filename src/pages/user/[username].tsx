@@ -480,6 +480,169 @@ export default function UserProfile() {
     return topDays.reduce((acc, curr) => acc + curr.count, 0);
   }, [topDays]);
 
+  const monthlyBreakdown = useMemo(() => {
+    if (series.length === 0) return [];
+    const map = new Map<
+      string,
+      { monthKey: string; label: string; count: number }
+    >();
+
+    series.forEach((d) => {
+      const dateObj = new Date(d.date + "T00:00:00Z");
+      const key = `${dateObj.getUTCFullYear()}-${String(dateObj.getUTCMonth() + 1).padStart(2, "0")}`;
+      const label = dateObj.toLocaleDateString(undefined, {
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+      });
+      const current = map.get(key) || { monthKey: key, label, count: 0 };
+      current.count += d.count;
+      map.set(key, current);
+    });
+
+    const months = Array.from(map.values());
+    const maxCount = Math.max(...months.map((m) => m.count), 1);
+
+    return months.map((m) => ({
+      ...m,
+      percent: (m.count / maxCount) * 100,
+      shareOfTotal:
+        stats.total > 0
+          ? ((m.count / stats.total) * 100).toFixed(1)
+          : "0",
+      isPeak: m.count === maxCount && maxCount > 0,
+    }));
+  }, [series, stats.total]);
+
+  const consistencyStats = useMemo(() => {
+    if (series.length === 0) {
+      return {
+        activeDays: 0,
+        totalDays: 0,
+        activeRatio: 0,
+        activeAverage: 0,
+        restDays: 0,
+        weekdayCount: 0,
+        weekendCount: 0,
+        weekdayPercent: 50,
+        weekendPercent: 50,
+        archetype: "Coder",
+        archetypeIcon: "💻",
+        archetypeDesc: "Consistent software development",
+      };
+    }
+
+    const totalDays = series.length;
+    const activeDays = series.filter((d) => d.count > 0).length;
+    const restDays = totalDays - activeDays;
+    const activeRatio = totalDays > 0 ? (activeDays / totalDays) * 100 : 0;
+    const activeAverage = activeDays > 0 ? stats.total / activeDays : 0;
+
+    let weekdayCount = 0;
+    let weekendCount = 0;
+
+    series.forEach((d) => {
+      const day = new Date(d.date + "T00:00:00Z").getUTCDay();
+      if (day === 0 || day === 6) {
+        weekendCount += d.count;
+      } else {
+        weekdayCount += d.count;
+      }
+    });
+
+    const totalCalculated = weekdayCount + weekendCount;
+    const weekdayPercent =
+      totalCalculated > 0 ? (weekdayCount / totalCalculated) * 100 : 50;
+    const weekendPercent =
+      totalCalculated > 0 ? (weekendCount / totalCalculated) * 100 : 50;
+
+    let archetype = "Daily Striker";
+    let archetypeIcon = "🔥";
+    let archetypeDesc = "High daily consistency and regular commits";
+
+    if (activeRatio >= 80) {
+      archetype = "Ironclad Striker";
+      archetypeIcon = "⚡";
+      archetypeDesc = "Active over 80% of all days in the period";
+    } else if (weekendPercent > 35) {
+      archetype = "Weekend Warrior";
+      archetypeIcon = "🛡️";
+      archetypeDesc = "Heavy contribution volume on weekends";
+    } else if (languages.length >= 4) {
+      archetype = "Polyglot Architect";
+      archetypeIcon = "🌐";
+      archetypeDesc = "Versatile across multiple programming stacks";
+    } else if (stats.best.count >= 80) {
+      archetype = "High-Velocity Sprinter";
+      archetypeIcon = "🚀";
+      archetypeDesc = "Capable of massive single-day contribution bursts";
+    } else if (stats.longest >= 30) {
+      archetype = "Endurance Runner";
+      archetypeIcon = "🏃";
+      archetypeDesc = "Exceptional continuous momentum";
+    }
+
+    return {
+      activeDays,
+      totalDays,
+      activeRatio,
+      activeAverage,
+      restDays,
+      weekdayCount,
+      weekendCount,
+      weekdayPercent,
+      weekendPercent,
+      archetype,
+      archetypeIcon,
+      archetypeDesc,
+    };
+  }, [series, stats.total, stats.best.count, stats.longest, languages.length]);
+
+  const achievements = useMemo(() => {
+    return [
+      {
+        id: "century",
+        icon: "👑",
+        title: "Century Club",
+        desc: "100+ contributions in a single day",
+        unlocked: stats.best.count >= 100,
+        progress: `${Math.min(stats.best.count, 100)}/100`,
+      },
+      {
+        id: "streak-30",
+        icon: "🔥",
+        title: "Iron Streak",
+        desc: "Maintained a 30+ day streak",
+        unlocked: stats.longest >= 30,
+        progress: `${Math.min(stats.longest, 30)}/30 days`,
+      },
+      {
+        id: "kilo-club",
+        icon: "🚀",
+        title: "1K Milestone",
+        desc: "Reached 1,000+ total contributions",
+        unlocked: stats.total >= 1000,
+        progress: `${Math.min(stats.total, 1000).toLocaleString()}/1,000`,
+      },
+      {
+        id: "multi-repo",
+        icon: "📦",
+        title: "Code Explorer",
+        desc: "Committed to 5+ repositories",
+        unlocked: repos.length >= 5,
+        progress: `${Math.min(repos.length, 5)}/5 repos`,
+      },
+      {
+        id: "polyglot",
+        icon: "🎨",
+        title: "Polyglot",
+        desc: "Used 4+ programming languages",
+        unlocked: languages.length >= 4,
+        progress: `${Math.min(languages.length, 4)}/4 langs`,
+      },
+    ];
+  }, [stats, repos.length, languages.length]);
+
   const showTooltip = (
     day: { date: string; count: number },
     x: number,
@@ -541,6 +704,9 @@ export default function UserProfile() {
                 <div className="panel h-[280px] skeleton" />
                 <div className="panel h-[560px] skeleton" />
                 <div className="panel h-[260px] skeleton" />
+                <div className="panel h-[340px] skeleton" />
+                <div className="panel h-[380px] skeleton" />
+                <div className="panel h-[320px] skeleton" />
               </aside>
             </section>
           </main>
@@ -1607,6 +1773,182 @@ export default function UserProfile() {
                   View all contributed accounts
                 </Link>
               )}
+            </div>
+
+            {/* Developer Habits & Consistency */}
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Habits & Consistency</h2>
+                <p className="text-xs opacity-60">Developer rhythm & activity profile</p>
+              </div>
+
+              <div className="persona-badge-wrap mt-3">
+                <div className="persona-icon">{consistencyStats.archetypeIcon}</div>
+                <div className="flex flex-col min-w-0">
+                  <div className="text-xs uppercase font-extrabold tracking-wider text-primary">
+                    Developer Archetype
+                  </div>
+                  <strong className="text-base font-bold truncate">
+                    {consistencyStats.archetype}
+                  </strong>
+                  <span className="text-xs opacity-60 mt-0.5">
+                    {consistencyStats.archetypeDesc}
+                  </span>
+                </div>
+              </div>
+
+              <div className="habit-stat-grid">
+                <div className="habit-stat-box">
+                  <span className="text-xs opacity-60">Active Ratio</span>
+                  <strong className="text-base font-mono text-primary font-bold">
+                    {consistencyStats.activeRatio.toFixed(1)}%
+                  </strong>
+                  <span className="text-[11px] opacity-50">
+                    {consistencyStats.activeDays} of {consistencyStats.totalDays} days
+                  </span>
+                </div>
+
+                <div className="habit-stat-box">
+                  <span className="text-xs opacity-60">Active Day Avg</span>
+                  <strong className="text-base font-mono font-bold">
+                    {consistencyStats.activeAverage.toFixed(1)}
+                  </strong>
+                  <span className="text-[11px] opacity-50">Commits / active day</span>
+                </div>
+
+                <div className="habit-stat-box">
+                  <span className="text-xs opacity-60">Rest Days</span>
+                  <strong className="text-base font-mono font-bold">
+                    {consistencyStats.restDays}
+                  </strong>
+                  <span className="text-[11px] opacity-50">Zero-commit days</span>
+                </div>
+
+                <div className="habit-stat-box">
+                  <span className="text-xs opacity-60">Longest Run</span>
+                  <strong className="text-base font-mono text-emerald-500 font-bold">
+                    {stats.longest}d
+                  </strong>
+                  <span className="text-[11px] opacity-50">Peak streak</span>
+                </div>
+              </div>
+
+              <div className="weekday-split-wrap">
+                <div className="flex justify-between items-center text-xs mb-2">
+                  <span className="font-bold">Weekday vs. Weekend Split</span>
+                  <span className="font-mono opacity-60">
+                    {consistencyStats.weekdayPercent.toFixed(0)}% / {consistencyStats.weekendPercent.toFixed(0)}%
+                  </span>
+                </div>
+                <div className="h-2.5 rounded-full bg-surface-offset flex overflow-hidden gap-0.5">
+                  <div
+                    className="h-full bg-primary transition-all duration-500"
+                    style={{ width: `${consistencyStats.weekdayPercent}%` }}
+                    title={`Weekdays: ${consistencyStats.weekdayCount.toLocaleString()} commits (${consistencyStats.weekdayPercent.toFixed(1)}%)`}
+                  />
+                  <div
+                    className="h-full bg-blue transition-all duration-500"
+                    style={{ width: `${consistencyStats.weekendPercent}%` }}
+                    title={`Weekends: ${consistencyStats.weekendCount.toLocaleString()} commits (${consistencyStats.weekendPercent.toFixed(1)}%)`}
+                  />
+                </div>
+                <div className="flex justify-between text-[11px] opacity-60 mt-1.5">
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-primary inline-block" />
+                    Mon–Fri ({consistencyStats.weekdayCount.toLocaleString()})
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-blue inline-block" />
+                    Sat–Sun ({consistencyStats.weekendCount.toLocaleString()})
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Monthly Activity Breakdown */}
+            <div className="panel">
+              <div className="panel-head flex justify-between items-center">
+                <div>
+                  <h2>Monthly Breakdown</h2>
+                  <p className="text-xs opacity-60">Output trend across months</p>
+                </div>
+              </div>
+
+              <div className="month-breakdown-list mt-3">
+                {monthlyBreakdown.map((m) => (
+                  <div key={m.monthKey} className="month-item">
+                    <div className="flex justify-between items-center text-xs">
+                      <span className="font-bold flex items-center gap-1.5">
+                        {m.label}
+                        {m.isPeak && (
+                          <span
+                            className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-bold"
+                            title="Peak contribution month"
+                          >
+                            PEAK
+                          </span>
+                        )}
+                      </span>
+                      <div className="flex items-center gap-2 font-mono">
+                        <span className="font-bold text-primary">
+                          {m.count.toLocaleString()}
+                        </span>
+                        <span className="opacity-50 text-[11px]">
+                          ({m.shareOfTotal}%)
+                        </span>
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-surface-offset overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          m.isPeak ? "bg-amber-400" : "bg-primary"
+                        }`}
+                        style={{ width: `${m.percent}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Developer Milestones & Badges */}
+            <div className="panel">
+              <div className="panel-head">
+                <h2>Milestones & Badges</h2>
+                <p className="text-xs opacity-60">Achievements earned from activity</p>
+              </div>
+
+              <div className="achievements-list mt-3">
+                {achievements.map((ach) => (
+                  <div
+                    key={ach.id}
+                    className={`achievement-card ${
+                      ach.unlocked ? "unlocked" : "locked"
+                    }`}
+                  >
+                    <div className="achievement-icon">{ach.icon}</div>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <div className="flex justify-between items-center">
+                        <strong className="text-sm font-bold truncate">
+                          {ach.title}
+                        </strong>
+                        <span
+                          className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded ${
+                            ach.unlocked
+                              ? "text-emerald-400 bg-emerald-500/10"
+                              : "opacity-60 bg-surface-offset"
+                          }`}
+                        >
+                          {ach.unlocked ? "UNLOCKED" : ach.progress}
+                        </span>
+                      </div>
+                      <span className="text-xs opacity-60 truncate mt-0.5">
+                        {ach.desc}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </aside>
         </section>

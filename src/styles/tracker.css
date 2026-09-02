@@ -1205,3 +1205,111 @@ input.tracker-input {
   }
 }
 
+/* Sidebar Habit & Consistency Card */
+.persona-badge-wrap {
+  background: radial-gradient(
+    circle at top right,
+    color-mix(in oklab, var(--color-primary) 15%, var(--color-surface-2)),
+    var(--color-surface-2)
+  );
+  border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.persona-icon {
+  font-size: 1.75rem;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--color-primary) 20%, transparent);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.habit-stat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.habit-stat-box {
+  background: var(--color-surface-2);
+  border: 1px solid color-mix(in oklab, var(--color-text) 5%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.weekday-split-wrap {
+  background: var(--color-surface-2);
+  border: 1px solid color-mix(in oklab, var(--color-text) 5%, transparent);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+/* Monthly Breakdown */
+.month-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.month-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Achievements */
+.achievements-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.achievement-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid color-mix(in oklab, var(--color-text) 5%, transparent);
+  transition: all 0.2s ease;
+}
+
+.achievement-card.unlocked {
+  border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+  background: radial-gradient(
+    circle at top right,
+    color-mix(in oklab, var(--color-primary) 6%, var(--color-surface-2)),
+    var(--color-surface-2)
+  );
+}
+
+.achievement-card.locked {
+  opacity: 0.45;
+  filter: grayscale(0.8);
+}
+
+.achievement-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  font-size: 1.25rem;
+  background: color-mix(in oklab, var(--color-primary) 15%, transparent);
+  flex-shrink: 0;
+}
+
+
