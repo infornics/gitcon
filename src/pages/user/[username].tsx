@@ -500,7 +500,9 @@ export default function UserProfile() {
       map.set(key, current);
     });
 
-    const months = Array.from(map.values());
+    const months = Array.from(map.values()).sort((a, b) =>
+      b.monthKey.localeCompare(a.monthKey),
+    );
     const maxCount = Math.max(...months.map((m) => m.count), 1);
 
     return months.map((m) => ({
