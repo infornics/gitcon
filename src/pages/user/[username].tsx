@@ -711,6 +711,10 @@ export default function UserProfile() {
         fullDesc:
           "Record 100 or more contributions within a single 24-hour UTC day.",
         unlocked: stats.best.count >= 100,
+        badgeSubtitle:
+          stats.best.count >= 100
+            ? `${stats.best.count.toLocaleString()} in a day`
+            : `${stats.best.count}/100 in a day`,
         progress: `${Math.min(stats.best.count, 100)}/100`,
         progressPercent: Math.min(
           100,
@@ -729,6 +733,10 @@ export default function UserProfile() {
         fullDesc:
           "Maintain an uninterrupted contribution streak for 30 consecutive calendar days or more.",
         unlocked: stats.longest >= 30,
+        badgeSubtitle:
+          stats.longest >= 30
+            ? `${stats.longest} days streak`
+            : `${stats.longest}/30 days`,
         progress: `${Math.min(stats.longest, 30)}/30 days`,
         progressPercent: Math.min(
           100,
@@ -747,6 +755,10 @@ export default function UserProfile() {
         fullDesc:
           "Accumulate 1,000 or more total contributions over the selected yearly tracking period.",
         unlocked: stats.total >= 1000,
+        badgeSubtitle:
+          stats.total >= 1000
+            ? `${stats.total.toLocaleString()} commits`
+            : `${stats.total.toLocaleString()}/1K commits`,
         progress: `${Math.min(stats.total, 1000).toLocaleString()}/1,000`,
         progressPercent: Math.min(
           100,
@@ -765,6 +777,10 @@ export default function UserProfile() {
         fullDesc:
           "Contribute commits across at least 5 distinct repositories within the past year.",
         unlocked: repos.length >= 5,
+        badgeSubtitle:
+          repos.length >= 5
+            ? `${repos.length} repositories`
+            : `${repos.length}/5 repos`,
         progress: `${Math.min(repos.length, 5)}/5 repos`,
         progressPercent: Math.min(
           100,
@@ -783,6 +799,10 @@ export default function UserProfile() {
         fullDesc:
           "Write and push code in 4 or more different programming languages.",
         unlocked: languages.length >= 4,
+        badgeSubtitle:
+          languages.length >= 4
+            ? `${languages.length} languages`
+            : `${languages.length}/4 langs`,
         progress: `${Math.min(languages.length, 4)}/4 langs`,
         progressPercent: Math.min(
           100,
@@ -965,9 +985,7 @@ export default function UserProfile() {
                     </span>
                     <div className="badge-chip-info">
                       <span className="badge-chip-title">{ach.title}</span>
-                      <span className="badge-chip-sub">
-                        {ach.unlocked ? "Unlocked" : ach.progress}
-                      </span>
+                      <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
                   </button>
                 ))}
@@ -986,9 +1004,7 @@ export default function UserProfile() {
                     </span>
                     <div className="badge-chip-info">
                       <span className="badge-chip-title">{ach.title}</span>
-                      <span className="badge-chip-sub">
-                        {ach.unlocked ? "Unlocked" : ach.progress}
-                      </span>
+                      <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
                   </button>
                 ))}
