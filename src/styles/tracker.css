@@ -1247,47 +1247,82 @@ input.tracker-input {
   gap: var(--space-1);
 }
 
-/* Achievements */
-.achievements-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.achievement-card {
+/* Profile Header Badges */
+.profile-header-badges {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
-  border: 1px solid color-mix(in oklab, var(--color-text) 5%, transparent);
-  transition: all 0.2s ease;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
-.achievement-card.unlocked {
-  border-color: color-mix(in oklab, var(--color-primary) 30%, transparent);
+@media (min-width: 1024px) {
+  .profile-header-badges {
+    justify-content: flex-end;
+    max-width: 600px;
+  }
+}
+
+.header-badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  border: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.header-badge-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-badge-chip.unlocked {
   background: radial-gradient(
     circle at top right,
-    color-mix(in oklab, var(--color-primary) 6%, var(--color-surface-2)),
-    var(--color-surface-2)
+    color-mix(in oklab, var(--color-primary) 12%, var(--color-surface)),
+    var(--color-surface)
   );
+  border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
 }
 
-.achievement-card.locked {
+.header-badge-chip.locked {
   opacity: 0.45;
   filter: grayscale(0.8);
 }
 
-.achievement-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-md);
-  display: grid;
-  place-items: center;
-  font-size: 1.25rem;
-  background: color-mix(in oklab, var(--color-primary) 15%, transparent);
-  flex-shrink: 0;
+.header-badge-chip .badge-chip-icon {
+  font-size: 1rem;
+  line-height: 1;
 }
+
+.header-badge-chip .badge-chip-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.header-badge-chip .badge-chip-title {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.header-badge-chip .badge-chip-sub {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--color-text-faint);
+  white-space: nowrap;
+}
+
+.header-badge-chip.unlocked .badge-chip-sub {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 
 

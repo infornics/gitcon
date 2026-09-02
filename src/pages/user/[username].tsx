@@ -674,14 +674,21 @@ export default function UserProfile() {
         <div className="page-shell">
           <main>
             <section className="profile-hero">
-              <div className="profile-info">
-                <div
-                  className="profile-avatar skeleton"
-                  style={{ border: "none" }}
-                />
-                <div className="flex flex-col gap-2">
-                  <div className="skeleton h-10 w-48 rounded-md" />
-                  <div className="skeleton h-6 w-32 rounded-md" />
+              <div className="profile-hero-inner">
+                <div className="profile-info">
+                  <div
+                    className="profile-avatar skeleton"
+                    style={{ border: "none" }}
+                  />
+                  <div className="flex flex-col gap-2">
+                    <div className="skeleton h-10 w-48 rounded-md" />
+                    <div className="skeleton h-6 w-32 rounded-md" />
+                  </div>
+                </div>
+                <div className="flex gap-2 flex-wrap items-center">
+                  <div className="skeleton h-8 w-28 rounded-full" />
+                  <div className="skeleton h-8 w-28 rounded-full" />
+                  <div className="skeleton h-8 w-28 rounded-full" />
                 </div>
               </div>
               <div className="profile-stats-grid">
@@ -706,9 +713,8 @@ export default function UserProfile() {
                 <div className="panel h-[280px] skeleton" />
                 <div className="panel h-[560px] skeleton" />
                 <div className="panel h-[260px] skeleton" />
-                <div className="panel h-[340px] skeleton" />
-                <div className="panel h-[380px] skeleton" />
-                <div className="panel h-[320px] skeleton" />
+                <div className="panel h-[260px] skeleton" />
+                <div className="panel h-[480px] skeleton" />
               </aside>
             </section>
           </main>
@@ -742,52 +748,73 @@ export default function UserProfile() {
     <>
       <main>
         <section className="profile-hero">
-          <div className="profile-info">
-            {userData?.avatarUrl && (
-              <a
-                href={`https://github.com/${userData?.login}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block shrink-0"
-                title="View GitHub profile"
-              >
-                <img
-                  src={userData?.avatarUrl}
-                  alt={userData?.login}
-                  className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
-                />
-              </a>
-            )}
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="profile-name">
-                  {userData?.name || userData?.login}
-                </h1>
-              </div>
-              <Link
-                href={`https://github.com/${userData?.login}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5"
-                title="View GitHub profile"
-              >
-                @{userData?.login}
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          <div className="profile-hero-inner">
+            <div className="profile-info">
+              {userData?.avatarUrl && (
+                <a
+                  href={`https://github.com/${userData?.login}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block shrink-0"
+                  title="View GitHub profile"
                 >
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                  <polyline points="15 3 21 3 21 9" />
-                  <line x1="10" y1="14" x2="21" y2="3" />
-                </svg>
-              </Link>
+                  <img
+                    src={userData?.avatarUrl}
+                    alt={userData?.login}
+                    className="profile-avatar hover:scale-105 hover:shadow-lg transition-all duration-300"
+                  />
+                </a>
+              )}
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="profile-name">
+                    {userData?.name || userData?.login}
+                  </h1>
+                </div>
+                <Link
+                  href={`https://github.com/${userData?.login}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="profile-username hover:text-primary transition-colors inline-flex items-center gap-1.5"
+                  title="View GitHub profile"
+                >
+                  @{userData?.login}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  >
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </Link>
+              </div>
+            </div>
+
+            {/* Header Badges */}
+            <div className="profile-header-badges">
+              {achievements.map((ach) => (
+                <div
+                  key={ach.id}
+                  className={`header-badge-chip ${ach.unlocked ? "unlocked" : "locked"}`}
+                  title={`${ach.title} — ${ach.desc} (${ach.unlocked ? "Unlocked" : ach.progress})`}
+                >
+                  <span className="badge-chip-icon">{ach.icon}</span>
+                  <div className="badge-chip-info">
+                    <span className="badge-chip-title">{ach.title}</span>
+                    <span className="badge-chip-sub">
+                      {ach.unlocked ? "Unlocked" : ach.progress}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1889,45 +1916,6 @@ export default function UserProfile() {
               </div>
             </div>
 
-            {/* Developer Milestones & Badges */}
-            <div className="panel">
-              <div className="panel-head">
-                <h2>Milestones & Badges</h2>
-                <p className="text-xs opacity-60">Achievements earned from activity</p>
-              </div>
-
-              <div className="achievements-list mt-3">
-                {achievements.map((ach) => (
-                  <div
-                    key={ach.id}
-                    className={`achievement-card ${
-                      ach.unlocked ? "unlocked" : "locked"
-                    }`}
-                  >
-                    <div className="achievement-icon">{ach.icon}</div>
-                    <div className="flex flex-col flex-1 min-w-0">
-                      <div className="flex justify-between items-center">
-                        <strong className="text-sm font-bold truncate">
-                          {ach.title}
-                        </strong>
-                        <span
-                          className={`text-[11px] font-mono font-bold px-1.5 py-0.5 rounded ${
-                            ach.unlocked
-                              ? "text-emerald-400 bg-emerald-500/10"
-                              : "opacity-60 bg-surface-offset"
-                          }`}
-                        >
-                          {ach.unlocked ? "UNLOCKED" : ach.progress}
-                        </span>
-                      </div>
-                      <span className="text-xs opacity-60 truncate mt-0.5">
-                        {ach.desc}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
           </aside>
         </section>
       </main>
