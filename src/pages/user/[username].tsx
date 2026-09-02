@@ -722,6 +722,28 @@ export default function UserProfile() {
   const achievements = useMemo(() => {
     return [
       {
+        id: "five-k",
+        iconType: "diamond",
+        title: "5K Milestone",
+        shortDesc: "5,000+ total contributions",
+        fullDesc:
+          "Accumulate 5,000 or more total contributions over the selected yearly tracking period.",
+        unlocked: stats.total >= 5000,
+        badgeSubtitle:
+          stats.total >= 5000
+            ? `${stats.total.toLocaleString()} commits`
+            : `${stats.total.toLocaleString()}/5K commits`,
+        progress: `${Math.min(stats.total, 5000).toLocaleString()}/5,000`,
+        progressPercent: Math.min(
+          100,
+          Math.round((stats.total / 5000) * 100),
+        ),
+        currentValue: `${stats.total.toLocaleString()} total contributions`,
+        targetValue: "5,000 contributions",
+        metricLabel: "Total Contribution Volume",
+        rewardCategory: "Elite Milestone",
+      },
+      {
         id: "century",
         iconType: "crown",
         title: "Century Club",
@@ -786,28 +808,6 @@ export default function UserProfile() {
         targetValue: "1,000 contributions",
         metricLabel: "Total Contribution Volume",
         rewardCategory: "Volume Milestone",
-      },
-      {
-        id: "five-k",
-        iconType: "diamond",
-        title: "5K Milestone",
-        shortDesc: "Reached 5,000+ total contributions",
-        fullDesc:
-          "Accumulate 5,000 or more total contributions over the selected yearly tracking period.",
-        unlocked: stats.total >= 5000,
-        badgeSubtitle:
-          stats.total >= 5000
-            ? `${stats.total.toLocaleString()} commits`
-            : `${stats.total.toLocaleString()}/5K commits`,
-        progress: `${Math.min(stats.total, 5000).toLocaleString()}/5,000`,
-        progressPercent: Math.min(
-          100,
-          Math.round((stats.total / 5000) * 100),
-        ),
-        currentValue: `${stats.total.toLocaleString()} total contributions`,
-        targetValue: "5,000 contributions",
-        metricLabel: "Total Contribution Volume",
-        rewardCategory: "Elite Milestone",
       },
       {
         id: "multi-repo",
