@@ -1807,14 +1807,6 @@ export default function UserProfile() {
                   </strong>
                   <span className="text-[11px] opacity-50">Zero-commit days</span>
                 </div>
-
-                <div className="habit-stat-box">
-                  <span className="text-xs opacity-60">Longest Run</span>
-                  <strong className="text-base font-mono text-emerald-500 font-bold">
-                    {stats.longest}d
-                  </strong>
-                  <span className="text-[11px] opacity-50">Peak streak</span>
-                </div>
               </div>
 
               <div className="weekday-split-wrap">
