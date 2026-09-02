@@ -1247,19 +1247,30 @@ input.tracker-input {
   gap: var(--space-1);
 }
 
-/* Profile Header Badges */
-.profile-header-badges {
+/* Profile Header Badges Stack */
+.profile-header-badges-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+@media (min-width: 1024px) {
+  .profile-header-badges-stack {
+    align-items: flex-end;
+  }
+}
+
+.header-badges-row {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
-  justify-content: flex-start;
 }
 
 @media (min-width: 1024px) {
-  .profile-header-badges {
+  .header-badges-row {
     justify-content: flex-end;
-    max-width: 600px;
   }
 }
 
@@ -1271,13 +1282,18 @@ input.tracker-input {
   border-radius: var(--radius-full);
   background: var(--color-surface);
   border: 1px solid color-mix(in oklab, var(--color-text) 8%, transparent);
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
 }
 
 .header-badge-chip:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
+  border-color: color-mix(in oklab, var(--color-primary) 50%, transparent);
 }
 
 .header-badge-chip.unlocked {
@@ -1289,14 +1305,21 @@ input.tracker-input {
   border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
 }
 
+.header-badge-chip.unlocked .badge-chip-icon {
+  color: var(--color-primary);
+}
+
 .header-badge-chip.locked {
-  opacity: 0.45;
-  filter: grayscale(0.8);
+  opacity: 0.5;
+  filter: grayscale(0.7);
 }
 
 .header-badge-chip .badge-chip-icon {
-  font-size: 1rem;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--color-text-muted);
 }
 
 .header-badge-chip .badge-chip-info {
@@ -1322,6 +1345,90 @@ input.tracker-input {
 .header-badge-chip.unlocked .badge-chip-sub {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+/* Achievement Details Modal */
+.achievement-modal-card {
+  background: var(--color-surface);
+  border: 1px solid color-mix(in oklab, var(--color-text) 12%, transparent);
+  border-radius: var(--radius-xl);
+  width: min(480px, 100%);
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+  animation: modalScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.achievement-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-5) var(--space-6);
+  border-bottom: 1px solid color-mix(in oklab, var(--color-text) 6%, transparent);
+}
+
+.achievement-modal-icon-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  display: grid;
+  place-items: center;
+  background: color-mix(in oklab, var(--color-primary) 15%, transparent);
+  color: var(--color-primary);
+  border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
+  flex-shrink: 0;
+}
+
+.achievement-modal-icon-badge.locked {
+  background: color-mix(in oklab, var(--color-surface-offset) 80%, transparent);
+  color: var(--color-text-muted);
+  border-color: color-mix(in oklab, var(--color-text) 10%, transparent);
+}
+
+.modal-close-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: grid;
+  place-items: center;
+  background: var(--color-surface-offset);
+  border: 1px solid color-mix(in oklab, var(--color-text) 10%, transparent);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.modal-close-btn:hover {
+  color: var(--color-text);
+  background: color-mix(in oklab, var(--color-text) 15%, transparent);
+}
+
+.achievement-modal-body {
+  padding: var(--space-6);
+}
+
+.achievement-status-banner {
+  background: var(--color-surface-2);
+  border: 1px solid color-mix(in oklab, var(--color-text) 6%, transparent);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.achievement-modal-footer {
+  padding: var(--space-4) var(--space-6) var(--space-5);
+  border-top: 1px solid color-mix(in oklab, var(--color-text) 6%, transparent);
+  background: color-mix(in oklab, var(--color-surface-2) 50%, var(--color-surface));
 }
 
 

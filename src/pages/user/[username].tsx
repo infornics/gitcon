@@ -27,6 +27,104 @@ const MONTH_NAMES = [
   "Dec",
 ];
 
+const renderAchievementIcon = (type: string, size = 15, className = "") => {
+  switch (type) {
+    case "crown":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <path d="M4 22h16" />
+          <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+          <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+          <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+        </svg>
+      );
+    case "flame":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z" />
+        </svg>
+      );
+    case "rocket":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+          <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+          <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+          <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+        </svg>
+      );
+    case "repo":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <polygon points="12 2 2 7 12 12 22 7 12 2" />
+          <polyline points="2 17 12 22 22 17" />
+          <polyline points="2 12 12 17 22 12" />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className={className}
+        >
+          <polyline points="16 18 22 12 16 6" />
+          <polyline points="8 6 2 12 8 18" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+};
+
 export default function UserProfile() {
   const { username } = useParams<{ username: string }>();
   const [loading, setLoading] = useState(true);
@@ -50,6 +148,9 @@ export default function UserProfile() {
     show: false,
   });
   const [hoveredChart, setHoveredChart] = useState<string | null>(null);
+  const [selectedAchievement, setSelectedAchievement] = useState<any | null>(
+    null,
+  );
 
   const graphWrapRef = useRef<HTMLDivElement>(null);
 
@@ -604,43 +705,93 @@ export default function UserProfile() {
     return [
       {
         id: "century",
-        icon: "👑",
+        iconType: "crown",
         title: "Century Club",
-        desc: "100+ contributions in a single day",
+        shortDesc: "100+ contributions in a single day",
+        fullDesc:
+          "Record 100 or more contributions within a single 24-hour UTC day.",
         unlocked: stats.best.count >= 100,
         progress: `${Math.min(stats.best.count, 100)}/100`,
+        progressPercent: Math.min(
+          100,
+          Math.round((stats.best.count / 100) * 100),
+        ),
+        currentValue: `${stats.best.count.toLocaleString()} contributions`,
+        targetValue: "100 contributions",
+        metricLabel: "Peak Single-Day Output",
+        rewardCategory: "Daily Intensity",
       },
       {
         id: "streak-30",
-        icon: "🔥",
+        iconType: "flame",
         title: "Iron Streak",
-        desc: "Maintained a 30+ day streak",
+        shortDesc: "Maintained a 30+ day streak",
+        fullDesc:
+          "Maintain an uninterrupted contribution streak for 30 consecutive calendar days or more.",
         unlocked: stats.longest >= 30,
         progress: `${Math.min(stats.longest, 30)}/30 days`,
+        progressPercent: Math.min(
+          100,
+          Math.round((stats.longest / 30) * 100),
+        ),
+        currentValue: `${stats.longest} consecutive days`,
+        targetValue: "30 days",
+        metricLabel: "Longest Consecutive Streak",
+        rewardCategory: "Consistency",
       },
       {
         id: "kilo-club",
-        icon: "🚀",
+        iconType: "rocket",
         title: "1K Milestone",
-        desc: "Reached 1,000+ total contributions",
+        shortDesc: "Reached 1,000+ total contributions",
+        fullDesc:
+          "Accumulate 1,000 or more total contributions over the selected yearly tracking period.",
         unlocked: stats.total >= 1000,
         progress: `${Math.min(stats.total, 1000).toLocaleString()}/1,000`,
+        progressPercent: Math.min(
+          100,
+          Math.round((stats.total / 1000) * 100),
+        ),
+        currentValue: `${stats.total.toLocaleString()} total contributions`,
+        targetValue: "1,000 contributions",
+        metricLabel: "Total Contribution Volume",
+        rewardCategory: "Volume Milestone",
       },
       {
         id: "multi-repo",
-        icon: "📦",
+        iconType: "repo",
         title: "Code Explorer",
-        desc: "Committed to 5+ repositories",
+        shortDesc: "Committed to 5+ repositories",
+        fullDesc:
+          "Contribute commits across at least 5 distinct repositories within the past year.",
         unlocked: repos.length >= 5,
         progress: `${Math.min(repos.length, 5)}/5 repos`,
+        progressPercent: Math.min(
+          100,
+          Math.round((repos.length / 5) * 100),
+        ),
+        currentValue: `${repos.length} repositories`,
+        targetValue: "5 repositories",
+        metricLabel: "Active Repositories",
+        rewardCategory: "Exploration",
       },
       {
         id: "polyglot",
-        icon: "🎨",
+        iconType: "code",
         title: "Polyglot",
-        desc: "Used 4+ programming languages",
+        shortDesc: "Used 4+ programming languages",
+        fullDesc:
+          "Write and push code in 4 or more different programming languages.",
         unlocked: languages.length >= 4,
         progress: `${Math.min(languages.length, 4)}/4 langs`,
+        progressPercent: Math.min(
+          100,
+          Math.round((languages.length / 4) * 100),
+        ),
+        currentValue: `${languages.length} languages detected`,
+        targetValue: "4 languages",
+        metricLabel: "Languages Stack",
+        rewardCategory: "Versatility",
       },
     ];
   }, [stats, repos.length, languages.length]);
@@ -798,23 +949,50 @@ export default function UserProfile() {
               </div>
             </div>
 
-            {/* Header Badges */}
-            <div className="profile-header-badges">
-              {achievements.map((ach) => (
-                <div
-                  key={ach.id}
-                  className={`header-badge-chip ${ach.unlocked ? "unlocked" : "locked"}`}
-                  title={`${ach.title} — ${ach.desc} (${ach.unlocked ? "Unlocked" : ach.progress})`}
-                >
-                  <span className="badge-chip-icon">{ach.icon}</span>
-                  <div className="badge-chip-info">
-                    <span className="badge-chip-title">{ach.title}</span>
-                    <span className="badge-chip-sub">
-                      {ach.unlocked ? "Unlocked" : ach.progress}
+            {/* Header Badges: 3 on Top Row, 2 on Second Row */}
+            <div className="profile-header-badges-stack">
+              <div className="header-badges-row">
+                {achievements.slice(0, 3).map((ach) => (
+                  <button
+                    key={ach.id}
+                    type="button"
+                    onClick={() => setSelectedAchievement(ach)}
+                    className={`header-badge-chip ${ach.unlocked ? "unlocked" : "locked"}`}
+                    title={`Click to view details: ${ach.title}`}
+                  >
+                    <span className="badge-chip-icon">
+                      {renderAchievementIcon(ach.iconType, 15)}
                     </span>
-                  </div>
-                </div>
-              ))}
+                    <div className="badge-chip-info">
+                      <span className="badge-chip-title">{ach.title}</span>
+                      <span className="badge-chip-sub">
+                        {ach.unlocked ? "Unlocked" : ach.progress}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="header-badges-row">
+                {achievements.slice(3, 5).map((ach) => (
+                  <button
+                    key={ach.id}
+                    type="button"
+                    onClick={() => setSelectedAchievement(ach)}
+                    className={`header-badge-chip ${ach.unlocked ? "unlocked" : "locked"}`}
+                    title={`Click to view details: ${ach.title}`}
+                  >
+                    <span className="badge-chip-icon">
+                      {renderAchievementIcon(ach.iconType, 15)}
+                    </span>
+                    <div className="badge-chip-info">
+                      <span className="badge-chip-title">{ach.title}</span>
+                      <span className="badge-chip-sub">
+                        {ach.unlocked ? "Unlocked" : ach.progress}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1930,6 +2108,123 @@ export default function UserProfile() {
           }}
         >
           {tooltip.text}
+        </div>
+      )}
+
+      {/* Achievement Detail Modal */}
+      {selectedAchievement && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{
+            background: "rgba(0, 0, 0, 0.72)",
+            backdropFilter: "blur(8px)",
+          }}
+          onClick={() => setSelectedAchievement(null)}
+        >
+          <div
+            className="achievement-modal-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="achievement-modal-header">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`achievement-modal-icon-badge ${
+                    selectedAchievement.unlocked ? "unlocked" : "locked"
+                  }`}
+                >
+                  {renderAchievementIcon(selectedAchievement.iconType, 22)}
+                </div>
+                <div>
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-primary">
+                    {selectedAchievement.rewardCategory}
+                  </span>
+                  <h3 className="text-xl font-bold leading-snug">
+                    {selectedAchievement.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedAchievement(null)}
+                className="modal-close-btn"
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="achievement-modal-body">
+              <p className="text-sm opacity-80 mb-6 leading-relaxed">
+                {selectedAchievement.fullDesc}
+              </p>
+
+              <div className="achievement-status-banner mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs font-bold">
+                    {selectedAchievement.unlocked
+                      ? "Milestone Completed"
+                      : "Current Progress"}
+                  </span>
+                  <span
+                    className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
+                      selectedAchievement.unlocked
+                        ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                        : "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                    }`}
+                  >
+                    {selectedAchievement.unlocked
+                      ? "✓ UNLOCKED"
+                      : `${selectedAchievement.progressPercent}%`}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-surface-offset overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      selectedAchievement.unlocked
+                        ? "bg-emerald-500"
+                        : "bg-primary"
+                    }`}
+                    style={{
+                      width: `${selectedAchievement.progressPercent}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3.5 rounded-xl bg-surface-offset/50 border border-white/5">
+                  <span className="text-xs opacity-60 block mb-1">
+                    {selectedAchievement.metricLabel}
+                  </span>
+                  <strong className="text-sm font-mono font-bold text-primary">
+                    {selectedAchievement.currentValue}
+                  </strong>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-surface-offset/50 border border-white/5">
+                  <span className="text-xs opacity-60 block mb-1">
+                    Required Goal
+                  </span>
+                  <strong className="text-sm font-mono font-bold">
+                    {selectedAchievement.targetValue}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="achievement-modal-footer">
+              <button
+                type="button"
+                onClick={() => setSelectedAchievement(null)}
+                className="btn btn-secondary w-full justify-center text-xs font-bold !py-2.5"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </>
