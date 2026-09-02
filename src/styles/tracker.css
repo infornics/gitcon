@@ -1206,32 +1206,6 @@ input.tracker-input {
 }
 
 /* Sidebar Habit & Consistency Card */
-.persona-badge-wrap {
-  background: radial-gradient(
-    circle at top right,
-    color-mix(in oklab, var(--color-primary) 15%, var(--color-surface-2)),
-    var(--color-surface-2)
-  );
-  border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
-}
-
-.persona-icon {
-  font-size: 1.75rem;
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  background: color-mix(in oklab, var(--color-primary) 20%, transparent);
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-}
-
 .habit-stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

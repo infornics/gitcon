@@ -1782,22 +1782,7 @@ export default function UserProfile() {
                 <p className="text-xs opacity-60">Developer rhythm & activity profile</p>
               </div>
 
-              <div className="persona-badge-wrap mt-3">
-                <div className="persona-icon">{consistencyStats.archetypeIcon}</div>
-                <div className="flex flex-col min-w-0">
-                  <div className="text-xs uppercase font-extrabold tracking-wider text-primary">
-                    Developer Archetype
-                  </div>
-                  <strong className="text-base font-bold truncate">
-                    {consistencyStats.archetype}
-                  </strong>
-                  <span className="text-xs opacity-60 mt-0.5">
-                    {consistencyStats.archetypeDesc}
-                  </span>
-                </div>
-              </div>
-
-              <div className="habit-stat-grid">
+              <div className="habit-stat-grid mt-4">
                 <div className="habit-stat-box">
                   <span className="text-xs opacity-60">Active Ratio</span>
                   <strong className="text-base font-mono text-primary font-bold">
