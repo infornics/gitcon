@@ -770,18 +770,18 @@ export default function UserProfile() {
         id: "streak-100",
         iconType: "flame",
         title: "Iron Streak",
-        shortDesc: "Maintained a 100+ day streak",
+        shortDesc: "Maintain a 100+ day active streak",
         fullDesc:
           "Maintain an uninterrupted contribution streak for 100 consecutive calendar days or more.",
-        unlocked: stats.longest >= 100,
+        unlocked: stats.current >= 100,
         badgeSubtitle:
-          stats.longest >= 100
-            ? `${stats.longest} days streak`
-            : `${stats.longest}/100 days`,
-        progress: `${Math.min(stats.longest, 100)}/100 days`,
+          stats.current >= 100
+            ? `${stats.current} days streak`
+            : `${stats.current}/100 days`,
+        progress: `${Math.min(stats.current, 100)}/100 days`,
         progressPercent: Math.min(
           100,
-          Math.round((stats.longest / 100) * 100),
+          Math.round((stats.current / 100) * 100),
         ),
         currentValue: `${stats.longest} consecutive days`,
         targetValue: "100 days",
