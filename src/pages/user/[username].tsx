@@ -766,24 +766,24 @@ export default function UserProfile() {
         rewardCategory: "Daily Intensity",
       },
       {
-        id: "streak-30",
+        id: "streak-100",
         iconType: "flame",
         title: "Iron Streak",
-        shortDesc: "Maintained a 30+ day streak",
+        shortDesc: "Maintained a 100+ day streak",
         fullDesc:
-          "Maintain an uninterrupted contribution streak for 30 consecutive calendar days or more.",
-        unlocked: stats.longest >= 30,
+          "Maintain an uninterrupted contribution streak for 100 consecutive calendar days or more.",
+        unlocked: stats.longest >= 100,
         badgeSubtitle:
-          stats.longest >= 30
+          stats.longest >= 100
             ? `${stats.longest} days streak`
-            : `${stats.longest}/30 days`,
-        progress: `${Math.min(stats.longest, 30)}/30 days`,
+            : `${stats.longest}/100 days`,
+        progress: `${Math.min(stats.longest, 100)}/100 days`,
         progressPercent: Math.min(
           100,
-          Math.round((stats.longest / 30) * 100),
+          Math.round((stats.longest / 100) * 100),
         ),
         currentValue: `${stats.longest} consecutive days`,
-        targetValue: "30 days",
+        targetValue: "100 days",
         metricLabel: "Longest Consecutive Streak",
         rewardCategory: "Consistency",
       },
