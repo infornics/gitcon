@@ -1779,7 +1779,6 @@ export default function UserProfile() {
             <div className="panel">
               <div className="panel-head">
                 <h2>Habits & Consistency</h2>
-                <p className="text-xs opacity-60">Developer rhythm & activity profile</p>
               </div>
 
               <div className="habit-stat-grid mt-4">
