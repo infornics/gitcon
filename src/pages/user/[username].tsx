@@ -1044,7 +1044,7 @@ export default function UserProfile() {
                       <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
                     {ach.timesGained > 1 && (
-                      <span className="badge-chip-count">(x {ach.timesGained})</span>
+                      <span className="badge-chip-count">x{ach.timesGained}</span>
                     )}
                   </button>
                 ))}
@@ -1066,7 +1066,7 @@ export default function UserProfile() {
                       <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
                     {ach.timesGained > 1 && (
-                      <span className="badge-chip-count">(x {ach.timesGained})</span>
+                      <span className="badge-chip-count">x{ach.timesGained}</span>
                     )}
                   </button>
                 ))}
