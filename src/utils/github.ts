@@ -53,9 +53,9 @@ export function clearRevineCache() {
 export function getGithubToken(): string {
   if (typeof window !== "undefined") {
     // One-time cache purge for PAT users to remove legacy cached public data
-    if (!localStorage.getItem("gitcon_cache_purged_v4")) {
+    if (!localStorage.getItem("gitcon_cache_purged_v5")) {
       clearRevineCache();
-      localStorage.setItem("gitcon_cache_purged_v4", "true");
+      localStorage.setItem("gitcon_cache_purged_v5", "true");
     }
     const userToken = localStorage.getItem("gitcon_pat")?.trim();
     if (userToken) return userToken;
@@ -1143,12 +1143,11 @@ export async function fetchUserPrivateRepos(
 
     if (!Array.isArray(res)) return [];
 
-    // Filter to repositories accessible by PAT
+    // Filter to repositories owned by the target user
     const userRepos = res.filter(
       (r: any) =>
-        r.private ||
-        (r.owner?.login &&
-          r.owner.login.toLowerCase() === username.toLowerCase()),
+        r.owner?.login &&
+        r.owner.login.toLowerCase() === username.toLowerCase(),
     );
 
     const enriched = await Promise.all(
