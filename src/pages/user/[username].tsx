@@ -720,6 +720,17 @@ export default function UserProfile() {
     };
   }, [series, stats.total, stats.best.count, stats.longest, languages.length]);
 
+  const totalReposCount = useMemo(() => {
+    const reposTotal = userData?.repositories?.totalCount || 0;
+    const contributedTotal =
+      userData?.repositoriesContributedTo?.totalCount || 0;
+    return Math.max(reposTotal, contributedTotal, repos.length);
+  }, [
+    userData?.repositories?.totalCount,
+    userData?.repositoriesContributedTo?.totalCount,
+    repos.length,
+  ]);
+
   const achievements = useMemo(() => {
     return [
       {
@@ -823,18 +834,18 @@ export default function UserProfile() {
         shortDesc: "Committed to 5+ repositories",
         fullDesc:
           "Contribute commits across at least 5 distinct repositories within the past year.",
-        unlocked: repos.length >= 5,
-        timesGained: repos.length >= 5 ? 1 : 0,
+        unlocked: totalReposCount >= 5,
+        timesGained: totalReposCount >= 5 ? 1 : 0,
         badgeSubtitle:
-          repos.length >= 5
-            ? `${repos.length} repositories`
-            : `${repos.length}/5 repos`,
-        progress: `${Math.min(repos.length, 5)}/5 repos`,
+          totalReposCount >= 5
+            ? `${totalReposCount} repositories`
+            : `${totalReposCount}/5 repos`,
+        progress: `${Math.min(totalReposCount, 5)}/5 repos`,
         progressPercent: Math.min(
           100,
-          Math.round((repos.length / 5) * 100),
+          Math.round((totalReposCount / 5) * 100),
         ),
-        currentValue: `${repos.length} repositories`,
+        currentValue: `${totalReposCount} repositories`,
         targetValue: "5 repositories",
         metricLabel: "Active Repositories",
         rewardCategory: "Exploration",
@@ -863,7 +874,7 @@ export default function UserProfile() {
         rewardCategory: "Versatility",
       },
     ];
-  }, [stats, repos.length, languages.length, series]);
+  }, [stats, repos.length, totalReposCount, languages.length, series]);
 
   const showTooltip = (
     day: { date: string; count: number },

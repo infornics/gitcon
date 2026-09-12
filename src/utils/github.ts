@@ -15,6 +15,12 @@ export interface GithubUserData {
   followers?: {
     totalCount: number;
   };
+  repositories?: {
+    totalCount: number;
+  };
+  repositoriesContributedTo?: {
+    totalCount: number;
+  };
   contributionsCollection: {
     contributionCalendar: {
       totalContributions: number;
@@ -41,7 +47,7 @@ export function clearRevineCache() {
   if (typeof window !== "undefined") {
     try {
       Object.keys(localStorage)
-        .filter((key) => key.startsWith("revine_cache_"))
+        .filter((key) => key.startsWith("revine_cache_") || key.startsWith("fetch_"))
         .forEach((key) => localStorage.removeItem(key));
     } catch (e) {}
   }
@@ -50,9 +56,9 @@ export function clearRevineCache() {
 export function getGithubToken(): string {
   if (typeof window !== "undefined") {
     // One-time cache purge for PAT users to remove legacy cached public data
-    if (!localStorage.getItem("gitcon_cache_purged_v2")) {
+    if (!localStorage.getItem("gitcon_cache_purged_v3")) {
       clearRevineCache();
-      localStorage.setItem("gitcon_cache_purged_v2", "true");
+      localStorage.setItem("gitcon_cache_purged_v3", "true");
     }
     const userToken = localStorage.getItem("gitcon_pat")?.trim();
     if (userToken) return userToken;
@@ -130,17 +136,19 @@ export function calculateStats(days: Array<{ date: string; count: number }>) {
     }
   }
 
+  const today = isoDate(new Date());
+  const yesterday = isoDate(new Date(Date.now() - 86400000));
+
   let current = 0;
-  for (let i = sorted.length - 1; i >= 0; i--) {
-    if (sorted[i].count > 0) {
-      current++;
-    } else if (i === sorted.length - 1) {
-      // Today is empty, that's fine, streak can still be active from yesterday
-      continue;
-    } else {
-      // Yesterday or older is empty, streak is broken
-      break;
-    }
+  const daysMap = new Map(sorted.map((d) => [d.date, d.count]));
+
+  let checkDate = daysMap.has(today) && daysMap.get(today)! > 0 ? today : yesterday;
+
+  while (daysMap.has(checkDate) && daysMap.get(checkDate)! > 0) {
+    current++;
+    const prev = new Date(checkDate);
+    prev.setUTCDate(prev.getUTCDate() - 1);
+    checkDate = isoDate(prev);
   }
 
   const best = sorted.reduce(
@@ -174,6 +182,12 @@ export async function fetchContributions(username: string, daysBack: number) {
         followers {
           totalCount
         }
+        repositories {
+          totalCount
+        }
+        repositoriesContributedTo {
+          totalCount
+        }
         contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions
@@ -205,6 +219,12 @@ export async function fetchContributions(username: string, daysBack: number) {
         login
         avatarUrl(size: 160)
         followers {
+          totalCount
+        }
+        repositories {
+          totalCount
+        }
+        repositoriesContributedTo {
           totalCount
         }
         contributionsCollection(from: $from, to: $to) {
