@@ -801,7 +801,7 @@ export default function UserProfile() {
         fullDesc:
           "Accumulate 1,000 or more total contributions over the selected yearly tracking period.",
         unlocked: stats.total >= 1000,
-        timesGained: Math.floor(stats.total / 1000),
+        timesGained: stats.total >= 1000 ? 1 : 0,
         badgeSubtitle:
           stats.total >= 1000
             ? `${stats.total.toLocaleString()} commits`
@@ -824,7 +824,7 @@ export default function UserProfile() {
         fullDesc:
           "Contribute commits across at least 5 distinct repositories within the past year.",
         unlocked: repos.length >= 5,
-        timesGained: Math.floor(repos.length / 5),
+        timesGained: repos.length >= 5 ? 1 : 0,
         badgeSubtitle:
           repos.length >= 5
             ? `${repos.length} repositories`
