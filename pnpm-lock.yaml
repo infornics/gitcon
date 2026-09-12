@@ -20,6 +20,9 @@ importers:
       react-icons:
         specifier: ^5.6.0
         version: 5.7.0(react@18.3.1)
+      react-router-dom:
+        specifier: ^6.22.0
+        version: 6.30.6
       revine:
         specifier: ^2.2.2
         version: 2.3.3(@types/node@25.9.6)(lightningcss@1.32.0)(react-dom@18.3.1(react@18.3.1))(react-router-dom@6.30.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
