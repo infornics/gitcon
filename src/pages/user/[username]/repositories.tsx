@@ -53,7 +53,7 @@ export default function UserRepositories() {
           if (existing) {
             existing.isPrivate = pr.isPrivate || existing.isPrivate;
             existing.count = Math.max(existing.count, pr.count);
-          } else {
+          } else if (pr.count > 0) {
             repoMap.set(key, {
               name: pr.name,
               owner: pr.owner,
@@ -63,7 +63,7 @@ export default function UserRepositories() {
           }
         });
 
-        extractedRepos = Array.from(repoMap.values());
+        extractedRepos = Array.from(repoMap.values()).filter((r) => r.count > 0);
       }
 
       extractedRepos.sort((a, b) => b.count - a.count);
