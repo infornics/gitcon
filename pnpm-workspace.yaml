@@ -1,4 +1,4 @@
 allowBuilds:
   esbuild: true
-overrides:
-  revine: link:../revine
+minimumReleaseAgeExclude:
+  - revine@2.3.5
