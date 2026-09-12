@@ -18,9 +18,6 @@ export interface GithubUserData {
   repositories?: {
     totalCount: number;
   };
-  repositoriesContributedTo?: {
-    totalCount: number;
-  };
   contributionsCollection: {
     contributionCalendar: {
       totalContributions: number;
@@ -56,9 +53,9 @@ export function clearRevineCache() {
 export function getGithubToken(): string {
   if (typeof window !== "undefined") {
     // One-time cache purge for PAT users to remove legacy cached public data
-    if (!localStorage.getItem("gitcon_cache_purged_v3")) {
+    if (!localStorage.getItem("gitcon_cache_purged_v4")) {
       clearRevineCache();
-      localStorage.setItem("gitcon_cache_purged_v3", "true");
+      localStorage.setItem("gitcon_cache_purged_v4", "true");
     }
     const userToken = localStorage.getItem("gitcon_pat")?.trim();
     if (userToken) return userToken;
@@ -185,9 +182,6 @@ export async function fetchContributions(username: string, daysBack: number) {
         repositories {
           totalCount
         }
-        repositoriesContributedTo {
-          totalCount
-        }
         contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             totalContributions
@@ -222,9 +216,6 @@ export async function fetchContributions(username: string, daysBack: number) {
           totalCount
         }
         repositories {
-          totalCount
-        }
-        repositoriesContributedTo {
           totalCount
         }
         contributionsCollection(from: $from, to: $to) {

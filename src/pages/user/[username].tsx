@@ -721,15 +721,8 @@ export default function UserProfile() {
   }, [series, stats.total, stats.best.count, stats.longest, languages.length]);
 
   const totalReposCount = useMemo(() => {
-    const reposTotal = userData?.repositories?.totalCount || 0;
-    const contributedTotal =
-      userData?.repositoriesContributedTo?.totalCount || 0;
-    return Math.max(reposTotal, contributedTotal, repos.length);
-  }, [
-    userData?.repositories?.totalCount,
-    userData?.repositoriesContributedTo?.totalCount,
-    repos.length,
-  ]);
+    return Math.max(userData?.repositories?.totalCount || 0, repos.length);
+  }, [userData?.repositories?.totalCount, repos.length]);
 
   const achievements = useMemo(() => {
     return [
