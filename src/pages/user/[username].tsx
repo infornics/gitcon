@@ -730,6 +730,7 @@ export default function UserProfile() {
         fullDesc:
           "Accumulate 5,000 or more total contributions over the selected yearly tracking period.",
         unlocked: stats.total >= 5000,
+        timesGained: Math.floor(stats.total / 5000),
         badgeSubtitle:
           stats.total >= 5000
             ? `${stats.total.toLocaleString()} commits`
@@ -752,6 +753,7 @@ export default function UserProfile() {
         fullDesc:
           "Record 100 or more contributions within a single 24-hour UTC day.",
         unlocked: stats.best.count >= 100,
+        timesGained: series.filter((d) => d.count >= 100).length,
         badgeSubtitle:
           stats.best.count >= 100
             ? `${stats.best.count.toLocaleString()} in a day`
@@ -773,7 +775,10 @@ export default function UserProfile() {
         shortDesc: "Maintain a 100+ day active streak",
         fullDesc:
           "Maintain an uninterrupted contribution streak for 100 consecutive calendar days or more.",
-        unlocked: stats.current >= 100,
+        unlocked: stats.current >= 100 || stats.longest >= 100,
+        timesGained: Math.floor(
+          Math.max(stats.current, stats.longest) / 100,
+        ),
         badgeSubtitle:
           stats.current >= 100
             ? `${stats.current} days streak`
@@ -796,6 +801,7 @@ export default function UserProfile() {
         fullDesc:
           "Accumulate 1,000 or more total contributions over the selected yearly tracking period.",
         unlocked: stats.total >= 1000,
+        timesGained: Math.floor(stats.total / 1000),
         badgeSubtitle:
           stats.total >= 1000
             ? `${stats.total.toLocaleString()} commits`
@@ -818,6 +824,7 @@ export default function UserProfile() {
         fullDesc:
           "Contribute commits across at least 5 distinct repositories within the past year.",
         unlocked: repos.length >= 5,
+        timesGained: Math.floor(repos.length / 5),
         badgeSubtitle:
           repos.length >= 5
             ? `${repos.length} repositories`
@@ -840,6 +847,7 @@ export default function UserProfile() {
         fullDesc:
           "Write and push code in 4 or more different programming languages.",
         unlocked: languages.length >= 4,
+        timesGained: Math.floor(languages.length / 4),
         badgeSubtitle:
           languages.length >= 4
             ? `${languages.length} languages`
@@ -855,7 +863,7 @@ export default function UserProfile() {
         rewardCategory: "Versatility",
       },
     ];
-  }, [stats, repos.length, languages.length]);
+  }, [stats, repos.length, languages.length, series]);
 
   const showTooltip = (
     day: { date: string; count: number },
@@ -1017,7 +1025,7 @@ export default function UserProfile() {
               </div>
             </div>
 
-            {/* Header Badges: 3 on Top Row, 2 on Second Row */}
+            {/* Header Badges: 3 on Top Row, 3 on Second Row */}
             <div className="profile-header-badges-stack">
               <div className="header-badges-row">
                 {achievements.slice(0, 3).map((ach) => (
@@ -1035,6 +1043,9 @@ export default function UserProfile() {
                       <span className="badge-chip-title">{ach.title}</span>
                       <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
+                    {ach.timesGained > 1 && (
+                      <span className="badge-chip-count">(x {ach.timesGained})</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -1054,6 +1065,9 @@ export default function UserProfile() {
                       <span className="badge-chip-title">{ach.title}</span>
                       <span className="badge-chip-sub">{ach.badgeSubtitle}</span>
                     </div>
+                    {ach.timesGained > 1 && (
+                      <span className="badge-chip-count">(x {ach.timesGained})</span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -2276,6 +2290,17 @@ export default function UserProfile() {
                   </strong>
                 </div>
               </div>
+
+              {selectedAchievement.timesGained > 1 && (
+                <div className="mt-3 p-3.5 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-between">
+                  <span className="text-xs font-semibold text-primary">
+                    Times Gained
+                  </span>
+                  <span className="text-sm font-mono font-extrabold text-primary">
+                    {selectedAchievement.timesGained}x
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Modal Footer */}
