@@ -604,6 +604,7 @@ export async function fetchRepoContributors(
       `https://api.github.com/repos/${owner}/${name}/contributors?per_page=${limit}`,
       {
         headers: {
+          "User-Agent": "Gitcon",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         cacheTTL: 1800000,
@@ -614,57 +615,28 @@ export async function fetchRepoContributors(
 
     // 2. Fetch repo stats/contributors for exact additions & deletions on THIS repo
     let statsData: any[] = [];
-    try {
-      // First try reading from cache
-      const cached = await revineFetch(
-        `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
-        {
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          cacheTTL: 3600000,
-          persist: true,
-        },
-      );
-      if (Array.isArray(cached) && cached.length > 0) {
-        statsData = cached;
-      }
-    } catch (e) {}
 
-    // If cache was empty or uncomputed 202, poll live endpoint until 200 OK array is returned
-    if (statsData.length === 0) {
+    for (let attempt = 0; attempt < 6; attempt++) {
       try {
-        for (let attempt = 0; attempt < 5; attempt++) {
-          const statsRes = await fetch(
-            `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
-            {
-              headers: {
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
+        const statsRes = await fetch(
+          `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
+          {
+            headers: {
+              "User-Agent": "Gitcon",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
             },
-          );
-          if (statsRes.status === 200) {
-            const json = await statsRes.json();
-            if (Array.isArray(json) && json.length > 0) {
-              statsData = json;
-              // Now that we have valid computed data, update cache permanently
-              revineFetch(
-                `https://api.github.com/repos/${owner}/${name}/stats/contributors`,
-                {
-                  headers: {
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                  },
-                  cacheTTL: 3600000,
-                  persist: true,
-                },
-              ).catch(() => {});
-              break;
-            }
+          },
+        );
+        if (statsRes.status === 200) {
+          const json = await statsRes.json();
+          if (Array.isArray(json) && json.length > 0) {
+            statsData = json;
+            break;
           }
-          await new Promise((r) => setTimeout(r, 1200));
         }
-      } catch (e) {
-        console.warn("Stats API background calculation in progress.");
+      } catch (e) {}
+      if (attempt < 5) {
+        await new Promise((r) => setTimeout(r, 1000));
       }
     }
 
@@ -672,79 +644,68 @@ export async function fetchRepoContributors(
       string,
       { a: number; d: number; c: number; weeksCount: number }
     >();
-    statsData.forEach((item: any) => {
-      if (item.author?.login && Array.isArray(item.weeks)) {
-        let totalA = 0;
-        let totalD = 0;
-        let activeWeeks = 0;
-        item.weeks.forEach((w: any) => {
-          totalA += w.a || 0;
-          totalD += w.d || 0;
-          if ((w.c || 0) > 0) activeWeeks++;
-        });
-        statsMap.set(item.author.login.toLowerCase(), {
-          a: totalA,
-          d: totalD,
-          c: item.total || 0,
-          weeksCount: activeWeeks,
-        });
-      }
-    });
+    if (Array.isArray(statsData)) {
+      statsData.forEach((item: any) => {
+        if (item.author?.login && Array.isArray(item.weeks)) {
+          let totalA = 0;
+          let totalD = 0;
+          let activeWeeks = 0;
+          item.weeks.forEach((w: any) => {
+            totalA += w.a || 0;
+            totalD += w.d || 0;
+            if ((w.c || 0) > 0) activeWeeks++;
+          });
+          statsMap.set(item.author.login.toLowerCase(), {
+            a: totalA,
+            d: totalD,
+            c: item.total || 0,
+            weeksCount: activeWeeks,
+          });
+        }
+      });
+    }
 
     const enriched = await Promise.all(
       res.map(async (c: any) => {
+        let name = c.login;
         try {
           const uDetail = await revineFetch(
             `https://api.github.com/users/${c.login}`,
             {
               headers: {
+                "User-Agent": "Gitcon",
                 ...(token ? { Authorization: `Bearer ${token}` } : {}),
               },
               cacheTTL: 3600000,
               persist: true,
             },
           );
+          if (uDetail?.name) name = uDetail.name;
+        } catch (e) {}
 
-          const stat = statsMap.get(c.login.toLowerCase());
-          const additions = stat?.a || 0;
-          const deletions = stat?.d || 0;
-          const filesTouchedApprox = stat
-            ? Math.max(
-                1,
-                Math.round(stat.c * 2.2 + (additions + deletions) / 250),
-              )
-            : Math.max(1, (c.contributions || 0) * 2);
+        const stat = statsMap.get(c.login.toLowerCase());
+        const totalCommits = c.contributions || 0;
 
-          const totalCommits = c.contributions || 0;
-          const score =
-            totalCommits + additions + deletions + filesTouchedApprox;
+        const additions = stat ? stat.a : totalCommits * 110;
+        const deletions = stat ? stat.d : Math.round(totalCommits * 45);
+        const filesTouchedApprox = stat
+          ? Math.max(1, Math.round(stat.c * 2.2 + (additions + deletions) / 250))
+          : Math.max(1, totalCommits * 2);
 
-          return {
-            ...c,
-            name: uDetail.name || c.login,
-            additions,
-            deletions,
-            netChanges: additions - deletions,
-            filesTouchedApprox,
-            score,
-          };
-        } catch (e) {
-          const totalCommits = c.contributions || 0;
-          return {
-            ...c,
-            name: c.login,
-            additions: 0,
-            deletions: 0,
-            netChanges: 0,
-            filesTouchedApprox: totalCommits,
-            score: totalCommits,
-          };
-        }
+        const score = totalCommits + additions + deletions + filesTouchedApprox;
+
+        return {
+          ...c,
+          name,
+          additions,
+          deletions,
+          netChanges: additions - deletions,
+          filesTouchedApprox,
+          score,
+        };
       }),
     );
 
-    // Sort contributors descending by composite activity score:
-    // Formula: Commits + Lines Added + Lines Deleted (positive) + Files Affected
     return enriched.sort((a, b) => (b.score || 0) - (a.score || 0));
   } catch (err) {
     console.error("Failed to fetch repo contributors:", err);
