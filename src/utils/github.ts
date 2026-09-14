@@ -1,4 +1,16 @@
 import { revineFetch } from "revine";
+
+export function formatBytes(bytes: number): string {
+  if (!bytes || bytes === 0) return "0 Bytes";
+  const k = 1024;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+  const absBytes = Math.abs(bytes);
+  const i = Math.floor(Math.log(absBytes) / Math.log(k));
+  const val = parseFloat((absBytes / Math.pow(k, i)).toFixed(2));
+  const prefix = bytes < 0 ? "-" : "";
+  return `${prefix}${val} ${sizes[i]}`;
+}
+
 export interface ContributionDay {
   date: string;
   contributionCount: number;

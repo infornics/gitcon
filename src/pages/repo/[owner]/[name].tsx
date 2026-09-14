@@ -2,6 +2,7 @@ import { StatCard } from "@/components/StatCard";
 import {
   fetchRepoContributors,
   fetchRepoStats,
+  formatBytes,
   GithubRepoData,
   parseRepoInput,
   RepoContributor,
@@ -593,12 +594,11 @@ export default function RepoDetail() {
                               }`}
                             >
                               {net >= 0
-                                ? `+${net.toLocaleString()}`
-                                : net.toLocaleString()}{" "}
-                              lines
+                                ? `+${formatBytes(net * 45)}`
+                                : formatBytes(net * 45)}
                             </span>
                             <span className="text-[10px] opacity-50">
-                              ({totalLines.toLocaleString()} total changed)
+                              ({formatBytes(totalLines * 45)} total)
                             </span>
                           </div>
                         ) : (
