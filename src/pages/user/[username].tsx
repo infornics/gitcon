@@ -243,8 +243,12 @@ export default function UserProfile() {
 
       const langMap = new Map<string, { size: number; color: string }>();
       let totalSize = 0;
-      user.contributionsCollection.commitContributionsByRepository.forEach(
+      const processedRepoKeys = new Set<string>();
+
+      (user.contributionsCollection.commitContributionsByRepository || []).forEach(
         (repo) => {
+          const key = `${repo.repository.owner.login.toLowerCase()}/${repo.repository.name.toLowerCase()}`;
+          processedRepoKeys.add(key);
           repo.repository.languages.edges.forEach((edge) => {
             const { name, color } = edge.node;
             const current = langMap.get(name) || { size: 0, color };
@@ -256,29 +260,33 @@ export default function UserProfile() {
 
       if (token && fetchedPrivateRepos.length > 0) {
         fetchedPrivateRepos.forEach((pr) => {
-          if (pr.languages && pr.languages.length > 0) {
-            pr.languages.forEach((l) => {
-              const current = langMap.get(l.name) || {
-                size: 0,
-                color: l.color,
-              };
-              langMap.set(l.name, {
-                size: current.size + l.size,
-                color: current.color || l.color,
+          const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
+          if (!processedRepoKeys.has(key)) {
+            processedRepoKeys.add(key);
+            if (pr.languages && pr.languages.length > 0) {
+              pr.languages.forEach((l) => {
+                const current = langMap.get(l.name) || {
+                  size: 0,
+                  color: l.color,
+                };
+                langMap.set(l.name, {
+                  size: current.size + l.size,
+                  color: current.color || l.color,
+                });
+                totalSize += l.size;
               });
-              totalSize += l.size;
-            });
-          } else if (pr.language) {
-            const fallbackSize = (pr.count || 1) * 2048;
-            const current = langMap.get(pr.language) || {
-              size: 0,
-              color: getLangColor(pr.language),
-            };
-            langMap.set(pr.language, {
-              size: current.size + fallbackSize,
-              color: current.color,
-            });
-            totalSize += fallbackSize;
+            } else if (pr.language) {
+              const fallbackSize = (pr.count || 1) * 2048;
+              const current = langMap.get(pr.language) || {
+                size: 0,
+                color: getLangColor(pr.language),
+              };
+              langMap.set(pr.language, {
+                size: current.size + fallbackSize,
+                color: current.color,
+              });
+              totalSize += fallbackSize;
+            }
           }
         });
       }

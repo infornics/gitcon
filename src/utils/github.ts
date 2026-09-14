@@ -1130,28 +1130,30 @@ export async function fetchUserPrivateRepos(
 ): Promise<UserPrivateRepo[]> {
   if (!token) return [];
   try {
-    const res = await revineFetch(
-      `https://api.github.com/user/repos?per_page=100&sort=updated&type=all`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const allRepos: any[] = [];
+    let page = 1;
+    while (page <= 5) {
+      const res = await revineFetch(
+        `https://api.github.com/user/repos?per_page=100&sort=updated&type=all&page=${page}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cacheTTL: 300000,
+          persist: true,
         },
-        cacheTTL: 300000,
-        persist: true,
-      },
-    );
+      );
 
-    if (!Array.isArray(res)) return [];
+      if (!Array.isArray(res) || res.length === 0) break;
+      allRepos.push(...res);
+      if (res.length < 100) break;
+      page++;
+    }
 
-    // Filter to repositories owned by the target user
-    const userRepos = res.filter(
-      (r: any) =>
-        r.owner?.login &&
-        r.owner.login.toLowerCase() === username.toLowerCase(),
-    );
+    if (allRepos.length === 0) return [];
 
     const enriched = await Promise.all(
-      userRepos.map(async (repo: any) => {
+      allRepos.map(async (repo: any) => {
         let count = 0;
         try {
           const resCommits = await fetch(
@@ -1214,7 +1216,7 @@ export async function fetchUserPrivateRepos(
 
     return enriched;
   } catch (err) {
-    console.error("Failed to fetch user private repos:", err);
+    console.error("Failed to fetch user accessible repos:", err);
     return [];
   }
 }

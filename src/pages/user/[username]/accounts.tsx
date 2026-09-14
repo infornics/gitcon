@@ -30,28 +30,46 @@ export default function UserAccounts() {
     try {
       const user = await fetchContributions(uname, 365);
       const token = getGithubToken();
-      const accountsMap = new Map<string, number>();
-
-      const repoContributions =
-        user.contributionsCollection.commitContributionsByRepository || [];
-
-      repoContributions.forEach((item) => {
-        const owner = item.repository.owner.login;
-        const current = accountsMap.get(owner) || 0;
-        accountsMap.set(owner, current + item.contributions.totalCount);
-      });
+      let extractedRepos = (
+        user.contributionsCollection.commitContributionsByRepository || []
+      ).map((item) => ({
+        name: item.repository.name,
+        owner: item.repository.owner.login,
+        count: item.contributions.totalCount,
+        isPrivate: item.repository.isPrivate,
+      }));
 
       if (token) {
         const privateRepos = await fetchUserPrivateRepos(uname, token);
+        const repoMap = new Map<string, (typeof extractedRepos)[0]>();
+        extractedRepos.forEach((r) =>
+          repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
+        );
+
         privateRepos.forEach((pr) => {
-          if (pr.owner) {
-            const current = accountsMap.get(pr.owner) || 0;
-            if (pr.count > current) {
-              accountsMap.set(pr.owner, pr.count);
-            }
+          const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
+          const existing = repoMap.get(key);
+          if (existing) {
+            existing.isPrivate = pr.isPrivate || existing.isPrivate;
+            existing.count = Math.max(existing.count, pr.count);
+          } else if (pr.count > 0) {
+            repoMap.set(key, {
+              name: pr.name,
+              owner: pr.owner,
+              count: pr.count,
+              isPrivate: pr.isPrivate,
+            });
           }
         });
+
+        extractedRepos = Array.from(repoMap.values()).filter((r) => r.count > 0);
       }
+
+      const accountsMap = new Map<string, number>();
+      extractedRepos.forEach((repo) => {
+        const current = accountsMap.get(repo.owner) || 0;
+        accountsMap.set(repo.owner, current + repo.count);
+      });
 
       const sortedAccounts = Array.from(accountsMap.entries())
         .map(([name, count]) => ({ name, count }))
