@@ -488,6 +488,7 @@ export default function RepoDetail() {
                   <th>Contributor</th>
                   <th className="text-center!">Commits</th>
                   <th className="text-center!">Lines Added / Deleted</th>
+                  <th className="text-center!">Contribution Size</th>
                   <th className="text-center!">Files Affected</th>
                   <th>Primary Language</th>
                 </tr>
@@ -506,6 +507,9 @@ export default function RepoDetail() {
                     </td>
                     <td className="text-center!">
                       <div className="skeleton h-5 w-16 mx-auto rounded" />
+                    </td>
+                    <td className="text-center!">
+                      <div className="skeleton h-5 w-24 mx-auto rounded" />
                     </td>
                     <td className="text-center!">
                       <div className="skeleton h-5 w-24 mx-auto rounded" />
@@ -530,67 +534,94 @@ export default function RepoDetail() {
                   <th>Contributor</th>
                   <th className="text-center!">Commits</th>
                   <th className="text-center!">Lines Added / Deleted</th>
+                  <th className="text-center!">Contribution Size</th>
                   <th className="text-center!">Files Affected</th>
                   <th>Primary Language</th>
                 </tr>
               </thead>
               <tbody>
-                {contributors.map((c, idx) => (
-                  <tr
-                    key={c.id}
-                    className="cursor-pointer"
-                    onClick={() => (window.location.href = `/user/${c.login}`)}
-                  >
-                    <td className="text-center font-mono opacity-60 font-bold text-sm">
-                      {idx + 1}
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={c.avatar_url}
-                          alt={c.login}
-                          className="w-10 h-10 rounded-full border border-white/10 shrink-0"
-                        />
-                        <div>
-                          <div className="font-bold">{c.name || c.login}</div>
-                          <div className="text-xs opacity-60">@{c.login}</div>
+                {contributors.map((c, idx) => {
+                  const net = (c.additions || 0) - (c.deletions || 0);
+                  const totalLines = (c.additions || 0) + (c.deletions || 0);
+
+                  return (
+                    <tr
+                      key={c.id}
+                      className="cursor-pointer"
+                      onClick={() => (window.location.href = `/user/${c.login}`)}
+                    >
+                      <td className="text-center font-mono opacity-60 font-bold text-sm">
+                        {idx + 1}
+                      </td>
+                      <td>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={c.avatar_url}
+                            alt={c.login}
+                            className="w-10 h-10 rounded-full border border-white/10 shrink-0"
+                          />
+                          <div>
+                            <div className="font-bold">{c.name || c.login}</div>
+                            <div className="text-xs opacity-60">@{c.login}</div>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="text-center! font-mono font-bold text-primary">
-                      {c.contributions.toLocaleString()}
-                    </td>
-                    <td className="text-center! font-mono text-xs">
-                      {c.additions || c.deletions ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <span className="text-emerald-500 font-bold">
-                            +{c.additions?.toLocaleString()}
+                      </td>
+                      <td className="text-center! font-mono font-bold text-primary">
+                        {c.contributions.toLocaleString()}
+                      </td>
+                      <td className="text-center! font-mono text-xs">
+                        {c.additions || c.deletions ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <span className="text-emerald-500 font-bold">
+                              +{c.additions?.toLocaleString()}
+                            </span>
+                            <span className="opacity-30">/</span>
+                            <span className="text-rose-500 font-bold">
+                              -{c.deletions?.toLocaleString()}
+                            </span>
                           </span>
-                          <span className="opacity-30">/</span>
-                          <span className="text-rose-500 font-bold">
-                            -{c.deletions?.toLocaleString()}
+                        ) : (
+                          <span className="opacity-40">—</span>
+                        )}
+                      </td>
+                      <td className="text-center! font-mono text-xs">
+                        {totalLines > 0 ? (
+                          <div className="flex flex-col items-center">
+                            <span
+                              className={`font-bold ${
+                                net >= 0 ? "text-emerald-400" : "text-rose-400"
+                              }`}
+                            >
+                              {net >= 0
+                                ? `+${net.toLocaleString()}`
+                                : net.toLocaleString()}{" "}
+                              lines
+                            </span>
+                            <span className="text-[10px] opacity-50">
+                              ({totalLines.toLocaleString()} total changed)
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="opacity-40">—</span>
+                        )}
+                      </td>
+                      <td className="text-center! font-mono opacity-80">
+                        {(
+                          c.filesTouchedApprox || c.contributions
+                        ).toLocaleString()}
+                      </td>
+                      <td>
+                        {repo.primaryLanguage?.name ? (
+                          <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 inline-block">
+                            {repo.primaryLanguage.name}
                           </span>
-                        </span>
-                      ) : (
-                        <span className="opacity-40">—</span>
-                      )}
-                    </td>
-                    <td className="text-center! font-mono opacity-80">
-                      {(
-                        c.filesTouchedApprox || c.contributions
-                      ).toLocaleString()}
-                    </td>
-                    <td>
-                      {repo.primaryLanguage?.name ? (
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 inline-block">
-                          {repo.primaryLanguage.name}
-                        </span>
-                      ) : (
-                        <span className="text-xs opacity-40">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                        ) : (
+                          <span className="text-xs opacity-40">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
