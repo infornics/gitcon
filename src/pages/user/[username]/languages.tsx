@@ -12,6 +12,11 @@ interface Language {
   color: string;
   percent: number;
   size: number;
+  topRepo?: {
+    owner: string;
+    name: string;
+    size: number;
+  } | null;
 }
 
 function formatBytes(bytes: number) {
@@ -41,18 +46,44 @@ export default function UserLanguages() {
     try {
       const user = await fetchContributions(uname, 365);
       const token = getGithubToken();
-      const langMap = new Map<string, { size: number; color: string }>();
+      const langMap = new Map<
+        string,
+        {
+          size: number;
+          color: string;
+          repoMap: Map<string, { owner: string; name: string; size: number }>;
+        }
+      >();
       let computedTotalSize = 0;
       const processedRepoKeys = new Set<string>();
 
       (user.contributionsCollection.commitContributionsByRepository || []).forEach(
         (repo) => {
-          const key = `${repo.repository.owner.login.toLowerCase()}/${repo.repository.name.toLowerCase()}`;
+          const repoOwner = repo.repository.owner.login;
+          const repoName = repo.repository.name;
+          const key = `${repoOwner.toLowerCase()}/${repoName.toLowerCase()}`;
           processedRepoKeys.add(key);
+
           repo.repository.languages.edges.forEach((edge) => {
             const { name, color } = edge.node;
-            const current = langMap.get(name) || { size: 0, color };
-            langMap.set(name, { size: current.size + edge.size, color });
+            const current = langMap.get(name) || {
+              size: 0,
+              color,
+              repoMap: new Map<string, { owner: string; name: string; size: number }>(),
+            };
+            const currentRepo = current.repoMap.get(key) || {
+              owner: repoOwner,
+              name: repoName,
+              size: 0,
+            };
+            currentRepo.size += edge.size;
+            current.repoMap.set(key, currentRepo);
+
+            langMap.set(name, {
+              size: current.size + edge.size,
+              color: current.color || color,
+              repoMap: current.repoMap,
+            });
             computedTotalSize += edge.size;
           });
         },
@@ -69,10 +100,20 @@ export default function UserLanguages() {
                 const current = langMap.get(l.name) || {
                   size: 0,
                   color: l.color,
+                  repoMap: new Map<string, { owner: string; name: string; size: number }>(),
                 };
+                const currentRepo = current.repoMap.get(key) || {
+                  owner: pr.owner,
+                  name: pr.name,
+                  size: 0,
+                };
+                currentRepo.size += l.size;
+                current.repoMap.set(key, currentRepo);
+
                 langMap.set(l.name, {
                   size: current.size + l.size,
                   color: current.color || l.color,
+                  repoMap: current.repoMap,
                 });
                 computedTotalSize += l.size;
               });
@@ -81,10 +122,20 @@ export default function UserLanguages() {
               const current = langMap.get(pr.language) || {
                 size: 0,
                 color: getLangColor(pr.language),
+                repoMap: new Map<string, { owner: string; name: string; size: number }>(),
               };
+              const currentRepo = current.repoMap.get(key) || {
+                owner: pr.owner,
+                name: pr.name,
+                size: 0,
+              };
+              currentRepo.size += fallbackSize;
+              current.repoMap.set(key, currentRepo);
+
               langMap.set(pr.language, {
                 size: current.size + fallbackSize,
                 color: current.color,
+                repoMap: current.repoMap,
               });
               computedTotalSize += fallbackSize;
             }
@@ -93,12 +144,21 @@ export default function UserLanguages() {
       }
 
       const extractedLangs = Array.from(langMap.entries())
-        .map(([name, { size, color }]) => ({
-          name,
-          color,
-          size,
-          percent: computedTotalSize > 0 ? (size / computedTotalSize) * 100 : 0,
-        }))
+        .map(([name, { size, color, repoMap }]) => {
+          let topRepo: { owner: string; name: string; size: number } | null = null;
+          if (repoMap && repoMap.size > 0) {
+            const reposArr = Array.from(repoMap.values());
+            reposArr.sort((a, b) => b.size - a.size);
+            topRepo = reposArr[0];
+          }
+          return {
+            name,
+            color,
+            size,
+            percent: computedTotalSize > 0 ? (size / computedTotalSize) * 100 : 0,
+            topRepo,
+          };
+        })
         .sort((a, b) => b.percent - a.percent);
 
       setLanguages(extractedLangs);
@@ -230,8 +290,20 @@ export default function UserLanguages() {
                           />
                         </div>
 
-                        <div className="flex justify-between text-xs opacity-60 font-mono mt-2">
-                          <span>Size: {formatBytes(lang.size)}</span>
+                        <div className="flex justify-between items-center text-xs font-mono mt-2 pt-3 border-t border-white/10 gap-2">
+                          <span className="opacity-60 shrink-0">Size: {formatBytes(lang.size)}</span>
+                          {lang.topRepo && (
+                            <div className="flex items-center gap-1.5 overflow-hidden justify-end text-right min-w-0">
+                              <span className="opacity-50 shrink-0 text-[11px]">Top Repo:</span>
+                              <Link
+                                href={`/repo/${lang.topRepo.owner}/${lang.topRepo.name}`}
+                                className="text-primary hover:underline truncate font-semibold text-xs"
+                                title={`${lang.topRepo.owner}/${lang.topRepo.name}`}
+                              >
+                                {lang.topRepo.owner}/{lang.topRepo.name}
+                              </Link>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -273,9 +345,24 @@ export default function UserLanguages() {
                         />
                       </div>
 
-                      <div className="flex justify-between text-xs opacity-60 font-mono mt-1">
-                        <span>Size: {formatBytes(lang.size)}</span>
-                        <span>Rank: #{i + 4}</span>
+                      <div className="flex justify-between items-center text-xs font-mono mt-1 pt-2 border-t border-white/5 gap-2">
+                        <div className="flex items-center gap-3 opacity-60 shrink-0">
+                          <span>Size: {formatBytes(lang.size)}</span>
+                          <span>•</span>
+                          <span>Rank: #{i + 4}</span>
+                        </div>
+                        {lang.topRepo && (
+                          <div className="flex items-center gap-1.5 overflow-hidden justify-end text-right min-w-0">
+                            <span className="opacity-50 shrink-0 text-[11px]">Top Repo:</span>
+                            <Link
+                              href={`/repo/${lang.topRepo.owner}/${lang.topRepo.name}`}
+                              className="text-primary hover:underline truncate font-semibold text-xs"
+                              title={`${lang.topRepo.owner}/${lang.topRepo.name}`}
+                            >
+                              {lang.topRepo.owner}/{lang.topRepo.name}
+                            </Link>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

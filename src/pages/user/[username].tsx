@@ -155,7 +155,12 @@ export default function UserProfile() {
     Array<{ name: string; owner: string; count: number; isPrivate?: boolean }>
   >([]);
   const [languages, setLanguages] = useState<
-    Array<{ name: string; color: string; percent: number }>
+    Array<{
+      name: string;
+      color: string;
+      percent: number;
+      topRepo?: { owner: string; name: string; size: number } | null;
+    }>
   >([]);
   const [range, setRange] = useState(365);
   const [tooltip, setTooltip] = useState({
@@ -241,18 +246,44 @@ export default function UserProfile() {
 
       extractedRepos.sort((a, b) => b.count - a.count);
 
-      const langMap = new Map<string, { size: number; color: string }>();
+      const langMap = new Map<
+        string,
+        {
+          size: number;
+          color: string;
+          repoMap: Map<string, { owner: string; name: string; size: number }>;
+        }
+      >();
       let totalSize = 0;
       const processedRepoKeys = new Set<string>();
 
       (user.contributionsCollection.commitContributionsByRepository || []).forEach(
         (repo) => {
-          const key = `${repo.repository.owner.login.toLowerCase()}/${repo.repository.name.toLowerCase()}`;
+          const repoOwner = repo.repository.owner.login;
+          const repoName = repo.repository.name;
+          const key = `${repoOwner.toLowerCase()}/${repoName.toLowerCase()}`;
           processedRepoKeys.add(key);
+
           repo.repository.languages.edges.forEach((edge) => {
             const { name, color } = edge.node;
-            const current = langMap.get(name) || { size: 0, color };
-            langMap.set(name, { size: current.size + edge.size, color });
+            const current = langMap.get(name) || {
+              size: 0,
+              color,
+              repoMap: new Map<string, { owner: string; name: string; size: number }>(),
+            };
+            const currentRepo = current.repoMap.get(key) || {
+              owner: repoOwner,
+              name: repoName,
+              size: 0,
+            };
+            currentRepo.size += edge.size;
+            current.repoMap.set(key, currentRepo);
+
+            langMap.set(name, {
+              size: current.size + edge.size,
+              color: current.color || color,
+              repoMap: current.repoMap,
+            });
             totalSize += edge.size;
           });
         },
@@ -268,10 +299,20 @@ export default function UserProfile() {
                 const current = langMap.get(l.name) || {
                   size: 0,
                   color: l.color,
+                  repoMap: new Map<string, { owner: string; name: string; size: number }>(),
                 };
+                const currentRepo = current.repoMap.get(key) || {
+                  owner: pr.owner,
+                  name: pr.name,
+                  size: 0,
+                };
+                currentRepo.size += l.size;
+                current.repoMap.set(key, currentRepo);
+
                 langMap.set(l.name, {
                   size: current.size + l.size,
                   color: current.color || l.color,
+                  repoMap: current.repoMap,
                 });
                 totalSize += l.size;
               });
@@ -280,10 +321,20 @@ export default function UserProfile() {
               const current = langMap.get(pr.language) || {
                 size: 0,
                 color: getLangColor(pr.language),
+                repoMap: new Map<string, { owner: string; name: string; size: number }>(),
               };
+              const currentRepo = current.repoMap.get(key) || {
+                owner: pr.owner,
+                name: pr.name,
+                size: 0,
+              };
+              currentRepo.size += fallbackSize;
+              current.repoMap.set(key, currentRepo);
+
               langMap.set(pr.language, {
                 size: current.size + fallbackSize,
                 color: current.color,
+                repoMap: current.repoMap,
               });
               totalSize += fallbackSize;
             }
@@ -292,11 +343,20 @@ export default function UserProfile() {
       }
 
       const extractedLangs = Array.from(langMap.entries())
-        .map(([name, { size, color }]) => ({
-          name,
-          color,
-          percent: totalSize > 0 ? (size / totalSize) * 100 : 0,
-        }))
+        .map(([name, { size, color, repoMap }]) => {
+          let topRepo: { owner: string; name: string; size: number } | null = null;
+          if (repoMap && repoMap.size > 0) {
+            const reposArr = Array.from(repoMap.values());
+            reposArr.sort((a, b) => b.size - a.size);
+            topRepo = reposArr[0];
+          }
+          return {
+            name,
+            color,
+            percent: totalSize > 0 ? (size / totalSize) * 100 : 0,
+            topRepo,
+          };
+        })
         .sort((a, b) => b.percent - a.percent)
         .slice(0, 6);
 
@@ -1926,10 +1986,10 @@ export default function UserProfile() {
               <div className="lang-list flex flex-col gap-4 mt-2">
                 {languages.length > 0 ? (
                   languages.map((lang, i) => (
-                    <div key={i} className="lang-item">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>{lang.name}</span>
-                        <span className="opacity-60">
+                    <div key={i} className="lang-item flex flex-col gap-1">
+                      <div className="flex justify-between text-sm mb-0.5">
+                        <span className="font-medium">{lang.name}</span>
+                        <span className="opacity-60 font-mono text-xs">
                           {lang.percent.toFixed(2)}%
                         </span>
                       </div>
@@ -1942,6 +2002,18 @@ export default function UserProfile() {
                           }}
                         />
                       </div>
+                      {lang.topRepo && (
+                        <div className="flex justify-between items-center text-[11px] font-mono opacity-70 mt-0.5">
+                          <span className="opacity-50">Top Repo</span>
+                          <Link
+                            href={`/repo/${lang.topRepo.owner}/${lang.topRepo.name}`}
+                            className="text-primary hover:underline truncate max-w-[160px] font-medium"
+                            title={`${lang.topRepo.owner}/${lang.topRepo.name}`}
+                          >
+                            {lang.topRepo.owner}/{lang.topRepo.name}
+                          </Link>
+                        </div>
+                      )}
                     </div>
                   ))
                 ) : (
