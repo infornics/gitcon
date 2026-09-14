@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "revine";
 import {
+  buildDateSeries,
   fetchContributions,
   fetchUserPrivateRepos,
   getGithubToken,
@@ -90,7 +91,12 @@ export default function UserLanguages() {
       );
 
       if (token) {
-        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        const { start } = buildDateSeries(365);
+        const privateRepos = await fetchUserPrivateRepos(
+          uname,
+          token,
+          start.toISOString(),
+        );
         privateRepos.forEach((pr) => {
           const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
           if (!processedRepoKeys.has(key)) {

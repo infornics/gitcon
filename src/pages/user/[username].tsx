@@ -3,6 +3,7 @@ import { Link, useParams } from "revine";
 import { ContributionGrid } from "../../components/ContributionGrid";
 import { StatCard } from "../../components/StatCard";
 import {
+  buildDateSeries,
   calculateStats,
   fetchContributions,
   fetchUserPrivateRepos,
@@ -219,7 +220,12 @@ export default function UserProfile() {
 
       let fetchedPrivateRepos: Awaited<ReturnType<typeof fetchUserPrivateRepos>> = [];
       if (token) {
-        fetchedPrivateRepos = await fetchUserPrivateRepos(uname, token);
+        const { start } = buildDateSeries(days);
+        fetchedPrivateRepos = await fetchUserPrivateRepos(
+          uname,
+          token,
+          start.toISOString(),
+        );
         const repoMap = new Map<string, (typeof extractedRepos)[0]>();
         extractedRepos.forEach((r) =>
           repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),

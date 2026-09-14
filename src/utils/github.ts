@@ -1127,6 +1127,7 @@ export interface UserPrivateRepo {
 export async function fetchUserPrivateRepos(
   username: string,
   token: string,
+  sinceDate?: string,
 ): Promise<UserPrivateRepo[]> {
   if (!token) return [];
   try {
@@ -1152,12 +1153,14 @@ export async function fetchUserPrivateRepos(
 
     if (allRepos.length === 0) return [];
 
+    const sinceParam = sinceDate ? `&since=${encodeURIComponent(sinceDate)}` : "";
+
     const enriched = await Promise.all(
       allRepos.map(async (repo: any) => {
         let count = 0;
         try {
           const resCommits = await fetch(
-            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}&per_page=1`,
+            `https://api.github.com/repos/${repo.owner.login}/${repo.name}/commits?author=${username}${sinceParam}&per_page=1`,
             {
               headers: {
                 "User-Agent": "Gitcon",

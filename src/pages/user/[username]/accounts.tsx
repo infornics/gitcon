@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "revine";
 import {
+  buildDateSeries,
   fetchContributions,
   fetchUserPrivateRepos,
   getGithubToken,
@@ -40,7 +41,12 @@ export default function UserAccounts() {
       }));
 
       if (token) {
-        const privateRepos = await fetchUserPrivateRepos(uname, token);
+        const { start } = buildDateSeries(365);
+        const privateRepos = await fetchUserPrivateRepos(
+          uname,
+          token,
+          start.toISOString(),
+        );
         const repoMap = new Map<string, (typeof extractedRepos)[0]>();
         extractedRepos.forEach((r) =>
           repoMap.set(`${r.owner.toLowerCase()}/${r.name.toLowerCase()}`, r),
