@@ -60,6 +60,7 @@ export default function UserLanguages() {
 
       (user.contributionsCollection.commitContributionsByRepository || []).forEach(
         (repo) => {
+          if ((repo.contributions?.totalCount || 0) <= 0) return;
           const repoOwner = repo.repository.owner.login;
           const repoName = repo.repository.name;
           const key = `${repoOwner.toLowerCase()}/${repoName.toLowerCase()}`;
@@ -98,6 +99,7 @@ export default function UserLanguages() {
           start.toISOString(),
         );
         privateRepos.forEach((pr) => {
+          if (pr.count <= 0) return;
           const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
           if (!processedRepoKeys.has(key)) {
             processedRepoKeys.add(key);

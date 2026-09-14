@@ -265,6 +265,7 @@ export default function UserProfile() {
 
       (user.contributionsCollection.commitContributionsByRepository || []).forEach(
         (repo) => {
+          if ((repo.contributions?.totalCount || 0) <= 0) return;
           const repoOwner = repo.repository.owner.login;
           const repoName = repo.repository.name;
           const key = `${repoOwner.toLowerCase()}/${repoName.toLowerCase()}`;
@@ -297,6 +298,7 @@ export default function UserProfile() {
 
       if (token && fetchedPrivateRepos.length > 0) {
         fetchedPrivateRepos.forEach((pr) => {
+          if (pr.count <= 0) return;
           const key = `${pr.owner.toLowerCase()}/${pr.name.toLowerCase()}`;
           if (!processedRepoKeys.has(key)) {
             processedRepoKeys.add(key);

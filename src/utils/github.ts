@@ -1217,7 +1217,7 @@ export async function fetchUserPrivateRepos(
       }),
     );
 
-    return enriched;
+    return enriched.filter((r) => r.count > 0);
   } catch (err) {
     console.error("Failed to fetch user accessible repos:", err);
     return [];
