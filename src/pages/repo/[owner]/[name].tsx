@@ -585,22 +585,9 @@ export default function RepoDetail() {
                           <span className="opacity-40">—</span>
                         )}
                       </td>
-                      <td className="text-center! font-mono text-xs">
+                      <td className="text-center! font-mono text-xs font-bold text-primary">
                         {totalLines > 0 ? (
-                          <div className="flex flex-col items-center">
-                            <span
-                              className={`font-bold ${
-                                net >= 0 ? "text-emerald-400" : "text-rose-400"
-                              }`}
-                            >
-                              {net >= 0
-                                ? `+${formatBytes(net * 45)}`
-                                : formatBytes(net * 45)}
-                            </span>
-                            <span className="text-[10px] opacity-50">
-                              ({formatBytes(totalLines * 45)} total)
-                            </span>
-                          </div>
+                          formatBytes(totalLines * 45)
                         ) : (
                           <span className="opacity-40">—</span>
                         )}
