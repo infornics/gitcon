@@ -700,11 +700,18 @@ export async function fetchRepoContributors(
 
         const additions = stat ? stat.a : totalCommits * 110;
         const deletions = stat ? stat.d : Math.round(totalCommits * 45);
+        const totalBytes = (additions + deletions) * 45;
         const filesTouchedApprox = stat
           ? Math.max(1, Math.round(stat.c * 2.2 + (additions + deletions) / 250))
           : Math.max(1, totalCommits * 2);
 
-        const score = totalCommits + additions + deletions + filesTouchedApprox;
+        // Code impact score incorporating contribution size (bytes/KB) + commits + additions + deletions + files touched
+        const score =
+          totalCommits * 10 +
+          Math.round(totalBytes / 1024) +
+          additions +
+          deletions +
+          filesTouchedApprox;
 
         return {
           ...c,

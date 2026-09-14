@@ -468,7 +468,7 @@ export default function RepoDetail() {
         <div className="panel-head flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold font-display">Contributors</h2>
             <p className="text-xs opacity-60 mt-0.5">
-              Ranked by total code impact: Commits + Additions + Deletions + Files Affected
+              Ranked by total code impact: Commits + Contribution Size + Additions + Deletions + Files Affected
             </p>
           <a
             href={`${repo.url}/graphs/contributors`}
