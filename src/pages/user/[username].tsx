@@ -1994,10 +1994,10 @@ export default function UserProfile() {
               <div className="lang-list flex flex-col gap-4 mt-2">
                 {languages.length > 0 ? (
                   languages.map((lang, i) => (
-                    <div key={i} className="lang-item flex flex-col gap-1">
-                      <div className="flex justify-between text-sm mb-0.5">
-                        <span className="font-medium">{lang.name}</span>
-                        <span className="opacity-60 font-mono text-xs">
+                    <div key={i} className="lang-item">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>{lang.name}</span>
+                        <span className="opacity-60">
                           {lang.percent.toFixed(2)}%
                         </span>
                       </div>
@@ -2010,18 +2010,6 @@ export default function UserProfile() {
                           }}
                         />
                       </div>
-                      {lang.topRepo && (
-                        <div className="flex justify-between items-center text-[11px] font-mono opacity-70 mt-0.5">
-                          <span className="opacity-50">Top Repo</span>
-                          <Link
-                            href={`/repo/${lang.topRepo.owner}/${lang.topRepo.name}`}
-                            className="text-primary hover:underline truncate max-w-[160px] font-medium"
-                            title={`${lang.topRepo.owner}/${lang.topRepo.name}`}
-                          >
-                            {lang.topRepo.owner}/{lang.topRepo.name}
-                          </Link>
-                        </div>
-                      )}
                     </div>
                   ))
                 ) : (
