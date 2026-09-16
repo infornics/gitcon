@@ -8,11 +8,9 @@ export default function Header() {
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("theme") as "light" | "dark";
       if (savedTheme) return savedTheme;
-      return window.matchMedia("(prefers-color-scheme: dark)").matches
-        ? "dark"
-        : "light";
+      return "dark";
     }
-    return "light";
+    return "dark";
   });
 
   const [scrolled, setScrolled] = useState(false);
