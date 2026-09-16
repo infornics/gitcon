@@ -735,6 +735,81 @@ export async function fetchRepoContributors(
       }
     } catch (e) {}
 
+    // 4. Fetch recent commit history with file counts using single GraphQL query
+    const authorCommitStats = new Map<
+      string,
+      { totalFiles: number; commitCount: number; maxFiles: number }
+    >();
+
+    try {
+      const gqlQuery = `
+        query($owner: String!, $name: String!) {
+          repository(owner: $owner, name: $name) {
+            defaultBranchRef {
+              target {
+                ... on Commit {
+                  history(first: 100) {
+                    nodes {
+                      oid
+                      author {
+                        user {
+                          login
+                        }
+                        name
+                        email
+                      }
+                      changedFilesIfAvailable
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const gqlRes = await revineFetch("https://api.github.com/graphql", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          query: gqlQuery,
+          variables: { owner, name },
+        }),
+        cacheTTL: 600000,
+        persist: true,
+      });
+
+      const nodes =
+        gqlRes?.data?.repository?.defaultBranchRef?.target?.history?.nodes;
+      if (Array.isArray(nodes)) {
+        nodes.forEach((node: any) => {
+          const userLogin = node.author?.user?.login?.toLowerCase();
+          const authorName = node.author?.name?.toLowerCase();
+          const filesCount = node.changedFilesIfAvailable || 1;
+
+          const keys = new Set<string>();
+          if (userLogin) keys.add(userLogin);
+          if (authorName) keys.add(authorName);
+
+          keys.forEach((key) => {
+            const current = authorCommitStats.get(key) || {
+              totalFiles: 0,
+              commitCount: 0,
+              maxFiles: 0,
+            };
+            authorCommitStats.set(key, {
+              totalFiles: current.totalFiles + filesCount,
+              commitCount: current.commitCount + 1,
+              maxFiles: Math.max(current.maxFiles, filesCount),
+            });
+          });
+        });
+      }
+    } catch (e) {}
+
     const enriched = await Promise.all(
       res.map(async (c: any) => {
         let name = c.login;
@@ -760,66 +835,36 @@ export async function fetchRepoContributors(
         const deletions = stat ? stat.d : Math.round(totalCommits * 45);
         const totalBytes = (additions + deletions) * 45;
 
-        // Fetch unique files touched from user's commits
-        let uniqueFilesTouched = 0;
-        try {
-          const userCommits = await revineFetch(
-            `https://api.github.com/repos/${owner}/${name}/commits?author=${c.login}&per_page=25`,
-            {
-              headers: {
-                "User-Agent": "Gitcon",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
-              },
-              cacheTTL: 1800000,
-              persist: true,
-            },
-          );
+        const cLoginLower = c.login.toLowerCase();
+        const cNameLower = (name || "").toLowerCase();
 
-          if (Array.isArray(userCommits) && userCommits.length > 0) {
-            const uniqueFilesSet = new Set<string>();
-            const commitsToInspect = userCommits.slice(0, 15);
-            const commitDetails = await Promise.all(
-              commitsToInspect.map(async (commitItem: any) => {
-                try {
-                  return await revineFetch(
-                    `https://api.github.com/repos/${owner}/${name}/commits/${commitItem.sha}`,
-                    {
-                      headers: {
-                        "User-Agent": "Gitcon",
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                      },
-                      cacheTTL: 3600000,
-                      persist: true,
-                    },
-                  );
-                } catch (e) {
-                  return null;
-                }
-              }),
+        const statsFromGql =
+          authorCommitStats.get(cLoginLower) ||
+          authorCommitStats.get(cNameLower);
+
+        let filesTouchedApprox = 0;
+
+        if (statsFromGql && statsFromGql.commitCount > 0) {
+          if (totalCommits <= statsFromGql.commitCount) {
+            // All commits for this contributor were found in GraphQL history!
+            // Use exact accumulated files changed from GraphQL
+            filesTouchedApprox = statsFromGql.totalFiles;
+          } else {
+            // Contributor has more commits than sampled in history
+            const logMultiplier =
+              1 + 0.35 * Math.log(totalCommits / statsFromGql.commitCount);
+            filesTouchedApprox = Math.round(
+              statsFromGql.totalFiles * logMultiplier,
             );
-
-            commitDetails.forEach((detail: any) => {
-              if (Array.isArray(detail?.files)) {
-                detail.files.forEach((f: any) => {
-                  if (f.filename) uniqueFilesSet.add(f.filename);
-                });
-              }
-            });
-
-            if (uniqueFilesSet.size > 0) {
-              uniqueFilesTouched = uniqueFilesSet.size;
-            }
           }
-        } catch (e) {}
-
-        let filesTouchedApprox = uniqueFilesTouched;
-        if (!filesTouchedApprox) {
-          filesTouchedApprox = stat
-            ? Math.max(1, Math.round(stat.c * 1.5 + (additions + deletions) / 300))
-            : Math.max(1, totalCommits);
+        } else {
+          // Fallback if contributor was not found in GraphQL recent history
+          filesTouchedApprox = Math.round(
+            Math.min(totalCommits * 1.8, Math.max(1, totalCommits)),
+          );
         }
 
-        // Enforce hard upper bound: can never exceed total unique files in repository
+        // Hard cap by repository total files
         if (totalRepoFiles > 0) {
           filesTouchedApprox = Math.min(filesTouchedApprox, totalRepoFiles);
         }
