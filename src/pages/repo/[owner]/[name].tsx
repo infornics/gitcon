@@ -592,10 +592,24 @@ export default function RepoDetail() {
                           <span className="opacity-40">—</span>
                         )}
                       </td>
-                      <td className="text-center! font-mono opacity-80">
-                        {(
-                          c.filesTouchedApprox || c.contributions
-                        ).toLocaleString()}
+                      <td className="text-center! font-mono opacity-80 text-xs">
+                        {c.totalRepoFiles && c.totalRepoFiles > 0 ? (
+                          <span>
+                            <span className="font-bold">
+                              {(
+                                c.filesTouchedApprox || c.contributions
+                              ).toLocaleString()}
+                            </span>
+                            <span className="opacity-40 font-sans mx-1">of</span>
+                            <span className="opacity-60">
+                              {c.totalRepoFiles.toLocaleString()}
+                            </span>
+                          </span>
+                        ) : (
+                          (
+                            c.filesTouchedApprox || c.contributions
+                          ).toLocaleString()
+                        )}
                       </td>
                       <td>
                         {repo.primaryLanguage?.name ? (

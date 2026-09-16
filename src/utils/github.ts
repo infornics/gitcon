@@ -601,6 +601,7 @@ export interface RepoContributor {
   deletions?: number;
   netChanges?: number;
   filesTouchedApprox?: number;
+  totalRepoFiles?: number;
   score?: number;
 }
 
