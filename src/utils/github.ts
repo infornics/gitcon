@@ -677,6 +677,27 @@ export async function fetchRepoContributors(
       });
     }
 
+    // 3. Fetch repo git tree to determine total unique files in repository
+    let totalRepoFiles = 0;
+    try {
+      const treeData = await revineFetch(
+        `https://api.github.com/repos/${owner}/${name}/git/trees/HEAD?recursive=1`,
+        {
+          headers: {
+            "User-Agent": "Gitcon",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          cacheTTL: 3600000,
+          persist: true,
+        },
+      );
+      if (Array.isArray(treeData?.tree)) {
+        totalRepoFiles = treeData.tree.filter(
+          (item: any) => item.type === "blob",
+        ).length;
+      }
+    } catch (e) {}
+
     const enriched = await Promise.all(
       res.map(async (c: any) => {
         let name = c.login;
@@ -701,9 +722,70 @@ export async function fetchRepoContributors(
         const additions = stat ? stat.a : totalCommits * 110;
         const deletions = stat ? stat.d : Math.round(totalCommits * 45);
         const totalBytes = (additions + deletions) * 45;
-        const filesTouchedApprox = stat
-          ? Math.max(1, Math.round(stat.c * 2.2 + (additions + deletions) / 250))
-          : Math.max(1, totalCommits * 2);
+
+        // Fetch unique files touched from user's commits
+        let uniqueFilesTouched = 0;
+        try {
+          const userCommits = await revineFetch(
+            `https://api.github.com/repos/${owner}/${name}/commits?author=${c.login}&per_page=25`,
+            {
+              headers: {
+                "User-Agent": "Gitcon",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              cacheTTL: 1800000,
+              persist: true,
+            },
+          );
+
+          if (Array.isArray(userCommits) && userCommits.length > 0) {
+            const uniqueFilesSet = new Set<string>();
+            const commitsToInspect = userCommits.slice(0, 15);
+            const commitDetails = await Promise.all(
+              commitsToInspect.map(async (commitItem: any) => {
+                try {
+                  return await revineFetch(
+                    `https://api.github.com/repos/${owner}/${name}/commits/${commitItem.sha}`,
+                    {
+                      headers: {
+                        "User-Agent": "Gitcon",
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                      },
+                      cacheTTL: 3600000,
+                      persist: true,
+                    },
+                  );
+                } catch (e) {
+                  return null;
+                }
+              }),
+            );
+
+            commitDetails.forEach((detail: any) => {
+              if (Array.isArray(detail?.files)) {
+                detail.files.forEach((f: any) => {
+                  if (f.filename) uniqueFilesSet.add(f.filename);
+                });
+              }
+            });
+
+            if (uniqueFilesSet.size > 0) {
+              uniqueFilesTouched = uniqueFilesSet.size;
+            }
+          }
+        } catch (e) {}
+
+        let filesTouchedApprox = uniqueFilesTouched;
+        if (!filesTouchedApprox) {
+          filesTouchedApprox = stat
+            ? Math.max(1, Math.round(stat.c * 1.5 + (additions + deletions) / 300))
+            : Math.max(1, totalCommits);
+        }
+
+        // Enforce hard upper bound: can never exceed total unique files in repository
+        if (totalRepoFiles > 0) {
+          filesTouchedApprox = Math.min(filesTouchedApprox, totalRepoFiles);
+        }
 
         // Code impact score incorporating contribution size (bytes/KB) + commits + additions + deletions + files touched
         const score =
