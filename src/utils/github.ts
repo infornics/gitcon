@@ -609,6 +609,7 @@ export async function fetchRepoContributors(
   owner: string,
   name: string,
   limit = 15,
+  branchHint?: string,
 ): Promise<RepoContributor[]> {
   const token = getGithubToken();
   try {
@@ -681,8 +682,28 @@ export async function fetchRepoContributors(
     // 3. Fetch repo git tree to determine total unique files in repository
     let totalRepoFiles = 0;
     try {
-      const treeData = await revineFetch(
-        `https://api.github.com/repos/${owner}/${name}/git/trees/HEAD?recursive=1`,
+      let defaultBranch = branchHint || "main";
+      if (!branchHint) {
+        try {
+          const repoInfo = await revineFetch(
+            `https://api.github.com/repos/${owner}/${name}`,
+            {
+              headers: {
+                "User-Agent": "Gitcon",
+                ...(token ? { Authorization: `Bearer ${token}` } : {}),
+              },
+              cacheTTL: 3600000,
+              persist: true,
+            },
+          );
+          if (repoInfo?.default_branch) {
+            defaultBranch = repoInfo.default_branch;
+          }
+        } catch (e) {}
+      }
+
+      let treeData = await revineFetch(
+        `https://api.github.com/repos/${owner}/${name}/git/trees/${defaultBranch}?recursive=1`,
         {
           headers: {
             "User-Agent": "Gitcon",
@@ -692,6 +713,21 @@ export async function fetchRepoContributors(
           persist: true,
         },
       );
+
+      if (!Array.isArray(treeData?.tree) && defaultBranch !== "master") {
+        treeData = await revineFetch(
+          `https://api.github.com/repos/${owner}/${name}/git/trees/master?recursive=1`,
+          {
+            headers: {
+              "User-Agent": "Gitcon",
+              ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            },
+            cacheTTL: 3600000,
+            persist: true,
+          },
+        );
+      }
+
       if (Array.isArray(treeData?.tree)) {
         totalRepoFiles = treeData.tree.filter(
           (item: any) => item.type === "blob",
@@ -803,6 +839,7 @@ export async function fetchRepoContributors(
           deletions,
           netChanges: additions - deletions,
           filesTouchedApprox,
+          totalRepoFiles,
           score,
         };
       }),

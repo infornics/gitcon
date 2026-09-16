@@ -43,7 +43,12 @@ export default function RepoDetail() {
   async function loadContributors(rOwner: string, rName: string) {
     setLoadingContributors(true);
     try {
-      const list = await fetchRepoContributors(rOwner, rName, 12);
+      const list = await fetchRepoContributors(
+        rOwner,
+        rName,
+        12,
+        repo?.defaultBranchRef?.name,
+      );
       setContributors(list);
     } catch (e) {
       console.error(e);
