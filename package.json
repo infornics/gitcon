@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "revine dev",
     "build": "revine build",
-    "preview": "revine preview",
-    "preinstall": "node dist/setup.js"
+    "preview": "revine preview"
   },
   "dependencies": {
     "react": "^18.2.0",
