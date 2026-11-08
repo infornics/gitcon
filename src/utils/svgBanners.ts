@@ -46,7 +46,7 @@ function encodeSvgDataUri(svg: string): string {
 }
 
 /**
- * Creates the signature Hero Visual Banner (resembling GitSkins' signature glowing card).
+ * Creates the signature Hero Visual Banner.
  */
 export function createHeroBannerSvg(params: BannerParams): string {
   const { username, name, title, avatarUrl, stars, languages, theme = "dark" } = params;

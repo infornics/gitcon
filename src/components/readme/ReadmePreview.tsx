@@ -38,7 +38,6 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      {/* GitHub Window Titlebar like GitSkins */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-white/10 text-xs select-none">
         <div className="flex items-center gap-2">
           {/* Mac Traffic Lights */}
