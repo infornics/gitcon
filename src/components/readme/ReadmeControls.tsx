@@ -357,7 +357,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
               </div>
 
               {/* Category Pills */}
-              <div className="flex flex-wrap gap-1.5 text-[11px]">
+              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 w-full">
                 {(
                   [
                     { id: "all", label: "All Layouts" },
@@ -371,7 +371,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                     key={cat.id}
                     type="button"
                     onClick={() => setTemplateCategory(cat.id)}
-                    className={`px-3 py-1 rounded-xl transition-all duration-200 text-xs font-semibold ${
+                    className={`flex-1 min-w-fit px-3 py-1.5 rounded-xl transition-all duration-200 text-xs font-semibold text-center whitespace-nowrap shrink-0 sm:shrink ${
                       templateCategory === cat.id
                         ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
                         : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10 border border-transparent"
