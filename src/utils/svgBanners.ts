@@ -9,6 +9,7 @@ export interface BannerParams {
   name: string;
   title: string;
   avatarUrl: string;
+  avatarBase64?: string;
   stars: number;
   followers?: number;
   contributions?: number;
@@ -49,7 +50,7 @@ function encodeSvgDataUri(svg: string): string {
  * Creates the signature Hero Visual Banner.
  */
 export function createHeroBannerSvg(params: BannerParams): string {
-  const { username, name, title, avatarUrl, stars, languages, theme = "dark" } = params;
+  const { username, name, title, avatarUrl, avatarBase64, stars, languages, theme = "dark" } = params;
   const colors = THEME_COLORS[theme] || THEME_COLORS.dark;
 
   const langsChips = languages
@@ -69,6 +70,20 @@ export function createHeroBannerSvg(params: BannerParams): string {
   const cleanUsername = username.replace(/[^a-zA-Z0-9_\-]/g, "");
 
   const initial = (name || username || "D").charAt(0).toUpperCase();
+
+  // If avatarBase64 is provided, embed real user GitHub DP with smooth circular clipping
+  const avatarElement = avatarBase64
+    ? `
+  <defs>
+    <clipPath id="av-clip-${cleanUsername}">
+      <circle cx="96" cy="94" r="46"/>
+    </clipPath>
+  </defs>
+  <circle cx="96" cy="94" r="48" fill="${colors.primary}" fill-opacity="0.2" stroke="${colors.primary}" stroke-opacity="0.6" stroke-width="2"/>
+  <image href="${avatarBase64}" x="50" y="48" width="92" height="92" preserveAspectRatio="xMidYMid slice" clip-path="url(#av-clip-${cleanUsername})"/>`
+    : `
+  <circle cx="96" cy="94" r="46" fill="url(#av-grad-${cleanUsername})" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+  <text x="96" y="108" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="38" font-weight="900" fill="#FFFFFF">${initial}</text>`;
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="860" height="240" viewBox="0 0 860 240">
   <defs>
@@ -116,9 +131,8 @@ export function createHeroBannerSvg(params: BannerParams): string {
   <text x="735" y="112" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="34" font-weight="900" fill="${colors.primary}">${starsFormatted}</text>
   <text x="735" y="134" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="800" letter-spacing="2.5" fill="#94A3B8">TOTAL STARS</text>
 
-  <!-- Vector Avatar Badge (Fully Offline & 100% Secure) -->
-  <circle cx="96" cy="94" r="46" fill="url(#av-grad-${cleanUsername})" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
-  <text x="96" y="108" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="38" font-weight="900" fill="#FFFFFF">${initial}</text>
+  <!-- Avatar Badge (Embedded GitHub DP with Vector Fallback) -->
+  ${avatarElement}
 
   <!-- User Details -->
   <text x="166" y="69" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="800" letter-spacing="2.5" fill="#94A3B8">@${username.toUpperCase()}</text>

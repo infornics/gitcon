@@ -31,6 +31,7 @@ export interface ReadmeProfileData {
   username: string;
   name: string;
   avatarUrl: string;
+  avatarBase64?: string;
   bio: string;
   company: string;
   location: string;
@@ -209,6 +210,25 @@ export const SKILLS_CATALOG: SkillItem[] = [
 export async function fetchReadmeData(username: string): Promise<ReadmeProfileData> {
   const token = getGithubToken();
 
+  // Helper to safely fetch and convert GitHub avatar to base64 data URI
+  // This allows SVGs to embed the user's real GitHub DP without browser CORS blocks
+  async function fetchAvatarBase64(url: string): Promise<string | undefined> {
+    if (!url) return undefined;
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return undefined;
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(undefined);
+        reader.readAsDataURL(blob);
+      });
+    } catch {
+      return undefined;
+    }
+  }
+
   // Try GraphQL first
   if (token) {
     try {
@@ -347,10 +367,13 @@ export async function fetchReadmeData(username: string): Promise<ReadmeProfileDa
           selected: true,
         }));
 
+        const avatarBase64 = await fetchAvatarBase64(u.avatarUrl || `https://avatars.githubusercontent.com/${username}?s=140`);
+
         return {
           username: u.login,
           name: u.name || u.login,
           avatarUrl: u.avatarUrl || "",
+          avatarBase64,
           bio: u.bio || "",
           company: u.company || "",
           location: u.location || "",
@@ -428,10 +451,13 @@ export async function fetchReadmeData(username: string): Promise<ReadmeProfileDa
       percent: Math.round((count / Math.max(topRepositories.length, 1)) * 100),
     }));
 
+  const avatarBase64 = await fetchAvatarBase64(u.avatar_url || `https://avatars.githubusercontent.com/${username}?s=140`);
+
   return {
     username: u.login,
     name: u.name || u.login,
     avatarUrl: u.avatar_url || "",
+    avatarBase64,
     bio: u.bio || "",
     company: u.company || "",
     location: u.location || "",
