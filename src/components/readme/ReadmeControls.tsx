@@ -334,24 +334,6 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
           <div className="space-y-6">
             {/* Template Gallery Header & Filter Toolbar */}
             <div className="p-4 rounded-xl border border-white/10 bg-surface-2/70 space-y-3.5">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/20 text-primary">
-                    <HiSparkles className="w-3.5 h-3.5" />
-                  </span>
-                  <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-text">
-                      Gitcon Template Studio
-                    </h4>
-                    <p className="text-[11px] text-text-muted">
-                      Self-contained, high-craft developer templates built natively for Gitcon
-                    </p>
-                  </div>
-                </div>
-                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
-                  {GITCON_TEMPLATES_CATALOG.length + templates.length} Styles
-                </span>
-              </div>
 
               {/* Search input */}
               <div className="relative">
