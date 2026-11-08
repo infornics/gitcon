@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   HiAdjustmentsHorizontal,
   HiBriefcase,
@@ -38,6 +38,33 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
   const [activeTab, setActiveTab] = useState<TabType>("template");
   const [skillCategory, setSkillCategory] = useState<string>("all");
   const [skillSearch, setSkillSearch] = useState<string>("");
+
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkScroll = () => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+  };
+
+  useEffect(() => {
+    checkScroll();
+    // Re-check after layout calculation
+    const timer = setTimeout(checkScroll, 50);
+    const el = tabsScrollRef.current;
+    if (!el) return () => clearTimeout(timer);
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      clearTimeout(timer);
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, []);
 
   const update = <K extends keyof ReadmeConfig>(key: K, value: ReadmeConfig[K]) => {
     onChange({ ...config, [key]: value });
@@ -202,8 +229,35 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
   return (
     <div className="flex flex-col h-full rounded-2xl overflow-hidden border border-white/10 bg-surface shadow-2xl backdrop-blur-xl">
       {/* Controls Segmented Header Navigation */}
-      <div className="border-b border-white/10 bg-surface-2/80 p-2 backdrop-blur-md">
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-none pb-0.5">
+      <div className="relative border-b border-white/10 bg-surface-2/80 p-2 backdrop-blur-md overflow-hidden">
+        {/* Left Faded Blur Indicator */}
+        <div
+          className={`absolute left-0 top-0 bottom-0 w-12 z-20 pointer-events-none transition-opacity duration-300 bg-gradient-to-r from-surface to-transparent backdrop-blur-[2px] ${
+            canScrollLeft ? "opacity-100" : "opacity-0"
+          }`}
+          aria-hidden="true"
+        />
+
+        {/* Right Faded Blur Indicator */}
+        <div
+          className={`absolute right-0 top-0 bottom-0 w-14 z-20 pointer-events-none transition-opacity duration-300 bg-gradient-to-l from-surface via-surface/80 to-transparent backdrop-blur-[2px] ${
+            canScrollRight ? "opacity-100" : "opacity-0"
+          }`}
+          aria-hidden="true"
+        />
+
+        <div
+          ref={tabsScrollRef}
+          className={`flex items-center gap-1 overflow-x-auto scrollbar-none pb-0.5 transition-all duration-300 ${
+            canScrollLeft && canScrollRight
+              ? "scroll-mask-both"
+              : canScrollRight
+                ? "scroll-mask-right"
+                : canScrollLeft
+                  ? "scroll-mask-left"
+                  : ""
+          }`}
+        >
           {[
             { id: "template" as TabType, label: "Template", icon: HiSparkles },
             { id: "header" as TabType, label: "Profile", icon: HiUser },
