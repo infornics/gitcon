@@ -5,6 +5,11 @@ import {
   renderSocialsMarkdown,
   SKILLS_CATALOG,
 } from "./readme";
+import {
+  createArcadeCabinetSvg,
+  createHeroBannerSvg,
+  createMixtapeCassetteSvg,
+} from "./svgBanners";
 
 export interface GitconTemplateDef {
   id: string;
@@ -178,33 +183,34 @@ export function generateRecruiterReadyTemplate(profile: ReadmeProfileData, confi
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
   const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const topLangs = profile.topLanguages?.map((l) => l.name) || ["TypeScript", "React", "Python"];
   const parts: string[] = [];
 
+  // Glowing Hero Banner
+  const heroSvgUri = createHeroBannerSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Full-Stack Software Engineer",
+    avatarUrl: profile.avatarUrl,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: topLangs,
+    theme: "emerald",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${heroSvgUri}" width="100%" alt="${username} Profile Snapshot" />\n</div>\n`);
+
   parts.push(`<div align="center">`);
-  parts.push(`  <table width="100%">`);
-  parts.push(`    <tr>`);
-  parts.push(`      <td width="65%" valign="middle">`);
-  parts.push(`        <p><sub><b>RECRUITER SIGNAL BRIEF</b> · <code>${username}</code></sub></p>`);
-  parts.push(`        <h1>${header.name || profile.name}</h1>`);
-  parts.push(`        <h3>${header.title || "Senior Software Engineer"}</h3>`);
-  parts.push(`        <p>${profile.bio || aboutMe.bio || "Building robust, scalable production systems with high craft."}</p>`);
-  parts.push(`        <p>`);
-  parts.push(`          <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github&logoColor=white" /></a>`);
+  parts.push(`  <p>`);
+  parts.push(`    <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/GitHub-Profile-181717?style=for-the-badge&logo=github&logoColor=white" /></a>`);
   if (socials.linkedin) {
-    parts.push(`          <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>`);
+    parts.push(`    <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>`);
   }
   if (socials.email) {
-    parts.push(`          <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Email-Direct_Reach-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>`);
+    parts.push(`    <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Email-Direct_Reach-D14836?style=for-the-badge&logo=gmail&logoColor=white" /></a>`);
   }
-  parts.push(`        </p>`);
-  parts.push(`      </td>`);
-  parts.push(`      <td width="35%" align="center" valign="middle">`);
-  if (header.showAvatar && profile.avatarUrl) {
-    parts.push(`        <img src="${profile.avatarUrl}" width="125" style="border-radius: 20px; border: 2px solid #34D399;" alt="${header.name}" />`);
-  }
-  parts.push(`      </td>`);
-  parts.push(`    </tr>`);
-  parts.push(`  </table>`);
+  parts.push(`  </p>`);
   parts.push(`</div>\n`);
 
   parts.push(`## 📌 Executive Summary\n`);
@@ -519,12 +525,25 @@ export function generatePlainTerminalTemplate(profile: ReadmeProfileData, config
 export function generateDataLabTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const topLangs = profile.topLanguages?.map((l) => l.name) || ["Python", "PyTorch", "C++", "CUDA"];
   const parts: string[] = [];
 
+  const heroSvgUri = createHeroBannerSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Data Scientist & AI Systems Researcher",
+    avatarUrl: profile.avatarUrl,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: topLangs,
+    theme: "cyan",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${heroSvgUri}" width="100%" alt="${username} Data Lab" />\n</div>\n`);
+
   parts.push(`<div align="center">\n`);
-  parts.push(`  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&pause=1000&color=06B6D4&center=true&vCenter=true&width=550&lines=Data+Lab+%26+Applied+AI+Research;Training+Foundation+Models;High-Throughput+Data+Pipelines" alt="Data Lab Banner" />\n`);
-  parts.push(`  <h1>🧬 ${header.name || profile.name}</h1>`);
-  parts.push(`  <p><b>Data Scientist · Machine Learning Engineer · Applied Systems Researcher</b></p>\n`);
   parts.push(`  <p>`);
   parts.push(`    <img src="https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" />`);
   parts.push(`    <img src="https://img.shields.io/badge/Compute-CUDA_Ready-76B900?style=for-the-badge&logo=nvidia&logoColor=white" />`);
@@ -678,21 +697,23 @@ export function generateNeofetchTemplate(profile: ReadmeProfileData, config: Rea
 export function generateMixtapeTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const topLangs = profile.topLanguages?.map((l) => l.name) || ["TypeScript", "Audio", "React"];
   const parts: string[] = [];
 
-  parts.push("```");
-  parts.push(" ____________________________________________________ ");
-  parts.push("|  ________________________________________________  |");
-  parts.push(`| |  SIDE A: GREATEST HITS // ${username.toUpperCase().padEnd(20)} [HQ] | |`);
-  parts.push("| |  ==============================================  | |");
-  parts.push("| |   (o)   [==============================]   (o)   | |");
-  parts.push("| |            [||||||||||||||||||||||]              | |");
-  parts.push("| |                                                  | |");
-  parts.push(`| |  TRACK: ${String(header.title || "Full Stack Symphony").slice(0, 39).padEnd(41)}| |`);
-  parts.push("| |__________________________________________________| |");
-  parts.push("|____________________________________________________|");
-  parts.push("       \\__  52-WEEK EQUALIZER : [||||||||||...]  __/");
-  parts.push("```\n");
+  const cassetteSvgUri = createMixtapeCassetteSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Full-Stack Symphony",
+    avatarUrl: profile.avatarUrl,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: topLangs,
+    theme: "rose",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${cassetteSvgUri}" width="100%" alt="${username} Mixtape Cassette" />\n</div>\n`);
 
   parts.push(`## 📼 ${header.name || profile.name} // Developer Mixtape\n`);
   parts.push(`> *"Coding with rhythm. Volume turned up to 11."*\n`);
@@ -740,24 +761,22 @@ export function generateMixtapeTemplate(profile: ReadmeProfileData, config: Read
 export function generateArcadeCabinetTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
   const parts: string[] = [];
 
-  parts.push("```");
-  parts.push("  ___________________________________________________  ");
-  parts.push(" /                                                   \\ ");
-  parts.push(`|   ★ ★ ★   ARCADE 1984: ${username.toUpperCase().padEnd(16)} ★ ★ ★    |`);
-  parts.push(" \\___________________________________________________/ ");
-  parts.push(" |  _______________________________________________  | ");
-  parts.push(" | |                                               | | ");
-  parts.push(` | |   PLAYER 1: READY                             | | `);
-  parts.push(` | |   SCORE   : ${String(profile.contributionsStats?.totalContributions || 4040).padEnd(8)}   LEVEL: ${(profile.publicRepos || 10)}            | | `);
-  parts.push(` | |   STREAK  : ${String(profile.contributionsStats?.currentStreak || 1).padEnd(8)}   LIVES: ★ ★ ★           | | `);
-  parts.push(" | |                                               | | ");
-  parts.push(" | |_______________________________________________| | ");
-  parts.push(" |                                                   | ");
-  parts.push(" |      [🕹️ JOYSTICK]         (A) (B) (C) [BUTTONS]  | ");
-  parts.push(" \\___________________________________________________/ ");
-  parts.push("```\n");
+  const arcadeSvgUri = createArcadeCabinetSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Arcade Player 1",
+    avatarUrl: profile.avatarUrl,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 4040,
+    languages: profile.topLanguages?.map((l) => l.name) || ["Assembly", "C", "Rust"],
+    theme: "rose",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${arcadeSvgUri}" width="100%" alt="${username} Arcade Cabinet" />\n</div>\n`);
 
   parts.push(`## 🕹️ ${header.name || profile.name} // 8-Bit Developer Arena\n`);
   parts.push(`> *"Insert coin to ship code."*\n`);
@@ -881,12 +900,24 @@ export function generateCharacterSheetTemplate(profile: ReadmeProfileData, confi
 export function generateNightShiftTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
   const parts: string[] = [];
 
+  const heroSvgUri = createHeroBannerSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Full-Stack Engineer · Night Shift",
+    avatarUrl: profile.avatarUrl,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: profile.topLanguages?.map((l) => l.name) || ["TypeScript", "Next.js", "Tailwind"],
+    theme: "purple",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${heroSvgUri}" width="100%" alt="${username} Night Shift Profile" />\n</div>\n`);
+
   parts.push(`<div align="center">\n`);
-  parts.push(`  <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=24&pause=1000&color=E879F9&center=true&vCenter=true&width=500&lines=NIGHT+SHIFT+%2F%2F+02%3A00+AM;Shipping+Code+Under+Neon;Deep+Work.+Quiet+Execution." alt="Night Shift" />\n`);
-  parts.push(`  <h1>🌑 ${header.name || profile.name}</h1>`);
-  parts.push(`  <p><b>${header.title || "Full-Stack Engineer"} · Night Owl & Deep Work Practitioner</b></p>\n`);
   parts.push(`  <p>`);
   parts.push(`    <img src="https://img.shields.io/badge/Mode-OLED_Monochrome-000000?style=for-the-badge&logo=probot&logoColor=E879F9" />`);
   parts.push(`    <img src="https://img.shields.io/badge/Focus-Flow_State-701A75?style=for-the-badge" />`);
