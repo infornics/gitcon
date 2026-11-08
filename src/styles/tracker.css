@@ -1606,5 +1606,14 @@ input.tracker-input {
   margin-right: auto;
 }
 
+/* Utilities for studio controls */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 
 

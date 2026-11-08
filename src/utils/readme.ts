@@ -105,19 +105,28 @@ export interface ReadmeConfig {
   };
 }
 
-export const STATS_THEMES = [
-  { id: "dark", name: "Dark" },
-  { id: "tokyonight", name: "Tokyo Night" },
-  { id: "dracula", name: "Dracula" },
-  { id: "radical", name: "Radical" },
-  { id: "onedark", name: "One Dark" },
-  { id: "synthwave", name: "Synthwave" },
-  { id: "github_dark", name: "GitHub Dark" },
-  { id: "nightowl", name: "Night Owl" },
-  { id: "merko", name: "Merko" },
-  { id: "gruvbox", name: "Gruvbox" },
-  { id: "catppuccin_mocha", name: "Catppuccin Mocha" },
-  { id: "transparent", name: "Transparent" },
+export interface StatsThemeItem {
+  id: string;
+  name: string;
+  bg: string;
+  accent: string;
+  text: string;
+  border?: boolean;
+}
+
+export const STATS_THEMES: StatsThemeItem[] = [
+  { id: "dark", name: "Dark", bg: "#0d1117", accent: "#58aab0", text: "#c9d1d9" },
+  { id: "tokyonight", name: "Tokyo Night", bg: "#1a1b26", accent: "#7aa2f7", text: "#a9b1d6" },
+  { id: "dracula", name: "Dracula", bg: "#282a36", accent: "#ff79c6", text: "#f8f8f2" },
+  { id: "radical", name: "Radical", bg: "#141321", accent: "#fe428e", text: "#a9fef7" },
+  { id: "onedark", name: "One Dark", bg: "#282c34", accent: "#61afef", text: "#abb2bf" },
+  { id: "synthwave", name: "Synthwave", bg: "#2b213a", accent: "#ff7edb", text: "#fede5d" },
+  { id: "github_dark", name: "GitHub Dark", bg: "#0d1117", accent: "#58a6ff", text: "#f0f6fc" },
+  { id: "nightowl", name: "Night Owl", bg: "#011627", accent: "#c792ea", text: "#d6deeb" },
+  { id: "merko", name: "Merko", bg: "#0a0f0d", accent: "#abd200", text: "#68b587" },
+  { id: "gruvbox", name: "Gruvbox", bg: "#282828", accent: "#fe8019", text: "#ebdbb2" },
+  { id: "catppuccin_mocha", name: "Catppuccin", bg: "#1e1e2e", accent: "#cba6f7", text: "#cdd6f4" },
+  { id: "transparent", name: "Transparent", bg: "rgba(255,255,255,0.05)", accent: "#58aab0", text: "#e3e0d9", border: true },
 ];
 
 export const SKILLS_CATALOG: SkillItem[] = [
