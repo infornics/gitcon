@@ -20,10 +20,10 @@ export default function MainLayout({ children }: LayoutProps) {
 
   return (
     <div className={`page-shell-wrapper ${isReadmeStudio ? "h-screen overflow-hidden flex flex-col" : ""}`}>
-      <div className={`page-shell ${isReadmeStudio ? "h-full flex flex-col overflow-hidden" : ""}`}>
+      <div className={`page-shell ${isReadmeStudio ? "h-full flex flex-col overflow-hidden !pb-0" : ""}`}>
         <Header />
         {isReadmeStudio ? (
-          <div className="flex-1 min-h-0 flex flex-col overflow-hidden pb-4">
+          <div className="flex-1 min-h-0 flex flex-col overflow-hidden pb-1">
             {children}
           </div>
         ) : (
