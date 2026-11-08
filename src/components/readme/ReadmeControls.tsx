@@ -24,6 +24,10 @@ import {
   STATS_THEMES,
   StatsThemeItem,
 } from "../../utils/readme";
+import {
+  GITCON_TEMPLATES_CATALOG,
+  GitconTemplateDef,
+} from "../../utils/templateGenerators";
 import { ToggleSwitch } from "./ToggleSwitch";
 
 interface ReadmeControlsProps {
@@ -38,6 +42,8 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
   const [activeTab, setActiveTab] = useState<TabType>("template");
   const [skillCategory, setSkillCategory] = useState<string>("all");
   const [skillSearch, setSkillSearch] = useState<string>("");
+  const [templateSearch, setTemplateSearch] = useState<string>("");
+  const [templateCategory, setTemplateCategory] = useState<"all" | "recruiter" | "technical" | "creative" | "opensource">("all");
 
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -326,59 +332,146 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
             ========================================================================= */}
         {activeTab === "template" && (
           <div className="space-y-6">
+            {/* Template Gallery Header & Filter Toolbar */}
+            <div className="p-4 rounded-xl border border-white/10 bg-surface-2/70 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-primary/20 text-primary">
+                    <HiSparkles className="w-3.5 h-3.5" />
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-text">
+                      Gitcon Template Studio
+                    </h4>
+                    <p className="text-[11px] text-text-muted">
+                      Self-contained, high-craft developer templates built natively for Gitcon
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                  {GITCON_TEMPLATES_CATALOG.length + templates.length} Styles
+                </span>
+              </div>
+
+              {/* Search input */}
+              <div className="relative">
+                <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+                <input
+                  type="text"
+                  value={templateSearch}
+                  onChange={(e) => setTemplateSearch(e.target.value)}
+                  placeholder="Filter templates (e.g. recruiter, terminal, cassette, arcade, devops)..."
+                  className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-8 py-1.5 text-xs text-text placeholder-text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                />
+                {templateSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setTemplateSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
+                  >
+                    <HiXMark className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Category Pills */}
+              <div className="flex flex-wrap gap-1.5 text-[11px]">
+                {(
+                  [
+                    { id: "all", label: "All Layouts" },
+                    { id: "recruiter", label: "Hiring & Recruiter" },
+                    { id: "technical", label: "Technical & Systems" },
+                    { id: "creative", label: "Creative & 8-Bit" },
+                    { id: "opensource", label: "Open-Source & Founder" },
+                  ] as const
+                ).map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => setTemplateCategory(cat.id)}
+                    className={`px-2.5 py-1 rounded-md transition-all font-medium ${
+                      templateCategory === cat.id
+                        ? "bg-primary text-text-inverse font-semibold shadow-sm"
+                        : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Premium Gitcon Extended Templates */}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
-                    Choose README Template
+                  <span className="text-xs font-bold uppercase tracking-wider text-text">
+                    Curated Templates ({
+                      GITCON_TEMPLATES_CATALOG.filter((t) => {
+                        const matchCat = templateCategory === "all" || t.category === templateCategory;
+                        const matchSearch =
+                          t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                          t.description.toLowerCase().includes(templateSearch.toLowerCase());
+                        return matchCat && matchSearch;
+                      }).length
+                    })
                   </span>
                 </div>
-                <span className="text-[11px] text-text-muted">4 curated presets</span>
+                <span className="text-[11px] text-text-muted">High-fidelity README designs</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {templates.map((tpl) => {
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+                {GITCON_TEMPLATES_CATALOG.filter((t) => {
+                  const matchCat = templateCategory === "all" || t.category === templateCategory;
+                  const matchSearch =
+                    t.name.toLowerCase().includes(templateSearch.toLowerCase()) ||
+                    t.description.toLowerCase().includes(templateSearch.toLowerCase());
+                  return matchCat && matchSearch;
+                }).map((tpl) => {
                   const isSelected = config.template === tpl.id;
                   return (
                     <button
                       key={tpl.id}
                       type="button"
                       onClick={() => update("template", tpl.id)}
-                      className={`text-left p-4 rounded-xl border transition-all duration-200 relative group flex flex-col justify-between ${
+                      className={`text-left p-3.5 rounded-xl border transition-all duration-200 relative group flex flex-col justify-between ${
                         isSelected
-                          ? "border-primary bg-gradient-to-br from-primary/15 via-primary/5 to-transparent shadow-[0_0_20px_-5px_rgba(88,170,176,0.25)] ring-1 ring-primary/40"
+                          ? "border-primary bg-gradient-to-br from-primary/20 via-primary/5 to-surface-2 shadow-[0_0_20px_-5px_rgba(88,170,176,0.35)] ring-1 ring-primary/50"
                           : "border-white/10 bg-surface-2/60 hover:border-white/25 hover:bg-surface-2 hover:-translate-y-0.5"
                       }`}
                     >
-                      {/* Active Checkmark Pill in Top Corner */}
+                      {/* Active indicator */}
                       {isSelected && (
-                        <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary text-text-inverse flex items-center justify-center shadow-md">
+                        <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-primary text-text-inverse flex items-center justify-center shadow-md">
                           <HiCheck className="w-3.5 h-3.5 stroke-[3]" />
                         </div>
                       )}
 
-                      {/* Mini Layout Diagram */}
-                      {renderMiniWireframe(tpl.layoutType)}
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1.5 pr-5">
-                          <strong className="font-bold text-text text-sm group-hover:text-primary transition-colors">
-                            {tpl.title}
+                      {/* Header Title & Badge */}
+                      <div className="mb-2">
+                        <div className="flex items-center gap-1.5 mb-1 pr-6">
+                          <span
+                            className="w-2 h-2 rounded-full shrink-0"
+                            style={{ backgroundColor: tpl.accentColor }}
+                          />
+                          <strong className="font-bold text-text text-xs group-hover:text-primary transition-colors truncate">
+                            {tpl.name}
                           </strong>
                         </div>
-                        <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
+                        <p className="text-[11px] text-text-muted leading-relaxed line-clamp-2">
                           {tpl.description}
                         </p>
                       </div>
 
-                      <div className="mt-3 flex items-center justify-between pt-2 border-t border-white/5">
+                      {/* Card Bottom Pill */}
+                      <div className="mt-2 flex items-center justify-between pt-2 border-t border-white/5">
                         <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${tpl.badgeColor}`}
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${tpl.badgeColor}`}
                         >
                           {tpl.badge}
                         </span>
-                        <span className="text-[11px] font-semibold text-text-muted group-hover:text-text transition-colors">
+                        <span className="text-[10px] font-semibold text-text-muted group-hover:text-text transition-colors">
                           {isSelected ? "Active" : "Apply"} →
                         </span>
                       </div>
@@ -387,6 +480,56 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 })}
               </div>
             </div>
+
+            {/* Core Baseline Presets */}
+            {templateCategory === "all" && !templateSearch && (
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-text-muted" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+                      Base Presets
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-text-muted">4 baseline formats</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {templates.map((tpl) => {
+                    const isSelected = config.template === tpl.id;
+                    return (
+                      <button
+                        key={tpl.id}
+                        type="button"
+                        onClick={() => update("template", tpl.id)}
+                        className={`text-left p-3 rounded-xl border transition-all duration-200 relative group flex flex-col justify-between ${
+                          isSelected
+                            ? "border-primary bg-gradient-to-br from-primary/15 via-primary/5 to-transparent ring-1 ring-primary/40"
+                            : "border-white/10 bg-surface-2/40 hover:border-white/20 hover:bg-surface-2"
+                        }`}
+                      >
+                        {isSelected && (
+                          <div className="absolute top-2.5 right-2.5 w-4 h-4 rounded-full bg-primary text-text-inverse flex items-center justify-center shadow-md">
+                            <HiCheck className="w-3 h-3 stroke-[3]" />
+                          </div>
+                        )}
+
+                        {renderMiniWireframe(tpl.layoutType)}
+
+                        <div>
+                          <strong className="font-bold text-text text-xs group-hover:text-primary transition-colors">
+                            {tpl.title}
+                          </strong>
+                          <p className="text-[11px] text-text-muted leading-relaxed line-clamp-1 mt-0.5">
+                            {tpl.description}
+                          </p>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Visual Color Palette Theme Swatch Selector */}
             <div>

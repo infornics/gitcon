@@ -1,6 +1,7 @@
 import { getGithubToken, hasCustomGithubToken } from "./github";
+import { generateExtendedTemplate } from "./templateGenerators";
 
-export type ReadmeTemplate = "modern" | "minimal" | "showcase" | "cyberpunk";
+export type ReadmeTemplate = string;
 
 export interface SkillItem {
   id: string;
@@ -544,7 +545,7 @@ export function buildDefaultConfig(profile: ReadmeProfileData): ReadmeConfig {
 /**
  * Generate Shields.io or SkillIcons markdown for selected skills.
  */
-function renderSkillsMarkdown(
+export function renderSkillsMarkdown(
   selectedIds: string[],
   badgeStyle: "shields" | "skillicons",
   align: "left" | "center" = "center"
@@ -579,7 +580,7 @@ function renderSkillsMarkdown(
 /**
  * Generate social badges markdown.
  */
-function renderSocialsMarkdown(
+export function renderSocialsMarkdown(
   socials: ReadmeConfig["socials"],
   align: "left" | "center" = "center"
 ): string {
@@ -645,6 +646,12 @@ function renderSocialsMarkdown(
  */
 export function generateReadmeMarkdown(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { template } = config;
+
+  // Check extended built-in templates first
+  const extendedResult = generateExtendedTemplate(template, profile, config);
+  if (extendedResult) {
+    return extendedResult;
+  }
 
   switch (template) {
     case "minimal":
