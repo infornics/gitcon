@@ -133,6 +133,13 @@ export default function UserRepositories() {
               >
                 ← Back to Profile
               </Link>
+              <Link
+                href={`/user/${username}/readme`}
+                className="btn btn-primary !py-1.5 !px-3.5 !text-xs inline-flex items-center gap-1.5"
+                title="Create GitHub Profile README"
+              >
+                <span>Profile README</span>
+              </Link>
             </div>
           </div>
 

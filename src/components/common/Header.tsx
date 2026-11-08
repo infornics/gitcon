@@ -163,6 +163,12 @@ export default function Header() {
         >
           Repo Stats
         </Link>
+        <Link
+          href="/readme"
+          className="text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-surface-2 transition-colors opacity-80 hover:opacity-100"
+        >
+          README Generator
+        </Link>
         <button
           onClick={() => setShowTokenModal(true)}
           className={`text-xs font-mono font-semibold px-3 py-1.5 rounded-full transition-all inline-flex items-center gap-1.5 cursor-pointer border ${

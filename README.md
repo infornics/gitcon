@@ -12,6 +12,7 @@ Gitcon is a high-performance, premium GitHub contribution dashboard built with *
 
 ## Features
 
+- **GitHub Profile README Generator**: Automatically generates high-converting, aesthetic GitHub profile READMEs based on your GitHub activity, repositories, and Gitcon momentum. Features 4 curated templates (Modern Developer, Minimalist Clean, Showcase Portfolio, Cyberpunk Terminal), live interactive preview, tech stack badge selector, GitHub stats themes, one-click copy, and download.
 - **Dynamic Contribution Heatmap**: Interactive calendar grid visualization with configurable filters (supporting last 6 months or last 12 months) and detailed tooltip counts.
 - **Weekly Coding Rhythm**: Graph highlighting weekly peaks and low-productivity days to discover when you code best.
 - **Productivity Hours**: SVG distribution chart plotting commit density by hour of the day to define core active periods.
