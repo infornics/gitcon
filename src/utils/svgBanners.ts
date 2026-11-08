@@ -245,3 +245,103 @@ export function createArcadeCabinetSvg(params: BannerParams): string {
 
   return encodeSvgDataUri(svg);
 }
+
+/**
+ * Creates the Realistic macOS / Linux Terminal Window SVG.
+ * High-craft CRT scanlines, neon syntax colors, traffic light controls, and live git prompt.
+ */
+export function createTerminalWindowSvg(params: BannerParams): string {
+  const { username, name, title, stars, followers = 0, contributions = 0, languages, avatarBase64 } = params;
+  const cleanUsername = username.replace(/[^a-zA-Z0-9_\-]/g, "");
+  const langsList = languages.slice(0, 5).join(" · ") || "TypeScript · Rust · Python";
+
+  // Avatar circular clip
+  const avatarTag = avatarBase64
+    ? `
+    <defs>
+      <clipPath id="term-av-clip-${cleanUsername}">
+        <circle cx="80" cy="115" r="38"/>
+      </clipPath>
+    </defs>
+    <circle cx="80" cy="115" r="40" fill="#22C55E" fill-opacity="0.2" stroke="#22C55E" stroke-opacity="0.8" stroke-width="2"/>
+    <image href="${avatarBase64}" x="40" y="75" width="80" height="80" preserveAspectRatio="xMidYMid slice" clip-path="url(#term-av-clip-${cleanUsername})"/>`
+    : `
+    <circle cx="80" cy="115" r="38" fill="#1E293B" stroke="#22C55E" stroke-width="2"/>
+    <text x="80" y="125" text-anchor="middle" font-family="'JetBrains Mono', 'Fira Code', monospace" font-size="28" font-weight="900" fill="#22C55E">&gt;_</text>`;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="860" height="280" viewBox="0 0 860 280">
+  <defs>
+    <linearGradient id="term-grad-${cleanUsername}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <filter id="neon-glow-${cleanUsername}" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <style>
+    .cursor-blink { animation: blink 1s step-end infinite; }
+    .term-code { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, Menlo, Monaco, Consolas, monospace; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  </style>
+
+  <!-- Outer Window Shadow / Glow Shell -->
+  <rect x="15" y="15" width="830" height="250" rx="14" fill="#000000" fill-opacity="0.6"/>
+  <rect x="15" y="15" width="830" height="250" rx="14" fill="url(#term-grad-${cleanUsername})" stroke="#22C55E" stroke-opacity="0.4" stroke-width="1.5"/>
+
+  <!-- Window Titlebar -->
+  <path d="M 15 29 Q 15 15 29 15 L 831 15 Q 845 15 845 29 L 845 52 L 15 52 Z" fill="#1e293b" fill-opacity="0.8"/>
+  <line x1="15" y1="52" x2="845" y2="52" stroke="#334155" stroke-width="1"/>
+
+  <!-- Traffic Lights -->
+  <circle cx="38" cy="33" r="6" fill="#EF4444"/>
+  <circle cx="56" cy="33" r="6" fill="#F59E0B"/>
+  <circle cx="74" cy="33" r="6" fill="#22C55E"/>
+
+  <!-- Window Title -->
+  <text x="430" y="37" text-anchor="middle" class="term-code" font-size="12" font-weight="600" fill="#94A3B8">bash — ${username}@gitcon:~ (zsh)</text>
+  <rect x="760" y="24" width="70" height="18" rx="4" fill="#22C55E" fill-opacity="0.15" stroke="#22C55E" stroke-opacity="0.3"/>
+  <text x="795" y="37" text-anchor="middle" class="term-code" font-size="10" font-weight="700" fill="#4ADE80">ONLINE</text>
+
+  <!-- Avatar Badge Section -->
+  ${avatarTag}
+
+  <!-- Command Prompt Line -->
+  <g transform="translate(140, 85)">
+    <text x="0" y="0" class="term-code" font-size="13" font-weight="700">
+      <tspan fill="#38BDF8">➜</tspan>
+      <tspan fill="#A855F7"> ~</tspan>
+      <tspan fill="#64748B"> git:(</tspan><tspan fill="#F43F5E">main</tspan><tspan fill="#64748B">)</tspan>
+      <tspan fill="#F8FAFC"> whoami --details</tspan>
+      <tspan fill="#22C55E" class="cursor-blink"> █</tspan>
+    </text>
+
+    <!-- Terminal Output -->
+    <text x="0" y="28" class="term-code" font-size="22" font-weight="800" fill="#F8FAFC">${name}</text>
+    <text x="0" y="50" class="term-code" font-size="13" font-weight="500" fill="#38BDF8">&gt; ${title}</text>
+
+    <text x="0" y="74" class="term-code" font-size="12" fill="#94A3B8">
+      <tspan fill="#F59E0B">STACK:</tspan> <tspan fill="#E2E8F0">${langsList}</tspan>
+    </text>
+
+    <text x="0" y="96" class="term-code" font-size="12" fill="#94A3B8">
+      <tspan fill="#22C55E">STATS:</tspan> <tspan fill="#E2E8F0">${stars.toLocaleString()} Stars</tspan>
+      <tspan fill="#64748B"> │ </tspan>
+      <tspan fill="#E2E8F0">${followers.toLocaleString()} Followers</tspan>
+      <tspan fill="#64748B"> │ </tspan>
+      <tspan fill="#E2E8F0">${contributions.toLocaleString()} Contributions</tspan>
+    </text>
+  </g>
+
+  <!-- Bottom Terminal Status Bar -->
+  <rect x="15" y="246" width="830" height="24" fill="#0f172a" stroke="#1e293b" stroke-width="1"/>
+  <rect x="15" y="246" width="90" height="24" fill="#22C55E"/>
+  <text x="60" y="262" text-anchor="middle" class="term-code" font-size="11" font-weight="800" fill="#020617">NORMAL</text>
+  <text x="120" y="262" class="term-code" font-size="11" font-weight="500" fill="#64748B">utf-8 [unix] │ gitcon.infornics.com</text>
+  <text x="830" y="262" text-anchor="end" class="term-code" font-size="11" font-weight="600" fill="#4ADE80">100% ⚡ 0.02ms</text>
+</svg>`;
+
+  return encodeSvgDataUri(svg);
+}

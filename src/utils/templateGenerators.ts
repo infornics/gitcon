@@ -9,6 +9,7 @@ import {
   createArcadeCabinetSvg,
   createHeroBannerSvg,
   createMixtapeCassetteSvg,
+  createTerminalWindowSvg,
 } from "./svgBanners";
 
 export interface GitconTemplateDef {
@@ -457,55 +458,87 @@ export function generateStudentVelocityTemplate(profile: ReadmeProfileData, conf
 export function generatePlainTerminalTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
   const { header, aboutMe, skills, githubStats, featuredRepos, socials, statsTheme } = config;
   const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const topLangs = profile.topLanguages?.map((l) => l.name) || ["TypeScript", "Rust", "Python", "C++"];
   const parts: string[] = [];
 
+  // 1. High-Craft Terminal Header Window (macOS / Linux styling)
+  const termSvg = createTerminalWindowSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "Full-Stack Software Engineer",
+    avatarUrl: profile.avatarUrl,
+    avatarBase64: profile.avatarBase64,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: topLangs,
+    theme: "emerald",
+  });
+
+  parts.push(`<div align="center">\n  <img src="${termSvg}" width="100%" alt="${username} Terminal Session" />\n</div>\n`);
+
+  // Quick navigation prompt
+  parts.push(`<div align="center">`);
+  parts.push(`  <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/Shell-bash%205.2-10B981?style=for-the-badge&logo=gnubash&logoColor=white" /></a>`);
+  parts.push(`  <a href="https://gitcon.infornics.com/user/${username}"><img src="https://img.shields.io/badge/Runtime-x86__64%20Linux-38BDF8?style=for-the-badge&logo=linux&logoColor=white" /></a>`);
+  if (socials.linkedin) {
+    parts.push(`  <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/Connect-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" /></a>`);
+  }
+  parts.push(`</div>\n`);
+
+  // 2. Active Session Telemetry
+  parts.push(`### 🖥️ \`session --active-tasks\``);
   parts.push("```sh");
-  parts.push(`┌──(${username}㉿gitcon-terminal)-[~]`);
-  parts.push(`└─$ whoami --verbose`);
-  parts.push(`Name      : ${header.name || profile.name}`);
-  parts.push(`Role      : ${header.title || "Systems Software Engineer"}`);
-  parts.push(`Location  : ${profile.location || "Localhost"}`);
-  parts.push(`Company   : ${profile.company || "Independent"}`);
-  parts.push(`Followers : ${profile.followers}`);
-  parts.push(`Repos     : ${profile.publicRepos}`);
-  parts.push(`Streak    : ${profile.contributionsStats?.currentStreak || 0} days active`);
+  parts.push(`[SYSTEM TELEMETRY REPORT] - ${new Date().toISOString().split("T")[0]} 00:00:00 UTC`);
+  parts.push(`USER         : ${username}`);
+  parts.push(`HOST         : dev-station-01 (${profile.location || "Earth, Solar System"})`);
+  parts.push(`AFFILIATION  : ${profile.company || "Independent Software Engineer"}`);
+  parts.push(`NETWORK      : ${profile.followers} followers │ ${profile.publicRepos} public repositories`);
+  parts.push(`UPTIME       : ${profile.contributionsStats?.currentStreak || 0} consecutive active days`);
   parts.push("```\n");
 
-  parts.push("```sh");
-  parts.push(`┌──(${username}㉿gitcon-terminal)-[~/status]`);
-  parts.push(`└─$ cat /proc/current_mission.txt`);
-  parts.push(`FOCUS    : ${aboutMe.workingOn || "Developing low-latency backend architectures"}`);
-  parts.push(`LEARNING : ${aboutMe.learning || "Rust, Linux Kernel internals, eBPF"}`);
-  parts.push(`ASK_ME   : ${aboutMe.askMeAbout || "Distributed consensus, memory optimization, database tuning"}`);
-  parts.push("```\n");
+  // 3. Process Mission / About
+  if (aboutMe.show) {
+    parts.push(`### 📂 \`cat /proc/mission.json\``);
+    parts.push("```json");
+    parts.push(`{`);
+    parts.push(`  "focus": "${aboutMe.workingOn || "Building reliable distributed systems & high-performance applications"}",`);
+    parts.push(`  "active_learning": "${aboutMe.learning || "Systems internals, compiler design, and AI tooling"}",`);
+    parts.push(`  "collaboration": "${aboutMe.collaborateOn || "Open-source developer tooling & cloud native infrastructure"}",`);
+    parts.push(`  "inquiries": "${aboutMe.askMeAbout || "C++, Rust, TypeScript, Architecture Design"}"`);
+    parts.push(`}`);
+    parts.push("```\n");
+  }
 
+  // 4. Installed Binaries & Toolchain
   if (skills.show && skills.selectedSkills.length > 0) {
+    parts.push(`### ⚙️ \`ls -la /usr/local/bin\``);
     parts.push("```sh");
-    parts.push(`┌──(${username}㉿gitcon-terminal)-[~/toolchain]`);
-    parts.push(`└─$ ls -l /usr/bin/active_stack`);
     const skillNames = skills.selectedSkills
       .map((id) => SKILLS_CATALOG.find((s) => s.id === id)?.name || id)
-      .slice(0, 15);
-    parts.push(skillNames.map((s) => `-rwxr-xr-x 1 ${username} dev 4096 Nov 08 2026 ${s.toLowerCase()}`).join("\n"));
+      .slice(0, 14);
+    parts.push(skillNames.map((s, i) => `drwxr-xr-x  1 ${username.padEnd(10)} staff   4096  Nov  8  ${s.toLowerCase()}`).join("\n"));
     parts.push("```\n");
     parts.push(renderSkillsMarkdown(skills.selectedSkills, "shields", "left") + "\n");
   }
 
+  // 5. Active Production Repos
   if (featuredRepos.show && featuredRepos.repos.length > 0) {
     const selected = featuredRepos.repos.filter((r) => r.selected !== false);
     if (selected.length > 0) {
+      parts.push(`### 📦 \`gitcon repos --top\``);
       parts.push("```sh");
-      parts.push(`┌──(${username}㉿gitcon-terminal)-[~/repositories]`);
-      parts.push(`└─$ gitcon repos --sort=stars --limit=5`);
       selected.forEach((r) => {
-        parts.push(`* [⭐ ${String(r.stars).padEnd(4)}] ${r.name.padEnd(20)} (${(r.language || "Plain").padEnd(10)}) - ${r.url}`);
+        parts.push(`★ [${String(r.stars).padStart(3)} stars]  ${r.name.padEnd(24)} [${(r.language || "code").padEnd(10)}]  ${r.url}`);
       });
       parts.push("```\n");
     }
   }
 
+  // 6. Live Telemetry Monitors
   if (githubStats.showStatsCard || githubStats.showStreakCard) {
-    parts.push(`### 📡 Telemetry Monitors\n`);
+    parts.push(`### 📊 \`htop --telemetry\`\n`);
     const cards: string[] = [];
     if (githubStats.showStatsCard) {
       cards.push(`<a href="https://gitcon.infornics.com/user/${username}"><img height="155em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&theme=terminal&hide_border=false" /></a>`);
@@ -516,10 +549,6 @@ export function generatePlainTerminalTemplate(profile: ReadmeProfileData, config
     parts.push(`<p align="left">\n  ${cards.join("\n  ")}\n</p>\n`);
   }
 
-  parts.push("```sh");
-  parts.push(`┌──(${username}㉿gitcon-terminal)-[~/exit]`);
-  parts.push(`└─$ echo "System normal. Process completed with returncode 0."`);
-  parts.push("```\n");
   return parts.join("\n");
 }
 
