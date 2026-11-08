@@ -49,6 +49,10 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  const filtersScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollFiltersLeft, setCanScrollFiltersLeft] = useState(false);
+  const [canScrollFiltersRight, setCanScrollFiltersRight] = useState(false);
+
   const checkScroll = () => {
     const el = tabsScrollRef.current;
     if (!el) return;
@@ -57,29 +61,69 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
     setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
   };
 
+  const checkFiltersScroll = () => {
+    const el = filtersScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollFiltersLeft(scrollLeft > 4);
+    setCanScrollFiltersRight(scrollLeft + clientWidth < scrollWidth - 4);
+  };
+
   useEffect(() => {
     checkScroll();
+    checkFiltersScroll();
     // Re-check after layout calculation
-    const timer = setTimeout(checkScroll, 50);
+    const timer = setTimeout(() => {
+      checkScroll();
+      checkFiltersScroll();
+    }, 50);
+
     const el = tabsScrollRef.current;
-    if (!el) return () => clearTimeout(timer);
+    const filterEl = filtersScrollRef.current;
 
     const handleWheel = (e: WheelEvent) => {
       // If user scrolls vertically with mouse wheel, translate to horizontal scroll
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        el.scrollLeft += e.deltaY;
+        el!.scrollLeft += e.deltaY;
       }
     };
 
-    el.addEventListener("wheel", handleWheel, { passive: false });
-    el.addEventListener("scroll", checkScroll, { passive: true });
-    window.addEventListener("resize", checkScroll);
+    const handleFilterWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        filterEl!.scrollLeft += e.deltaY;
+      }
+    };
+
+    if (el) {
+      el.addEventListener("wheel", handleWheel, { passive: false });
+      el.addEventListener("scroll", checkScroll, { passive: true });
+    }
+
+    if (filterEl) {
+      filterEl.addEventListener("wheel", handleFilterWheel, { passive: false });
+      filterEl.addEventListener("scroll", checkFiltersScroll, { passive: true });
+    }
+
+    const handleResize = () => {
+      checkScroll();
+      checkFiltersScroll();
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
       clearTimeout(timer);
-      el.removeEventListener("wheel", handleWheel);
-      el.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
+      if (el) {
+        el.removeEventListener("wheel", handleWheel);
+        el.removeEventListener("scroll", checkScroll);
+      }
+      if (filterEl) {
+        filterEl.removeEventListener("wheel", handleFilterWheel);
+        filterEl.removeEventListener("scroll", checkFiltersScroll);
+      }
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -356,30 +400,59 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 )}
               </div>
 
-              {/* Category Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-0.5 w-full">
-                {(
-                  [
-                    { id: "all", label: "All Layouts" },
-                    { id: "recruiter", label: "Hiring & Recruiter" },
-                    { id: "technical", label: "Technical & Systems" },
-                    { id: "creative", label: "Creative & 8-Bit" },
-                    { id: "opensource", label: "Open-Source & Founder" },
-                  ] as const
-                ).map((cat) => (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setTemplateCategory(cat.id)}
-                    className={`flex-1 min-w-fit px-3 py-1.5 rounded-xl transition-all duration-200 text-xs font-semibold text-center whitespace-nowrap shrink-0 sm:shrink ${
-                      templateCategory === cat.id
-                        ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
-                        : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10 border border-transparent"
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                ))}
+              {/* Category Pills with Faded Blur Indicators & Horizontal Wheel Scroll */}
+              <div className="relative overflow-hidden w-full">
+                {/* Left Faded Blur Indicator */}
+                <div
+                  className={`absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none transition-opacity duration-300 bg-gradient-to-r from-surface-2 to-transparent backdrop-blur-[1px] ${
+                    canScrollFiltersLeft ? "opacity-100" : "opacity-0"
+                  }`}
+                  aria-hidden="true"
+                />
+
+                {/* Right Faded Blur Indicator */}
+                <div
+                  className={`absolute right-0 top-0 bottom-0 w-10 z-10 pointer-events-none transition-opacity duration-300 bg-gradient-to-l from-surface-2 via-surface-2/80 to-transparent backdrop-blur-[1px] ${
+                    canScrollFiltersRight ? "opacity-100" : "opacity-0"
+                  }`}
+                  aria-hidden="true"
+                />
+
+                <div
+                  ref={filtersScrollRef}
+                  className={`flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1 w-full transition-all duration-300 ${
+                    canScrollFiltersLeft && canScrollFiltersRight
+                      ? "scroll-mask-both"
+                      : canScrollFiltersRight
+                        ? "scroll-mask-right"
+                        : canScrollFiltersLeft
+                          ? "scroll-mask-left"
+                          : ""
+                  }`}
+                >
+                  {(
+                    [
+                      { id: "all", label: "All Layouts" },
+                      { id: "recruiter", label: "Hiring & Recruiter" },
+                      { id: "technical", label: "Technical & Systems" },
+                      { id: "creative", label: "Creative & 8-Bit" },
+                      { id: "opensource", label: "Open-Source & Founder" },
+                    ] as const
+                  ).map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setTemplateCategory(cat.id)}
+                      className={`px-3.5 py-1.5 rounded-xl transition-all duration-200 text-xs font-semibold whitespace-nowrap shrink-0 ${
+                        templateCategory === cat.id
+                          ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
+                          : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10 border border-transparent"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
