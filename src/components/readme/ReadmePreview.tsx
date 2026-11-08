@@ -38,7 +38,7 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-white/10 text-xs select-none">
+      <div className="readme-preview-titlebar flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-white/10 text-xs select-none transition-colors">
         <div className="flex items-center gap-2">
           {/* Mac Traffic Lights */}
           <div className="flex items-center gap-1.5 mr-2">
@@ -59,7 +59,7 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
       </div>
 
       {/* Main Document Body */}
-      <div className="readme-preview-wrapper p-6 sm:p-10 overflow-x-auto flex-1 min-h-0 bg-[#0d1117]" ref={containerRef}>
+      <div className="readme-preview-wrapper p-6 sm:p-10 overflow-x-auto flex-1 min-h-0 bg-[#0d1117] transition-colors" ref={containerRef}>
         <div
           className="github-markdown-body max-w-4xl mx-auto"
           dangerouslySetInnerHTML={{ __html: html }}

@@ -1660,6 +1660,126 @@ input.tracker-input {
   mask-image: linear-gradient(to right, transparent 0%, black 48px, black calc(100% - 48px), transparent 100%);
 }
 
+/* =========================================================================
+   Readme Studio Light Mode Refinements
+   ========================================================================= */
+[data-theme="light"] .readme-studio-page {
+  --color-border-subtle: color-mix(in oklab, var(--color-text) 12%, transparent);
+  --color-border-faint: color-mix(in oklab, var(--color-text) 8%, transparent);
+}
+
+/* Map hardcoded dark border utility classes in readme studio to light borders */
+[data-theme="light"] .readme-studio-page .border-white\/10,
+[data-theme="light"] .readme-studio-page .border-white\/15,
+[data-theme="light"] .readme-studio-page .border-white\/20,
+[data-theme="light"] .readme-studio-page .border-white\/30 {
+  border-color: color-mix(in oklab, var(--color-text) 12%, transparent);
+}
+
+[data-theme="light"] .readme-studio-page .border-white\/5 {
+  border-color: color-mix(in oklab, var(--color-text) 8%, transparent);
+}
+
+[data-theme="light"] .readme-studio-page .hover\:border-white\/20:hover,
+[data-theme="light"] .readme-studio-page .hover\:border-white\/30:hover {
+  border-color: color-mix(in oklab, var(--color-text) 22%, transparent);
+}
+
+/* Map hardcoded dark backgrounds in search & thumbnail cards */
+[data-theme="light"] .readme-studio-page .bg-black\/40,
+[data-theme="light"] .readme-studio-page .bg-black\/50 {
+  background-color: var(--color-surface);
+  border-color: color-mix(in oklab, var(--color-text) 12%, transparent);
+}
+
+[data-theme="light"] .readme-studio-page input::placeholder {
+  color: var(--color-text-faint);
+}
+
+/* Light mode Live Preview & traffic light titlebar (GitHub Light theme) */
+[data-theme="light"] .readme-preview-titlebar {
+  background-color: #f6f8fa;
+  border-bottom-color: #d0d7de;
+  color: #1f2328;
+}
+
+[data-theme="light"] .readme-preview-titlebar .text-text-muted,
+[data-theme="light"] .readme-preview-titlebar .text-text {
+  color: #57606a;
+}
+
+[data-theme="light"] .readme-preview-wrapper {
+  background-color: #ffffff;
+  color: #1f2328;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body {
+  color: #1f2328;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h1,
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h2,
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h3,
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h4,
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h5,
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h6 {
+  color: #1f2328;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h1 {
+  border-bottom-color: #d0d7de;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body h2 {
+  border-bottom-color: #d0d7de;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body hr {
+  background-color: #d0d7de;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body table {
+  background: #ffffff;
+  border-color: #d0d7de;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body table th {
+  background-color: #f6f8fa;
+  color: #24292f;
+  border-bottom-color: #d0d7de;
+  border-right-color: #d0d7de;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body table td {
+  border-bottom-color: #d0d7de;
+  border-right-color: #eaeef2;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body table tr:hover td {
+  background-color: #f3f4f6;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body pre {
+  background-color: #f6f8fa;
+  border-color: #d0d7de;
+  box-shadow: none;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body pre code {
+  color: #0969da;
+}
+
+[data-theme="light"] .readme-preview-wrapper .github-markdown-body code:not(pre code) {
+  background-color: #eff1f3;
+  border-color: #d0d7de;
+  color: #24292f;
+}
+
+
 
 
 
