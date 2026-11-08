@@ -57,10 +57,21 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
     const timer = setTimeout(checkScroll, 50);
     const el = tabsScrollRef.current;
     if (!el) return () => clearTimeout(timer);
+
+    const handleWheel = (e: WheelEvent) => {
+      // If user scrolls vertically with mouse wheel, translate to horizontal scroll
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        el.scrollLeft += e.deltaY;
+      }
+    };
+
+    el.addEventListener("wheel", handleWheel, { passive: false });
     el.addEventListener("scroll", checkScroll, { passive: true });
     window.addEventListener("resize", checkScroll);
     return () => {
       clearTimeout(timer);
+      el.removeEventListener("wheel", handleWheel);
       el.removeEventListener("scroll", checkScroll);
       window.removeEventListener("resize", checkScroll);
     };
