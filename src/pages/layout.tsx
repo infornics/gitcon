@@ -5,7 +5,9 @@ import ReactGA from "react-ga4";
 
 export default function MainLayout({ children }: LayoutProps) {
   const location = useLocation();
-  const isReadmeStudio = location.pathname === "/readme";
+  const isReadmeStudio =
+    location.pathname === "/readme" ||
+    (location.pathname.startsWith("/user/") && location.pathname.endsWith("/readme"));
 
   useEffect(() => {
     const measurementId = (import.meta as any).env.REVINE_PUBLIC_GA_MEASUREMENT_ID;
@@ -19,8 +21,8 @@ export default function MainLayout({ children }: LayoutProps) {
   }, [location]);
 
   return (
-    <div className={`page-shell-wrapper ${isReadmeStudio ? "h-screen overflow-hidden flex flex-col" : ""}`}>
-      <div className={`page-shell ${isReadmeStudio ? "h-full flex flex-col overflow-hidden !pb-0" : ""}`}>
+    <div className={`page-shell-wrapper ${isReadmeStudio ? "!h-screen !min-h-0 overflow-hidden flex flex-col" : ""}`}>
+      <div className={`page-shell ${isReadmeStudio ? "!h-full flex flex-col overflow-hidden !pb-0" : ""}`}>
         <Header />
         {isReadmeStudio ? (
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden pb-1">

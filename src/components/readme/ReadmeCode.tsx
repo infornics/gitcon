@@ -62,12 +62,12 @@ export function ReadmeCode({ markdown, username, onMarkdownChange }: ReadmeCodeP
       </div>
 
       {/* Editor / Code Container */}
-      <div className="relative flex-1 p-4 font-mono text-xs sm:text-sm overflow-auto">
+      <div className="relative flex-1 p-4 font-mono text-xs sm:text-sm overflow-auto min-h-0">
         <textarea
           value={markdown}
           onChange={(e) => onMarkdownChange?.(e.target.value)}
           readOnly={!onMarkdownChange}
-          className="w-full h-full min-h-[500px] bg-transparent text-text font-mono text-xs sm:text-sm resize-none focus:outline-none border-none p-0 leading-relaxed selection:bg-primary/30"
+          className="w-full h-full min-h-0 bg-transparent text-text font-mono text-xs sm:text-sm resize-none focus:outline-none border-none p-0 leading-relaxed selection:bg-primary/30"
           spellCheck={false}
         />
       </div>

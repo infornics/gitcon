@@ -59,7 +59,7 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
       </div>
 
       {/* Main Document Body */}
-      <div className="readme-preview-wrapper p-6 sm:p-10 overflow-x-auto min-h-[540px] bg-[#0d1117]" ref={containerRef}>
+      <div className="readme-preview-wrapper p-6 sm:p-10 overflow-x-auto flex-1 min-h-0 bg-[#0d1117]" ref={containerRef}>
         <div
           className="github-markdown-body max-w-4xl mx-auto"
           dangerouslySetInnerHTML={{ __html: html }}

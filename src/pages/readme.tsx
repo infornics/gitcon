@@ -12,7 +12,7 @@ export default function ReadmePage() {
   }
 
   return (
-    <main className="h-full flex flex-col min-h-0 overflow-hidden">
+    <main className="h-full flex flex-col min-h-0 overflow-hidden !pb-0">
       <ReadmeStudio initialUsername={queryUser} />
     </main>
   );
