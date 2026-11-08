@@ -392,9 +392,9 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
             {/* Template Gallery Header & Filter Toolbar */}
             <div className="p-4 rounded-xl border border-white/10 bg-surface-2/70 space-y-3.5">
 
-              {/* Search & Colors Dropdown Row */}
-              <div className="flex items-center gap-2 relative">
-                <div className="relative flex-1">
+              {/* Search, Colors Dropdown & Visitor Badge Toggle Row */}
+              <div className="flex items-center gap-2 relative flex-wrap sm:flex-nowrap">
+                <div className="relative flex-1 min-w-[200px]">
                   <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
                   <input
                     type="text"
@@ -415,7 +415,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 </div>
 
                 {/* Color Palette Dropdown Button */}
-                <div className="relative" ref={colorDropdownRef}>
+                <div className="relative shrink-0" ref={colorDropdownRef}>
                   <button
                     type="button"
                     onClick={() => setIsColorDropdownOpen((prev) => !prev)}
@@ -512,6 +512,31 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                     </div>
                   )}
                 </div>
+
+                {/* Profile Views Badge Toggle Button */}
+                <button
+                  type="button"
+                  onClick={() =>
+                    update("extras", {
+                      ...config.extras,
+                      showVisitorBadge: !config.extras.showVisitorBadge,
+                    })
+                  }
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 shrink-0 cursor-pointer ${
+                    config.extras.showVisitorBadge
+                      ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
+                      : "bg-surface-offset text-text-muted hover:text-text hover:border-white/20 border-white/10"
+                  }`}
+                  title="Toggle Profile Views Counter Badge"
+                >
+                  <HiEye className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Views Badge</span>
+                  <span
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      config.extras.showVisitorBadge ? "bg-primary" : "bg-white/20"
+                    }`}
+                  />
+                </button>
               </div>
 
               {/* Category Pills with Faded Blur Indicators & Horizontal Wheel Scroll */}
@@ -699,43 +724,6 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 </div>
               </div>
             )}
-
-
-
-            {/* Extras & Badges Card */}
-            <div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Extras & Badges
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-surface-2/60 border border-white/10 hover:border-white/20 transition-all flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-primary/10 text-primary">
-                    <HiEye className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <strong className="text-xs font-bold text-text block">
-                      Profile Views Counter Badge
-                    </strong>
-                    <span className="text-[11px] text-text-muted">
-                      Embeds an auto-updating visitor count badge
-                    </span>
-                  </div>
-                </div>
-                <ToggleSwitch
-                  checked={config.extras.showVisitorBadge}
-                  onChange={(val) =>
-                    update("extras", {
-                      ...config.extras,
-                      showVisitorBadge: val,
-                    })
-                  }
-                />
-              </div>
-            </div>
           </div>
         )}
 
