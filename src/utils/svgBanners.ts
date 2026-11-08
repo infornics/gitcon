@@ -142,7 +142,7 @@ export function createHeroBannerSvg(params: BannerParams): string {
   <!-- Tags -->
   ${langsChips}
   
-  <text x="825" y="232" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" font-weight="700" letter-spacing="1" fill="#64748B">GITCON STUDIO</text>
+  <text x="825" y="232" text-anchor="end" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" font-weight="700" letter-spacing="1" fill="#64748B">gitcon.infornics.com</text>
   <rect x="0.5" y="0.5" width="859" height="239" rx="19.5" fill="none" stroke="${colors.primary}" stroke-opacity="0.35"/>
 </svg>`;
 
