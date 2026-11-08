@@ -750,7 +750,7 @@ function generateModernTemplate(profile: ReadmeProfileData, config: ReadmeConfig
       const cards: string[] = [];
       if (githubStats.showStatsCard) {
         cards.push(
-          `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="180em" src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=false" alt="${username}'s GitHub Stats" />\n  </a>`
+          `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="180em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=false" alt="${username}'s GitHub Stats" />\n  </a>`
         );
       }
       if (githubStats.showStreakCard) {
@@ -763,7 +763,7 @@ function generateModernTemplate(profile: ReadmeProfileData, config: ReadmeConfig
 
     if (githubStats.showTopLangsCard) {
       parts.push(
-        `<p align="center">\n  <a href="https://gitcon.infornics.com/user/${username}">\n    <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=${statsTheme}&hide_border=false" alt="Top Languages" />\n  </a>\n</p>\n`
+        `<p align="center">\n  <a href="https://gitcon.infornics.com/user/${username}">\n    <img height="180em" src="https://github-readme-stats-fast.vercel.app/api/top-langs?username=${username}&layout=compact&theme=${statsTheme}&hide_border=false" alt="Top Languages" />\n  </a>\n</p>\n`
       );
     }
 
@@ -859,7 +859,7 @@ function generateMinimalTemplate(profile: ReadmeProfileData, config: ReadmeConfi
     const cards: string[] = [];
     if (githubStats.showStatsCard) {
       cards.push(
-        `<img height="150em" src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=true" alt="Stats" />`
+        `<img height="150em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=true" alt="Stats" />`
       );
     }
     if (githubStats.showStreakCard) {
@@ -952,7 +952,7 @@ function generateShowcaseTemplate(profile: ReadmeProfileData, config: ReadmeConf
   if (githubStats.showTrophies) {
     parts.push(`## 🏆 GitHub Achievements & Trophies\n`);
     parts.push(
-      `<p align="center">\n  <img src="https://github-profile-trophy.vercel.app/?username=${username}&theme=radical&no-frame=false&no-bg=true&margin-w=4" alt="Trophies" />\n</p>\n`
+      `<p align="center">\n  <img src="https://github-trophies.vercel.app/?username=${username}&theme=radical&no-frame=false&no-bg=true&margin-w=4" alt="Trophies" />\n</p>\n`
     );
   }
 
@@ -962,7 +962,7 @@ function generateShowcaseTemplate(profile: ReadmeProfileData, config: ReadmeConf
     const cards: string[] = [];
     if (githubStats.showStatsCard) {
       cards.push(
-        `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="185em" src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=false" alt="Stats" />\n  </a>`
+        `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="185em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=false" alt="Stats" />\n  </a>`
       );
     }
     if (githubStats.showStreakCard) {
@@ -974,7 +974,7 @@ function generateShowcaseTemplate(profile: ReadmeProfileData, config: ReadmeConf
 
     if (githubStats.showTopLangsCard) {
       parts.push(
-        `<p align="center">\n  <img height="185em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=${statsTheme}&hide_border=false" alt="Top Languages" />\n</p>\n`
+        `<p align="center">\n  <img height="185em" src="https://github-readme-stats-fast.vercel.app/api/top-langs?username=${username}&layout=compact&theme=${statsTheme}&hide_border=false" alt="Top Languages" />\n</p>\n`
       );
     }
   }
@@ -1062,7 +1062,7 @@ function generateCyberpunkTemplate(profile: ReadmeProfileData, config: ReadmeCon
     const cards: string[] = [];
     if (githubStats.showStatsCard) {
       cards.push(
-        `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="175em" src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${cyberTheme}&hide_border=false" alt="Cyber Stats" />\n  </a>`
+        `<a href="https://gitcon.infornics.com/user/${username}">\n    <img height="175em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&theme=${cyberTheme}&hide_border=false" alt="Cyber Stats" />\n  </a>`
       );
     }
     if (githubStats.showStreakCard) {

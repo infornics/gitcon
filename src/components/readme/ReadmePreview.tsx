@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { marked } from "marked";
 
 interface ReadmePreviewProps {
@@ -6,6 +6,8 @@ interface ReadmePreviewProps {
 }
 
 export function ReadmePreview({ markdown }: ReadmePreviewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const html = useMemo(() => {
     try {
       // Configure marked for GitHub Flavored Markdown
@@ -21,8 +23,20 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
     }
   }, [markdown]);
 
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const images = containerRef.current.querySelectorAll("img");
+    images.forEach((img) => {
+      img.onerror = () => {
+        // Subtle fallback when a third-party image service is temporarily offline
+        img.style.opacity = "0.6";
+        img.title = "Image service temporarily offline or loading";
+      };
+    });
+  }, [html]);
+
   return (
-    <div className="readme-preview-wrapper p-6 sm:p-8 overflow-x-auto min-h-[500px]">
+    <div className="readme-preview-wrapper p-6 sm:p-8 overflow-x-auto min-h-[500px]" ref={containerRef}>
       <div
         className="github-markdown-body"
         dangerouslySetInnerHTML={{ __html: html }}
@@ -39,4 +53,3 @@ export function ReadmePreview({ markdown }: ReadmePreviewProps) {
     </div>
   );
 }
-
