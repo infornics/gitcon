@@ -9,6 +9,7 @@ import {
   HiCommandLine,
   HiDocumentText,
   HiEye,
+  HiEyeSlash,
   HiFolder,
   HiMagnifyingGlass,
   HiPaintBrush,
@@ -527,15 +528,14 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                       ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
                       : "bg-surface-offset text-text-muted hover:text-text hover:border-white/20 border-white/10"
                   }`}
-                  title="Toggle Profile Views Counter Badge"
+                  title={config.extras.showVisitorBadge ? "Profile Views Badge is visible (click to hide)" : "Profile Views Badge is hidden (click to show)"}
                 >
-                  <HiEye className="w-3.5 h-3.5" />
+                  {config.extras.showVisitorBadge ? (
+                    <HiEye className="w-3.5 h-3.5 text-primary" />
+                  ) : (
+                    <HiEyeSlash className="w-3.5 h-3.5 opacity-60" />
+                  )}
                   <span className="whitespace-nowrap">Profile Views</span>
-                  <span
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      config.extras.showVisitorBadge ? "bg-primary shadow-[0_0_8px_rgba(88,170,176,0.5)]" : "bg-white/20"
-                    }`}
-                  />
                 </button>
               </div>
 
