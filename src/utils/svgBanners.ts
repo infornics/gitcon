@@ -31,6 +31,20 @@ function formatCount(num: number): string {
   return String(num);
 }
 
+function encodeSvgDataUri(svg: string): string {
+  // Use Base64 encoding to guarantee 100% reliable rendering in all browsers, img tags, and markdown parsers
+  if (typeof btoa !== "undefined") {
+    try {
+      return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`;
+    } catch {
+      return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    }
+  } else if (typeof Buffer !== "undefined") {
+    return `data:image/svg+xml;base64,${Buffer.from(svg, "utf-8").toString("base64")}`;
+  }
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 /**
  * Creates the signature Hero Visual Banner (resembling GitSkins' signature glowing card).
  */
@@ -54,7 +68,9 @@ export function createHeroBannerSvg(params: BannerParams): string {
   const starsFormatted = formatCount(stars);
   const cleanUsername = username.replace(/[^a-zA-Z0-9_\-]/g, "");
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="860" height="240" viewBox="0 0 860 240">
+  const initial = (name || username || "D").charAt(0).toUpperCase();
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="860" height="240" viewBox="0 0 860 240">
   <defs>
     <linearGradient id="bg-${cleanUsername}" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#090d16"/>
@@ -73,7 +89,10 @@ export function createHeroBannerSvg(params: BannerParams): string {
       <stop offset="0%" stop-color="${colors.tertiary}" stop-opacity="0.6"/>
       <stop offset="100%" stop-color="${colors.tertiary}" stop-opacity="0"/>
     </radialGradient>
-    <clipPath id="av-${cleanUsername}"><circle cx="96" cy="94" r="45"/></clipPath>
+    <linearGradient id="av-grad-${cleanUsername}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="${colors.primary}"/>
+      <stop offset="100%" stop-color="${colors.secondary}"/>
+    </linearGradient>
   </defs>
   <style>
     .aura-orb-a { animation: float-a 9s ease-in-out infinite; }
@@ -97,13 +116,9 @@ export function createHeroBannerSvg(params: BannerParams): string {
   <text x="735" y="112" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="34" font-weight="900" fill="${colors.primary}">${starsFormatted}</text>
   <text x="735" y="134" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" font-weight="800" letter-spacing="2.5" fill="#94A3B8">TOTAL STARS</text>
 
-  <!-- Avatar -->
-  <circle cx="96" cy="94" r="48" fill="rgba(255,255,255,0.06)" stroke="${colors.primary}" stroke-opacity="0.85" stroke-width="2"/>
-  ${
-    avatarUrl
-      ? `<image href="${avatarUrl}" x="51" y="49" width="90" height="90" clip-path="url(#av-${cleanUsername})" preserveAspectRatio="xMidYMid slice"/>`
-      : `<circle cx="96" cy="94" r="45" fill="${colors.primary}" fill-opacity="0.3"/>`
-  }
+  <!-- Vector Avatar Badge (Fully Offline & 100% Secure) -->
+  <circle cx="96" cy="94" r="46" fill="url(#av-grad-${cleanUsername})" stroke="#FFFFFF" stroke-opacity="0.25" stroke-width="2"/>
+  <text x="96" y="108" text-anchor="middle" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="38" font-weight="900" fill="#FFFFFF">${initial}</text>
 
   <!-- User Details -->
   <text x="166" y="69" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="800" letter-spacing="2.5" fill="#94A3B8">@${username.toUpperCase()}</text>
@@ -117,7 +132,7 @@ export function createHeroBannerSvg(params: BannerParams): string {
   <rect x="0.5" y="0.5" width="859" height="239" rx="19.5" fill="none" stroke="${colors.primary}" stroke-opacity="0.35"/>
 </svg>`;
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return encodeSvgDataUri(svg);
 }
 
 /**
@@ -168,7 +183,7 @@ export function createMixtapeCassetteSvg(params: BannerParams): string {
   <text x="430" y="198" text-anchor="middle" font-family="monospace" font-size="11" font-weight="bold" fill="#F43F5E">[52-WK EQUALIZER]</text>
 </svg>`;
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return encodeSvgDataUri(svg);
 }
 
 /**
@@ -214,5 +229,5 @@ export function createArcadeCabinetSvg(params: BannerParams): string {
   <text x="140" y="214" font-family="'Courier New', Courier, monospace" font-size="11" fill="#71717A">[JOYSTICK: INSERT COMMITS TO ADVANCE STAGE]</text>
 </svg>`;
 
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  return encodeSvgDataUri(svg);
 }
