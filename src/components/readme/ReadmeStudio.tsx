@@ -142,7 +142,7 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
             <button
               type="submit"
               disabled={loading}
-              className="btn btn-primary !min-h-0 !py-1.5 !px-3.5 text-xs font-bold inline-flex items-center gap-1.5 shrink-0"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 shrink-0 bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] hover:from-primary/35 hover:to-primary/20 hover:border-primary/60 cursor-pointer disabled:opacity-50"
             >
               {loading ? (
                 <HiArrowPath className="w-3.5 h-3.5 animate-spin" />
@@ -267,14 +267,14 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
               </div>
 
               {/* Segmented Mode Switcher */}
-              <div className="flex items-center gap-1 p-0.5 rounded-lg bg-surface-2 border border-white/5">
+              <div className="flex items-center gap-1 p-0.5 rounded-xl bg-surface-2 border border-white/5">
                 <button
                   type="button"
                   onClick={() => setViewMode("preview")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
                     viewMode === "preview"
-                      ? "bg-primary text-text-inverse font-bold shadow-sm"
-                      : "text-text-muted hover:text-text"
+                      ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
+                      : "text-text-muted hover:text-text border border-transparent"
                   }`}
                 >
                   <HiEye className="w-3.5 h-3.5" />
@@ -284,10 +284,10 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
                 <button
                   type="button"
                   onClick={() => setViewMode("code")}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
                     viewMode === "code"
-                      ? "bg-primary text-text-inverse font-bold shadow-sm"
-                      : "text-text-muted hover:text-text"
+                      ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
+                      : "text-text-muted hover:text-text border border-transparent"
                   }`}
                 >
                   <HiCodeBracket className="w-3.5 h-3.5" />
@@ -303,14 +303,14 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
               <button
                 onClick={handleCopy}
                 disabled={loading || !generatedMarkdown}
-                className={`btn !min-h-0 !py-1 !px-2.5 text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm ${
+                className={`!min-h-0 !py-1.5 !px-3 text-xs font-bold inline-flex items-center gap-1.5 transition-all duration-200 rounded-xl cursor-pointer disabled:opacity-50 ${
                   copied
-                    ? "bg-emerald-500 text-white shadow-emerald-500/25"
-                    : "btn-primary shadow-primary/20"
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_2px_12px_rgba(16,185,129,0.2)]"
+                    : "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] hover:from-primary/35 hover:to-primary/20 hover:border-primary/60"
                 }`}
                 title="Copy Markdown"
               >
-                {copied ? <HiCheck className="w-3.5 h-3.5" /> : <HiClipboardDocument className="w-3.5 h-3.5" />}
+                {copied ? <HiCheck className="w-3.5 h-3.5 text-emerald-400" /> : <HiClipboardDocument className="w-3.5 h-3.5" />}
                 <span>{copied ? "Copied!" : "Copy"}</span>
               </button>
 
