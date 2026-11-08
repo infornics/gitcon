@@ -371,10 +371,10 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                     key={cat.id}
                     type="button"
                     onClick={() => setTemplateCategory(cat.id)}
-                    className={`px-2.5 py-1 rounded-md transition-all font-medium ${
+                    className={`px-3 py-1 rounded-xl transition-all duration-200 text-xs font-semibold ${
                       templateCategory === cat.id
-                        ? "bg-primary text-text-inverse font-semibold shadow-sm"
-                        : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10"
+                        ? "bg-gradient-to-b from-primary/25 to-primary/10 text-primary border border-primary/40 shadow-[0_2px_12px_rgba(88,170,176,0.18)] font-bold"
+                        : "bg-surface-offset text-text-muted hover:text-text hover:bg-white/10 border border-transparent"
                     }`}
                   >
                     {cat.label}
