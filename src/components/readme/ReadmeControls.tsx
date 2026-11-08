@@ -4,14 +4,17 @@ import {
   HiBriefcase,
   HiChartBar,
   HiCheck,
+  HiChevronDown,
   HiCodeBracket,
   HiCommandLine,
   HiDocumentText,
   HiEye,
   HiFolder,
   HiMagnifyingGlass,
+  HiPaintBrush,
   HiShare,
   HiSparkles,
+  HiSwatch,
   HiTrash,
   HiUser,
   HiXMark,
@@ -44,6 +47,8 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
   const [skillSearch, setSkillSearch] = useState<string>("");
   const [templateSearch, setTemplateSearch] = useState<string>("");
   const [templateCategory, setTemplateCategory] = useState<"all" | "recruiter" | "technical" | "creative" | "opensource">("all");
+  const [isColorDropdownOpen, setIsColorDropdownOpen] = useState(false);
+  const colorDropdownRef = useRef<HTMLDivElement>(null);
 
   const tabsScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -113,6 +118,13 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
 
     window.addEventListener("resize", handleResize);
 
+    const handleClickOutside = (e: MouseEvent) => {
+      if (colorDropdownRef.current && !colorDropdownRef.current.contains(e.target as Node)) {
+        setIsColorDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       clearTimeout(timer);
       if (el) {
@@ -124,6 +136,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
         filterEl.removeEventListener("scroll", checkFiltersScroll);
       }
       window.removeEventListener("resize", handleResize);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -379,25 +392,126 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
             {/* Template Gallery Header & Filter Toolbar */}
             <div className="p-4 rounded-xl border border-white/10 bg-surface-2/70 space-y-3.5">
 
-              {/* Search input */}
-              <div className="relative">
-                <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
-                <input
-                  type="text"
-                  value={templateSearch}
-                  onChange={(e) => setTemplateSearch(e.target.value)}
-                  placeholder="Filter templates (e.g. recruiter, terminal, cassette, arcade, devops)..."
-                  className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-8 py-1.5 text-xs text-text placeholder-text-muted focus:outline-none focus:border-primary/50 transition-colors"
-                />
-                {templateSearch && (
+              {/* Search & Colors Dropdown Row */}
+              <div className="flex items-center gap-2 relative">
+                <div className="relative flex-1">
+                  <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none" />
+                  <input
+                    type="text"
+                    value={templateSearch}
+                    onChange={(e) => setTemplateSearch(e.target.value)}
+                    placeholder="Filter templates (e.g. recruiter, terminal, cassette, arcade, devops)..."
+                    className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-8 py-1.5 text-xs text-text placeholder-text-muted focus:outline-none focus:border-primary/50 transition-colors"
+                  />
+                  {templateSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setTemplateSearch("")}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
+                    >
+                      <HiXMark className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Color Palette Dropdown Button */}
+                <div className="relative" ref={colorDropdownRef}>
                   <button
                     type="button"
-                    onClick={() => setTemplateSearch("")}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text"
+                    onClick={() => setIsColorDropdownOpen((prev) => !prev)}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all duration-200 shrink-0 ${
+                      isColorDropdownOpen
+                        ? "bg-primary/20 text-primary border-primary/50 shadow-[0_2px_12px_rgba(88,170,176,0.18)]"
+                        : "bg-surface-offset text-text hover:text-primary hover:border-white/20 border-white/10"
+                    }`}
+                    title="Change Stats & Cards Color Palette"
                   >
-                    <HiXMark className="w-3.5 h-3.5" />
+                    {/* Selected theme mini dots */}
+                    {(() => {
+                      const currentTheme =
+                        STATS_THEMES.find((t) => t.id === config.statsTheme) || STATS_THEMES[0];
+                      return (
+                        <div className="flex items-center -space-x-1 shrink-0">
+                          <span
+                            className="w-3 h-3 rounded-full border border-black/40 shadow-sm"
+                            style={{ backgroundColor: currentTheme.bg }}
+                          />
+                          <span
+                            className="w-3 h-3 rounded-full border border-black/40 shadow-sm"
+                            style={{ backgroundColor: currentTheme.accent }}
+                          />
+                          <span
+                            className="w-3 h-3 rounded-full border border-black/40 shadow-sm"
+                            style={{ backgroundColor: currentTheme.text }}
+                          />
+                        </div>
+                      );
+                    })()}
+                    <span className="hidden sm:inline text-xs font-semibold">
+                      {STATS_THEMES.find((t) => t.id === config.statsTheme)?.name || "Colors"}
+                    </span>
+                    <HiChevronDown
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        isColorDropdownOpen ? "rotate-180 text-primary" : "text-text-muted"
+                      }`}
+                    />
                   </button>
-                )}
+
+                  {/* Dropdown Menu */}
+                  {isColorDropdownOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-72 sm:w-80 p-3 rounded-2xl bg-surface border border-white/15 shadow-2xl z-50 backdrop-blur-2xl space-y-2 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="flex items-center justify-between pb-2 border-b border-white/10 px-1">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-text">
+                          <HiSwatch className="w-4 h-4 text-primary" />
+                          <span>Stats Cards Palette</span>
+                        </div>
+                        <span className="text-[10px] text-text-muted">12 Themes</span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-1.5 max-h-64 overflow-y-auto custom-scrollbar p-0.5">
+                        {STATS_THEMES.map((theme: StatsThemeItem) => {
+                          const isSelected = config.statsTheme === theme.id;
+                          return (
+                            <button
+                              key={theme.id}
+                              type="button"
+                              onClick={() => {
+                                update("statsTheme", theme.id);
+                                setIsColorDropdownOpen(false);
+                              }}
+                              className={`flex items-center justify-between p-2 rounded-xl border text-left transition-all duration-150 text-xs ${
+                                isSelected
+                                  ? "border-primary bg-primary/15 text-text font-bold shadow-[0_0_10px_rgba(88,170,176,0.2)] ring-1 ring-primary/40"
+                                  : "border-white/5 bg-surface-2/60 text-text-muted hover:border-white/20 hover:text-text hover:bg-surface-2"
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0 pr-1">
+                                <div className="flex items-center -space-x-1 shrink-0">
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-sm"
+                                    style={{ backgroundColor: theme.bg }}
+                                  />
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-sm"
+                                    style={{ backgroundColor: theme.accent }}
+                                  />
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full border border-black/40 shadow-sm"
+                                    style={{ backgroundColor: theme.text }}
+                                  />
+                                </div>
+                                <span className="truncate text-[11px]">{theme.name}</span>
+                              </div>
+                              {isSelected && (
+                                <HiCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Category Pills with Faded Blur Indicators & Horizontal Wheel Scroll */}
@@ -586,58 +700,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
               </div>
             )}
 
-            {/* Visual Color Palette Theme Swatch Selector */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-                  <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
-                    Stats Cards Palette
-                  </span>
-                </div>
-                <span className="text-[11px] text-text-muted">Live preview swatches</span>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {STATS_THEMES.map((theme: StatsThemeItem) => {
-                  const isSelected = config.statsTheme === theme.id;
-                  return (
-                    <button
-                      key={theme.id}
-                      type="button"
-                      onClick={() => update("statsTheme", theme.id)}
-                      className={`flex items-center justify-between p-2.5 rounded-xl border text-left transition-all duration-200 ${
-                        isSelected
-                          ? "border-primary bg-primary/10 shadow-[0_0_12px_rgba(88,170,176,0.2)] ring-1 ring-primary/40"
-                          : "border-white/10 bg-surface-2/60 hover:border-white/20 hover:bg-surface-2"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0 pr-1">
-                        {/* 3 mini color dots representing the theme's colors */}
-                        <div className="flex items-center -space-x-1 shrink-0">
-                          <span
-                            className="w-3.5 h-3.5 rounded-full border border-black/40 shadow-sm"
-                            style={{ backgroundColor: theme.bg }}
-                          />
-                          <span
-                            className="w-3.5 h-3.5 rounded-full border border-black/40 shadow-sm"
-                            style={{ backgroundColor: theme.accent }}
-                          />
-                          <span
-                            className="w-3.5 h-3.5 rounded-full border border-black/40 shadow-sm"
-                            style={{ backgroundColor: theme.text }}
-                          />
-                        </div>
-                        <span className="text-xs font-medium text-text truncate">
-                          {theme.name}
-                        </span>
-                      </div>
-                      {isSelected && <HiCheck className="w-3.5 h-3.5 text-primary shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
 
             {/* Extras & Badges Card */}
             <div>
