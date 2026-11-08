@@ -113,143 +113,108 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
 
   return (
     <div className="readme-studio-page h-full flex flex-col min-h-0 space-y-2 pb-1">
-      {/* Top Banner & Header (Compact Studio Header) */}
-      <div className="flex items-center justify-between flex-wrap gap-2 shrink-0">
-        <div className="flex items-center gap-2.5">
+      {/* Top Row: User Search + User Profile Status + Action Tools */}
+      <div className="flex items-center justify-between flex-wrap gap-2.5 shrink-0 bg-surface/80 p-2 sm:p-2.5 rounded-xl border border-white/10 shadow-md backdrop-blur-md">
+        {/* Left: Username Search Input & Generate button */}
+        <div className="flex items-center gap-2 flex-1 max-w-xl">
           {backHref && (
             <Link
               href={backHref}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-muted hover:text-primary transition-colors mr-1"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-text-muted hover:text-primary transition-colors mr-1 shrink-0"
             >
               ← Back
             </Link>
           )}
-          <span className="p-1 rounded-lg bg-gradient-to-br from-primary/30 to-primary/10 text-primary shadow-sm border border-primary/20">
-            <HiSparkles className="w-3.5 h-3.5" />
-          </span>
-          <div>
-            <h1 className="text-base sm:text-lg font-extrabold text-text tracking-tight flex items-center gap-2">
-              GitHub Profile README Generator
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 font-bold hidden sm:inline">
-                Live Studio
+
+          <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-1">
+            <div className="relative flex-1">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-mono font-bold text-xs">
+                @
               </span>
-            </h1>
-          </div>
+              <input
+                type="text"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                placeholder="Enter GitHub username..."
+                className="w-full pl-7 pr-3 py-1.5 rounded-lg bg-surface-2 border border-white/10 text-text text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-mono"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="btn btn-primary !min-h-0 !py-1.5 !px-3.5 text-xs font-bold inline-flex items-center gap-1.5 shrink-0"
+            >
+              {loading ? (
+                <HiArrowPath className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <HiMagnifyingGlass className="w-3.5 h-3.5" />
+              )}
+              <span>Generate</span>
+            </button>
+          </form>
+
+          {/* Quick suggestions if no profile loaded */}
+          {!profileData && (
+            <div className="hidden xl:flex items-center gap-1 overflow-x-auto text-xs text-text-muted">
+              {POPULAR_SUGGESTIONS.slice(0, 3).map((user) => (
+                <button
+                  key={user}
+                  type="button"
+                  onClick={() => {
+                    setUsernameInput(user);
+                    setCurrentUsername(user);
+                  }}
+                  className="px-1.5 py-0.5 rounded bg-surface-2 hover:bg-surface-offset text-text-muted hover:text-text border border-white/5 transition-colors shrink-0 font-mono text-[10px]"
+                >
+                  @{user}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="flex items-center gap-1.5">
+        {/* Right: Loaded Profile Snapshot Pill + How to Use button */}
+        <div className="flex items-center gap-2 shrink-0">
+          {profileData && (
+            <div className="flex items-center gap-2.5 bg-surface-2/80 px-3 py-1 rounded-lg border border-white/5">
+              {profileData.avatarUrl && (
+                <img
+                  src={profileData.avatarUrl}
+                  alt={profileData.username}
+                  className="w-7 h-7 rounded-full border border-primary/40 object-cover shadow-sm"
+                />
+              )}
+              <div className="text-left">
+                <div className="flex items-center gap-1.5 leading-none">
+                  <strong className="text-xs font-bold text-text">{profileData.name}</strong>
+                  <span className="text-[10px] text-text-muted">(@{profileData.username})</span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-text-muted mt-0.5 leading-none">
+                  <span>{profileData.publicRepos} Repos</span>
+                  <span>•</span>
+                  <span>{profileData.followers} Followers</span>
+                  {profileData.contributionsStats.totalContributions > 0 && (
+                    <>
+                      <span>•</span>
+                      <span className="text-primary font-bold">
+                        {profileData.contributionsStats.totalContributions.toLocaleString()} Contributions
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
           <button
             onClick={() => setIsHowToModalOpen(true)}
-            className="btn btn-secondary !min-h-0 !py-1 !px-2.5 text-xs font-bold inline-flex items-center gap-1 hover:border-white/30"
+            className="btn btn-secondary !min-h-0 !py-1.5 !px-3 text-xs font-bold inline-flex items-center gap-1.5 hover:border-white/30"
             title="Step-by-step guide to add to GitHub"
           >
             <HiQuestionMarkCircle className="w-3.5 h-3.5 text-primary" />
             <span>How to Use</span>
           </button>
-
-          <button
-            onClick={handleCopy}
-            disabled={loading || !generatedMarkdown}
-            className={`btn !min-h-0 !py-1 !px-3 text-xs font-bold inline-flex items-center gap-1 transition-all shadow-md ${
-              copied
-                ? "bg-emerald-500 text-white shadow-emerald-500/25"
-                : "btn-primary shadow-primary/20"
-            }`}
-          >
-            {copied ? <HiCheck className="w-3.5 h-3.5" /> : <HiClipboardDocument className="w-3.5 h-3.5" />}
-            <span>{copied ? "Copied!" : "Copy Markdown"}</span>
-          </button>
-
-          <button
-            onClick={handleDownload}
-            disabled={loading || !generatedMarkdown}
-            className="btn btn-secondary !min-h-0 !py-1 !px-2.5 text-xs font-bold inline-flex items-center gap-1 hover:border-white/30"
-            title="Download README.md"
-          >
-            <HiArrowDownTray className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Download</span>
-          </button>
         </div>
-      </div>
-
-      {/* Profile Bar / User Search */}
-      <div className="p-2 sm:p-2.5 rounded-xl bg-surface border border-white/10 shadow-lg backdrop-blur-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 shrink-0">
-        {/* User Info or Search Form */}
-        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-1 max-w-md">
-          <div className="relative flex-1">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted font-mono font-bold text-xs">
-              @
-            </span>
-            <input
-              type="text"
-              value={usernameInput}
-              onChange={(e) => setUsernameInput(e.target.value)}
-              placeholder="Enter GitHub username..."
-              className="w-full pl-7 pr-3 py-1 rounded-lg bg-surface-2 border border-white/10 text-text text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-mono"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-primary !min-h-0 !py-1 !px-3 text-xs font-bold inline-flex items-center gap-1 shrink-0"
-          >
-            {loading ? (
-              <HiArrowPath className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <HiMagnifyingGlass className="w-3.5 h-3.5" />
-            )}
-            <span>Generate</span>
-          </button>
-        </form>
-
-        {/* Quick suggestions or loaded profile preview */}
-        {profileData ? (
-          <div className="flex items-center gap-2 bg-surface-2/60 px-2.5 py-1 rounded-lg border border-white/5">
-            {profileData.avatarUrl && (
-              <img
-                src={profileData.avatarUrl}
-                alt={profileData.username}
-                className="w-6 h-6 rounded-full border border-primary/40 object-cover shadow-sm"
-              />
-            )}
-            <div>
-              <div className="flex items-center gap-1.5">
-                <strong className="text-xs font-bold text-text">{profileData.name}</strong>
-                <span className="text-[10px] text-text-muted">(@{profileData.username})</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[10px] text-text-muted">
-                <span>{profileData.publicRepos} Repos</span>
-                <span>•</span>
-                <span>{profileData.followers} Followers</span>
-                {profileData.contributionsStats.totalContributions > 0 && (
-                  <>
-                    <span>•</span>
-                    <span className="text-primary font-bold">
-                      {profileData.contributionsStats.totalContributions.toLocaleString()} Contributions
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 overflow-x-auto text-xs text-text-muted">
-            <span className="shrink-0 font-medium text-[10px]">Quick load:</span>
-            {POPULAR_SUGGESTIONS.map((user) => (
-              <button
-                key={user}
-                type="button"
-                onClick={() => {
-                  setUsernameInput(user);
-                  setCurrentUsername(user);
-                }}
-                className="px-1.5 py-0.5 rounded bg-surface-2 hover:bg-surface-offset text-text-muted hover:text-text border border-white/5 transition-colors shrink-0 font-mono text-[10px]"
-              >
-                @{user}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Error display */}
@@ -332,9 +297,31 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
             </div>
 
             <div className="flex items-center gap-2 text-xs font-mono text-text-muted">
-              <span className="text-text font-semibold">
+              <span className="text-text font-semibold mr-1">
                 {currentUsername}/{currentUsername}/README.md
               </span>
+              <button
+                onClick={handleCopy}
+                disabled={loading || !generatedMarkdown}
+                className={`btn !min-h-0 !py-1 !px-2.5 text-xs font-bold inline-flex items-center gap-1 transition-all shadow-sm ${
+                  copied
+                    ? "bg-emerald-500 text-white shadow-emerald-500/25"
+                    : "btn-primary shadow-primary/20"
+                }`}
+                title="Copy Markdown"
+              >
+                {copied ? <HiCheck className="w-3.5 h-3.5" /> : <HiClipboardDocument className="w-3.5 h-3.5" />}
+                <span>{copied ? "Copied!" : "Copy"}</span>
+              </button>
+
+              <button
+                onClick={handleDownload}
+                disabled={loading || !generatedMarkdown}
+                className="btn btn-secondary !min-h-0 !py-1 !px-2 text-xs font-bold inline-flex items-center gap-1 hover:border-white/30"
+                title="Download README.md"
+              >
+                <HiArrowDownTray className="w-3.5 h-3.5" />
+              </button>
             </div>
           </div>
 
