@@ -530,10 +530,10 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                   title="Toggle Profile Views Counter Badge"
                 >
                   <HiEye className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Views Badge</span>
+                  <span className="whitespace-nowrap">Profile Views</span>
                   <span
                     className={`w-2 h-2 rounded-full transition-colors ${
-                      config.extras.showVisitorBadge ? "bg-primary" : "bg-white/20"
+                      config.extras.showVisitorBadge ? "bg-primary shadow-[0_0_8px_rgba(88,170,176,0.5)]" : "bg-white/20"
                     }`}
                   />
                 </button>
