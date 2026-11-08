@@ -326,7 +326,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
       </div>
 
       {/* Tab Panels Body */}
-      <div className="p-5 overflow-y-auto space-y-6 max-h-[640px] text-sm">
+      <div className="p-5 overflow-y-auto space-y-6 flex-1 text-sm custom-scrollbar">
         {/* =========================================================================
             1. TEMPLATE TAB
             ========================================================================= */}
@@ -421,7 +421,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 <span className="text-[11px] text-text-muted">High-fidelity README designs</span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[380px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-1">
                 {GITCON_TEMPLATES_CATALOG.filter((t) => {
                   const matchCat = templateCategory === "all" || t.category === templateCategory;
                   const matchSearch =

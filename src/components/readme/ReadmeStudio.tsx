@@ -271,11 +271,11 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
       )}
 
       {/* Main Studio Area (2 Columns) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch h-[calc(100vh-210px)] min-h-[640px]">
         {/* Left Column: Customizer Controls (5 cols) */}
-        <div className="lg:col-span-5 w-full">
+        <div className="lg:col-span-5 w-full h-full min-h-0 flex flex-col">
           {loading && !profileData ? (
-            <div className="p-16 text-center rounded-2xl bg-surface border border-white/10 space-y-3">
+            <div className="p-16 text-center rounded-2xl bg-surface border border-white/10 space-y-3 h-full flex flex-col items-center justify-center">
               <HiArrowPath className="w-8 h-8 text-primary animate-spin mx-auto" />
               <p className="text-xs font-semibold text-text-muted">
                 Fetching GitHub activity & profile insights...
@@ -288,16 +288,16 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
               onChange={handleConfigChange}
             />
           ) : (
-            <div className="p-16 text-center rounded-2xl bg-surface border border-white/10 text-xs text-text-muted">
+            <div className="p-16 text-center rounded-2xl bg-surface border border-white/10 text-xs text-text-muted h-full flex items-center justify-center">
               Enter a GitHub username above to start customizing.
             </div>
           )}
         </div>
 
         {/* Right Column: Studio Live Preview & Code (7 cols) */}
-        <div className="lg:col-span-7 w-full flex flex-col gap-3">
+        <div className="lg:col-span-7 w-full h-full min-h-0 flex flex-col gap-3">
           {/* Studio Viewer Controls & Mockup Header */}
-          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-surface border border-white/10 flex-wrap gap-2 shadow-sm">
+          <div className="flex items-center justify-between px-4 py-2.5 rounded-xl bg-surface border border-white/10 flex-wrap gap-2 shadow-sm shrink-0">
             <div className="flex items-center gap-3">
               {/* macOS / Window dots */}
               <div className="flex items-center gap-1.5 opacity-60 hidden sm:flex">
@@ -344,22 +344,26 @@ export function ReadmeStudio({ initialUsername = "rachit-bharadwaj", backHref }:
           </div>
 
           {/* Viewer Card */}
-          <div className="rounded-2xl border border-white/10 bg-surface shadow-2xl overflow-hidden min-h-[580px] backdrop-blur-xl">
+          <div className="rounded-2xl border border-white/10 bg-surface shadow-2xl overflow-hidden flex-1 min-h-0 flex flex-col backdrop-blur-xl">
             {loading ? (
-              <div className="p-20 text-center space-y-4">
+              <div className="p-20 text-center space-y-4 m-auto">
                 <HiArrowPath className="w-8 h-8 text-primary animate-spin mx-auto" />
                 <p className="text-xs font-semibold text-text-muted">
                   Generating profile README for @{currentUsername}...
                 </p>
               </div>
             ) : viewMode === "preview" ? (
-              <ReadmePreview markdown={generatedMarkdown} />
+              <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+                <ReadmePreview markdown={generatedMarkdown} />
+              </div>
             ) : (
-              <ReadmeCode
-                markdown={generatedMarkdown}
-                username={currentUsername}
-                onMarkdownChange={(newVal) => setCustomMarkdown(newVal)}
-              />
+              <div className="flex-1 overflow-y-auto min-h-0 custom-scrollbar">
+                <ReadmeCode
+                  markdown={generatedMarkdown}
+                  username={currentUsername}
+                  onMarkdownChange={(newVal) => setCustomMarkdown(newVal)}
+                />
+              </div>
             )}
           </div>
         </div>
