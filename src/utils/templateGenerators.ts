@@ -115,7 +115,7 @@ export const GITCON_TEMPLATES_CATALOG: GitconTemplateDef[] = [
     id: "velvet-editorial",
     name: "Velvet Crimson Editorial",
     category: "creative",
-    badge: "Trending Reel",
+    badge: "Trending",
     badgeColor: "bg-rose-500/15 text-rose-300 border-rose-500/30",
     description: "Viral Instagram aesthetic: deep wine crimson aura, architectural arch portrait, astrolabe orbit rings, and magazine headings.",
     accentColor: "#E5B5C7",
