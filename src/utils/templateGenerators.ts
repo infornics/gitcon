@@ -10,6 +10,8 @@ import {
   createHeroBannerSvg,
   createMixtapeCassetteSvg,
   createTerminalWindowSvg,
+  createVelvetEditorialHeroSvg,
+  createVelvetSectionDividerSvg,
 } from "./svgBanners";
 
 export interface GitconTemplateDef {
@@ -108,6 +110,15 @@ export const GITCON_TEMPLATES_CATALOG: GitconTemplateDef[] = [
     badgeColor: "bg-pink-500/15 text-pink-400 border-pink-500/30",
     description: "Cassette tape visual with side A / side B tracklists representing top repositories and monthly equalizer bars.",
     accentColor: "#F472B6",
+  },
+  {
+    id: "velvet-editorial",
+    name: "Velvet Crimson Editorial",
+    category: "creative",
+    badge: "Trending Reel",
+    badgeColor: "bg-rose-500/15 text-rose-300 border-rose-500/30",
+    description: "Viral Instagram aesthetic: deep wine crimson aura, architectural arch portrait, astrolabe orbit rings, and magazine headings.",
+    accentColor: "#E5B5C7",
   },
   {
     id: "arcade-cabinet",
@@ -1147,6 +1158,141 @@ export function generateFounderLogTemplate(profile: ReadmeProfileData, config: R
 }
 
 /**
+ * 17. Velvet Crimson Editorial Template (Viral Instagram / Reel Aesthetic)
+ * High-craft editorial typography, wine-red aura, architectural arch portrait,
+ * custom section dividers, and matching crimson badge palette (#701A3D, #190B12, #F8F0F3).
+ */
+export function generateVelvetEditorialTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
+  const { header, aboutMe, skills, githubStats, featuredRepos, socials } = config;
+  const username = profile.username;
+  const totalStars = featuredRepos.repos.reduce((acc, r) => acc + (r.stars || 0), 0);
+  const topLangs = profile.topLanguages?.map((l) => l.name) || ["Python", "TypeScript", "React", "Rust"];
+  const parts: string[] = [];
+
+  // 1. Signature Velvet Editorial Hero Banner
+  const heroSvg = createVelvetEditorialHeroSvg({
+    username,
+    name: header.name || profile.name || username,
+    title: header.title || "AI & Full-Stack Engineer · Creative Technologist",
+    avatarUrl: profile.avatarUrl,
+    avatarBase64: profile.avatarBase64,
+    stars: totalStars,
+    followers: profile.followers,
+    contributions: profile.contributionsStats?.totalContributions || 0,
+    languages: topLangs,
+    theme: "rose",
+  });
+
+  parts.push(`<div align="center">\n  <a href="https://gitcon.infornics.com/user/${username}">\n    <img src="${heroSvg}" width="100%" alt="${username} Editorial Profile" />\n  </a>\n</div>\n`);
+
+  // Quick Action Buttons (Matching the Reel: Portfolio, LinkedIn, LeetCode, Email)
+  parts.push(`<p align="center">`);
+  if (profile.website) {
+    parts.push(`  <a href="${profile.website}"><img src="https://img.shields.io/badge/Portfolio-${encodeURIComponent(username)}.dev-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=githubpages" alt="Portfolio" /></a>`);
+  } else {
+    parts.push(`  <a href="https://gitcon.infornics.com/user/${username}"><img src="https://img.shields.io/badge/Profile-Gitcon_Studio-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=github" alt="Profile" /></a>`);
+  }
+  if (socials.linkedin) {
+    parts.push(`  <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/LinkedIn-Connect-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=linkedin" alt="LinkedIn" /></a>`);
+  }
+  if (socials.twitter) {
+    parts.push(`  <a href="https://twitter.com/${socials.twitter}"><img src="https://img.shields.io/badge/Twitter-@${socials.twitter}-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=twitter" alt="Twitter" /></a>`);
+  }
+  if (socials.email) {
+    parts.push(`  <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Email-Get_in_Touch-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=gmail" alt="Email" /></a>`);
+  }
+  parts.push(`</p>\n`);
+
+  // Section 01: About
+  const aboutDivider = createVelvetSectionDividerSvg("01", "About", `Hello, I'm ${header.name?.split(" ")[0] || username}.`);
+  parts.push(`<img src="${aboutDivider}" width="100%" alt="01 About" />\n`);
+
+  const bioText = profile.bio || "Engineering intelligence. Designing experiences with modern software.";
+  const locationText = profile.location ? `Based in **${profile.location}**` : "Building globally";
+  const orgText = profile.company ? `Working at **${profile.company}**` : "Independent software engineer";
+
+  parts.push(`> ### ✦ Creative Dossier & Career Thesis`);
+  parts.push(`> ${bioText}`);
+  parts.push(`> `);
+  parts.push(`> 📍 ${locationText} &nbsp;·&nbsp; 🏛️ ${orgText} &nbsp;·&nbsp; ⚡ **${profile.publicRepos}** Repositories &nbsp;·&nbsp; 👥 **${profile.followers}** Followers\n`);
+
+  if (aboutMe.show) {
+    if (aboutMe.workingOn) parts.push(`- 🚀 **Currently Building:** ${aboutMe.workingOn}`);
+    if (aboutMe.learning) parts.push(`- 🧠 **Research & Deep-Dive:** ${aboutMe.learning}`);
+    if (aboutMe.collaborateOn) parts.push(`- 🤝 **Open for Collaboration:** ${aboutMe.collaborateOn}`);
+    if (aboutMe.askMeAbout) parts.push(`- 💬 **Ask Me About:** ${aboutMe.askMeAbout}`);
+    parts.push(`\n`);
+  }
+
+  // Section 02: Selected Work
+  if (featuredRepos.show && featuredRepos.repos.length > 0) {
+    const selected = featuredRepos.repos.filter((r) => r.selected !== false);
+    if (selected.length > 0) {
+      const workDivider = createVelvetSectionDividerSvg("02", "Selected Work", "Products, not assignments.");
+      parts.push(`<img src="${workDivider}" width="100%" alt="02 Selected Work" />\n`);
+
+      parts.push(`<table>`);
+      for (let i = 0; i < selected.length; i += 2) {
+        parts.push(`  <tr>`);
+        for (let j = 0; j < 2; j++) {
+          const repo = selected[i + j];
+          if (repo) {
+            parts.push(`    <td width="50%" valign="top">`);
+            parts.push(`      <h3><a href="${repo.url}" style="color: #E5B5C7;">${repo.name}</a></h3>`);
+            parts.push(`      <p><em>${repo.description || "Production system and verified implementation."}</em></p>`);
+            parts.push(`      <p><kbd>${repo.language || "Software"}</kbd> &nbsp; <b>★ ${repo.stars}</b> &nbsp; <b>⑂ ${repo.forks}</b></p>`);
+            parts.push(`      <p><a href="${repo.url}"><img src="https://img.shields.io/badge/Repository-Inspect_Code-451126?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=github" alt="${repo.name}" /></a></p>`);
+            parts.push(`    </td>`);
+          } else {
+            parts.push(`    <td width="50%"></td>`);
+          }
+        }
+        parts.push(`  </tr>`);
+      }
+      parts.push(`</table>\n`);
+    }
+  }
+
+  // Section 03: Toolkit
+  if (skills.show && skills.selectedSkills.length > 0) {
+    const toolkitDivider = createVelvetSectionDividerSvg("03", "Toolkit", "The tools I reach for.");
+    parts.push(`<img src="${toolkitDivider}" width="100%" alt="03 Toolkit" />\n`);
+    parts.push(renderSkillsMarkdown(skills.selectedSkills, "shields", "center") + "\n");
+  }
+
+  // Section 04: Commit Log & Telemetry
+  if (githubStats.showStatsCard || githubStats.showStreakCard) {
+    const commitDivider = createVelvetSectionDividerSvg("04", "Commit Log", "A year of building, one square at a time.");
+    parts.push(`<img src="${commitDivider}" width="100%" alt="04 Commit Log" />\n`);
+
+    const cards: string[] = [];
+    if (githubStats.showStatsCard) {
+      cards.push(`<a href="https://gitcon.infornics.com/user/${username}"><img height="165em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&hide_rank=true&hide_border=true&border_radius=16&bg_color=190B12&title_color=E5B5C7&text_color=B6A3AC&icon_color=C77B9B&custom_title=GitHub%20At%20A%20Glance" /></a>`);
+    }
+    if (githubStats.showStreakCard) {
+      cards.push(`<a href="https://gitcon.infornics.com/user/${username}"><img height="165em" src="https://streak-stats.demolab.com?user=${username}&hide_border=true&border_radius=16&background=190B12&ring=701A3D&fire=E5B5C7&currStreakNum=F8F0F3&sideNums=E5B5C7&currStreakLabel=C77B9B&sideLabels=B6A3AC&dates=701A3D" /></a>`);
+    }
+    parts.push(`<p align="center">\n  ${cards.join("\n  ")}\n</p>\n`);
+  }
+
+  // Section 05: Connect
+  const connectDivider = createVelvetSectionDividerSvg("05", "Connect", "Let's build something worth explaining.");
+  parts.push(`<img src="${connectDivider}" width="100%" alt="05 Connect" />\n`);
+
+  parts.push(`<p align="center">`);
+  parts.push(`  <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/GitHub-@${username}-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=github" alt="GitHub" /></a>`);
+  if (socials.linkedin) {
+    parts.push(`  <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/LinkedIn-Connect-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=linkedin" alt="LinkedIn" /></a>`);
+  }
+  if (socials.email) {
+    parts.push(`  <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Email-Direct_Reach-701A3D?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=gmail" alt="Email" /></a>`);
+  }
+  parts.push(`</p>\n`);
+
+  return parts.join("\n");
+}
+
+/**
  * Route generator for all extended Gitcon templates.
  */
 export function generateExtendedTemplate(
@@ -1176,6 +1322,8 @@ export function generateExtendedTemplate(
       return generateNeofetchTemplate(profile, config);
 
     // Creative
+    case "velvet-editorial":
+      return generateVelvetEditorialTemplate(profile, config);
     case "mixtape-cassette":
       return generateMixtapeTemplate(profile, config);
     case "arcade-cabinet":

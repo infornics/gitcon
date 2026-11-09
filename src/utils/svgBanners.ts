@@ -345,3 +345,200 @@ export function createTerminalWindowSvg(params: BannerParams): string {
 
   return encodeSvgDataUri(svg);
 }
+
+/**
+ * Creates the Viral "Velvet Editorial / Crimson Silk" Hero Banner SVG.
+ * Inspired by the high-craft Instagram viral editorial aesthetic:
+ * - Rich deep plum/crimson/wine radial lighting (#190B12, #2A0E1B, #701A3D)
+ * - Shimmering serif editorial typography with animated sheen
+ * - Precision architectural portrait arch frame with rotating astrolabe rings
+ * - Live dynamic user avatar, title, stack tags, and achievements
+ */
+export function createVelvetEditorialHeroSvg(params: BannerParams): string {
+  const { username, name, title, stars, followers = 0, contributions = 0, languages, avatarBase64 } = params;
+  const cleanUsername = username.replace(/[^a-zA-Z0-9_\-]/g, "");
+  const langsFormatted = languages.slice(0, 3).map((l) => l.toUpperCase()).join("  ·  ") || "AI  ·  ENGINEERING  ·  SYSTEMS";
+
+  // Name split into 2 lines if long
+  const nameParts = name.trim().split(" ");
+  let line1 = name;
+  let line2 = "";
+  if (nameParts.length >= 2) {
+    line1 = nameParts.slice(0, Math.ceil(nameParts.length / 2)).join(" ");
+    line2 = nameParts.slice(Math.ceil(nameParts.length / 2)).join(" ") + ".";
+  } else {
+    line1 = name + ".";
+  }
+
+  // Portrait Arch Frame (or vector fallback)
+  const portraitElement = avatarBase64
+    ? `
+    <defs>
+      <clipPath id="velvet-arch-${cleanUsername}">
+        <path d="M 850 420 V 220 A 110 110 0 0 1 1070 220 V 420 Z" />
+      </clipPath>
+    </defs>
+    <path d="M 850 420 V 220 A 110 110 0 0 1 1070 220 V 420 Z" fill="#2A0E1B" stroke="#E5B5C7" stroke-width="2" stroke-opacity="0.8"/>
+    <image href="${avatarBase64}" x="840" y="90" width="240" height="340" preserveAspectRatio="xMidYMid slice" clip-path="url(#velvet-arch-${cleanUsername})"/>
+    <!-- Subtle gradient overlay on portrait bottom for depth -->
+    <path d="M 850 340 L 1070 340 L 1070 420 L 850 420 Z" fill="url(#velvet-photo-shade-${cleanUsername})" clip-path="url(#velvet-arch-${cleanUsername})" />`
+    : `
+    <defs>
+      <clipPath id="velvet-arch-${cleanUsername}">
+        <path d="M 850 420 V 220 A 110 110 0 0 1 1070 220 V 420 Z" />
+      </clipPath>
+    </defs>
+    <path d="M 850 420 V 220 A 110 110 0 0 1 1070 220 V 420 Z" fill="#2A0E1B" stroke="#E5B5C7" stroke-width="2" stroke-opacity="0.8"/>
+    <text x="960" y="310" text-anchor="middle" font-family="Georgia, serif" font-size="72" font-weight="700" fill="#E5B5C7">${name.charAt(0).toUpperCase()}</text>`;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 480" width="1200" height="480">
+  <defs>
+    <radialGradient id="velvet-bg-${cleanUsername}" cx="72%" cy="38%" r="80%">
+      <stop offset="0%" stop-color="#2A0E1B"/>
+      <stop offset="55%" stop-color="#190B12"/>
+      <stop offset="100%" stop-color="#10070C"/>
+    </radialGradient>
+    <radialGradient id="velvet-light-a-${cleanUsername}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#701A3D" stop-opacity="0.75"/>
+      <stop offset="100%" stop-color="#701A3D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="velvet-light-b-${cleanUsername}" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C77B9B" stop-opacity="0.32"/>
+      <stop offset="100%" stop-color="#C77B9B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="velvet-sheen-${cleanUsername}" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F8F0F3"/>
+      <stop offset="50%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#E5B5C7"/>
+    </linearGradient>
+    <linearGradient id="velvet-photo-shade-${cleanUsername}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#10070C" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#10070C" stop-opacity="0.85"/>
+    </linearGradient>
+    <pattern id="velvet-grid-${cleanUsername}" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#C77B9B" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+    <clipPath id="velvet-clip-${cleanUsername}"><rect width="1200" height="480" rx="20"/></clipPath>
+  </defs>
+
+  <style>
+    .v-serif { font-family: 'Playfair Display', Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Times New Roman', serif; }
+    .v-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .v-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    @keyframes orb-float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-30px, 15px); } }
+    .v-glow-a { animation: orb-float 12s ease-in-out infinite; }
+  </style>
+
+  <g clip-path="url(#velvet-clip-${cleanUsername})">
+    <!-- Velvet Darkroom Canvas -->
+    <rect width="1200" height="480" fill="url(#velvet-bg-${cleanUsername})"/>
+
+    <!-- Luminous Ambient Light Fields -->
+    <ellipse class="v-glow-a" cx="950" cy="180" rx="420" ry="320" fill="url(#velvet-light-a-${cleanUsername})"/>
+    <ellipse cx="200" cy="420" rx="380" ry="240" fill="url(#velvet-light-b-${cleanUsername})"/>
+
+    <!-- Architectural Grid Overlay -->
+    <rect width="1200" height="480" fill="url(#velvet-grid-${cleanUsername})"/>
+
+    <!-- Precision Astrolabe Celestial Orbiting Rings around Portrait -->
+    <g transform="translate(960 270)">
+      <circle r="220" fill="none" stroke="#C77B9B" stroke-opacity="0.12" stroke-dasharray="2 10"/>
+      <circle r="190" fill="none" stroke="#E5B5C7" stroke-opacity="0.25" stroke-width="1"/>
+      <circle r="150" fill="none" stroke="#701A3D" stroke-opacity="0.35" stroke-dasharray="4 8"/>
+      <circle cx="134" cy="-134" r="3.5" fill="#F8F0F3" opacity="0.8"/>
+      <circle cx="-106" cy="106" r="2.5" fill="#E5B5C7" opacity="0.6"/>
+    </g>
+
+    <!-- Top Terminal Command Line Pill -->
+    <g transform="translate(60, 48)">
+      <rect width="280" height="28" rx="14" fill="#190B12" fill-opacity="0.8" stroke="#701A3D" stroke-width="1"/>
+      <text x="20" y="19" class="v-mono" font-size="11.5" font-weight="700" fill="#E5B5C7">~/${username} $ build --intelligent</text>
+    </g>
+
+    <!-- Category / Thesis Subheader -->
+    <text x="60" y="112" class="v-mono" font-size="12" letter-spacing="4" font-weight="800" fill="#C77B9B">
+      ${langsFormatted}
+    </text>
+
+    <!-- Main Editorial Display Name (Serif Headline) -->
+    <text x="60" y="180" class="v-serif" font-size="58" font-weight="400" letter-spacing="-1.5" fill="url(#velvet-sheen-${cleanUsername})">${line1}</text>
+    ${line2 ? `<text x="60" y="244" class="v-serif" font-size="58" font-weight="400" letter-spacing="-1.5" fill="url(#velvet-sheen-${cleanUsername})">${line2}</text>` : ""}
+
+    <!-- Role / Title Pill Deck -->
+    <text x="60" y="286" class="v-mono" font-size="12" letter-spacing="2.5" font-weight="700" fill="#E5B5C7">
+      ${title.toUpperCase()}
+    </text>
+
+    <!-- Philosophy Tagline -->
+    <text x="60" y="316" class="v-sans" font-size="15" font-style="italic" fill="#DDA3B8">
+      Engineering intelligence. Designing experiences.
+    </text>
+
+    <!-- Divider Line -->
+    <line x1="60" y1="344" x2="760" y2="344" stroke="#701A3D" stroke-width="1.2"/>
+
+    <!-- Key Telemetry Highlights Bar -->
+    <g transform="translate(60, 375)">
+      <text x="0" y="0" class="v-mono" font-size="11" font-weight="700" letter-spacing="1.5" fill="#E5B5C7">
+        ECOSYSTEM: <tspan fill="#F8F0F3">${stars.toLocaleString()} STARS</tspan>   ·   NETWORK: <tspan fill="#F8F0F3">${followers.toLocaleString()} DEVELOPERS</tspan>   ·   CONTRIBUTIONS: <tspan fill="#F8F0F3">${contributions.toLocaleString()}</tspan>
+      </text>
+      <text x="0" y="24" class="v-mono" font-size="11" font-weight="600" letter-spacing="1" fill="#C77B9B">
+        GITCON VERIFIED TELEMETRY   ·   ${languages.slice(0, 4).join("  ·  ")}
+      </text>
+    </g>
+
+    <!-- Arch Portrait Frame -->
+    ${portraitElement}
+
+    <!-- Watermark Brand -->
+    <text x="1140" y="456" text-anchor="end" class="v-mono" font-size="9" font-weight="700" letter-spacing="2" fill="#701A3D">gitcon.infornics.com</text>
+    <rect x="0.5" y="0.5" width="1199" height="479" rx="19.5" fill="none" stroke="#701A3D" stroke-opacity="0.4"/>
+  </g>
+</svg>`;
+
+  return encodeSvgDataUri(svg);
+}
+
+/**
+ * Creates the Velvet Editorial Section Title Divider Banner SVG.
+ * Matching the signature "01 ABOUT — Hello, I'm ...", "03 WORK — Products, not assignments", "04 TOOLKIT", etc.
+ */
+export function createVelvetSectionDividerSvg(sectionNum: string, sectionTitle: string, subtitle: string): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" width="1200" height="120">
+  <defs>
+    <linearGradient id="v-sec-line" x1="40" y1="0" x2="1160" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#C77B9B"/>
+      <stop offset="60%" stop-color="#701A3D"/>
+      <stop offset="100%" stop-color="#701A3D" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="v-sec-sheen" x1="-300" y1="0" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#E5B5C7"/>
+      <stop offset="50%" stop-color="#F8F0F3"/>
+      <stop offset="100%" stop-color="#E5B5C7"/>
+    </linearGradient>
+  </defs>
+  <style>
+    .vs-serif { font-family: 'Playfair Display', Georgia, serif; }
+    .vs-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+  </style>
+
+  <!-- Number & Section Tracker -->
+  <text class="vs-mono" x="40" y="34" font-size="12" letter-spacing="3" fill="#C77B9B">
+    <tspan fill="#E5B5C7">${sectionNum}</tspan>   ${sectionTitle.toUpperCase()}
+  </text>
+
+  <!-- Editorial Title -->
+  <text class="vs-serif" x="38" y="84" font-size="42" font-weight="300" letter-spacing="-1" fill="#F8F0F3">
+    ${subtitle}
+  </text>
+
+  <text class="vs-mono" x="1160" y="34" text-anchor="end" font-size="10.5" letter-spacing="2.4" fill="#B6A3AC">
+    gitcon.infornics.com
+  </text>
+
+  <!-- Dividing Line -->
+  <path d="M 40 106 H 1160" stroke="url(#v-sec-line)" stroke-width="1.2"/>
+</svg>`;
+
+  return encodeSvgDataUri(svg);
+}
