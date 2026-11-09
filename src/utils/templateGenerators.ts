@@ -11,6 +11,7 @@ import {
   createMixtapeCassetteSvg,
   createTerminalWindowSvg,
   createVelvetEditorialHeroSvg,
+  createVelvetProjectCardSvg,
   createVelvetSectionDividerSvg,
 } from "./svgBanners";
 
@@ -1231,25 +1232,22 @@ export function generateVelvetEditorialTemplate(profile: ReadmeProfileData, conf
       const workDivider = createVelvetSectionDividerSvg("02", "Selected Work", "Products, not assignments.");
       parts.push(`<img src="${workDivider}" width="100%" alt="02 Selected Work" />\n`);
 
-      parts.push(`<table>`);
-      for (let i = 0; i < selected.length; i += 2) {
-        parts.push(`  <tr>`);
-        for (let j = 0; j < 2; j++) {
-          const repo = selected[i + j];
-          if (repo) {
-            parts.push(`    <td width="50%" valign="top">`);
-            parts.push(`      <h3><a href="${repo.url}" style="color: #E5B5C7;">${repo.name}</a></h3>`);
-            parts.push(`      <p><em>${repo.description || "Production system and verified implementation."}</em></p>`);
-            parts.push(`      <p><kbd>${repo.language || "Software"}</kbd> &nbsp; <b>★ ${repo.stars}</b> &nbsp; <b>⑂ ${repo.forks}</b></p>`);
-            parts.push(`      <p><a href="${repo.url}"><img src="https://img.shields.io/badge/Repository-Inspect_Code-451126?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=github" alt="${repo.name}" /></a></p>`);
-            parts.push(`    </td>`);
-          } else {
-            parts.push(`    <td width="50%"></td>`);
-          }
-        }
-        parts.push(`  </tr>`);
-      }
-      parts.push(`</table>\n`);
+      // Render each project as an animated Velvet Editorial card with moving laser border
+      selected.forEach((repo, idx) => {
+        const cardSvgUri = createVelvetProjectCardSvg({
+          index: idx + 1,
+          name: repo.name,
+          description: repo.description || "Production system and verified implementation.",
+          language: repo.language || "Code",
+          stars: repo.stars || 0,
+          forks: repo.forks || 0,
+          tags: [repo.language || "Software", "Production", "Verified", "Gitcon"],
+          repoUrl: repo.url,
+        });
+
+        parts.push(`<a href="${repo.url}">\n  <img src="${cardSvgUri}" width="100%" alt="${repo.name}" />\n</a>\n`);
+        parts.push(`<p align="center">\n  <a href="${repo.url}"><img src="https://img.shields.io/badge/Repository-${encodeURIComponent(repo.name.replace(/-/g, "--"))}-451126?style=for-the-badge&labelColor=190B12&logoColor=F8F0F3&logo=github" alt="${repo.name} repository" /></a>\n</p>\n`);
+      });
     }
   }
 

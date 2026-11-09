@@ -542,3 +542,161 @@ export function createVelvetSectionDividerSvg(sectionNum: string, sectionTitle: 
 
   return encodeSvgDataUri(svg);
 }
+
+export interface VelvetProjectCardParams {
+  index: number;
+  name: string;
+  description: string;
+  language: string;
+  stars: number;
+  forks: number;
+  tags?: string[];
+  repoUrl: string;
+}
+
+/**
+ * Creates the high-craft Velvet Editorial Project Card with moving borders,
+ * deep wine gradient background, ambient luminous orb, technical grid,
+ * and animated running laser trace border.
+ */
+export function createVelvetProjectCardSvg(params: VelvetProjectCardParams): string {
+  const { index, name, description, language, stars, forks, tags = [] } = params;
+  const numStr = String(index).padStart(2, "0");
+  const cleanName = name.replace(/[^a-zA-Z0-9_\-]/g, "");
+  const tagList = tags.length > 0 ? tags : [language || "Software", "Production", "Verified", "Open Source"];
+
+  const tagChips = tagList
+    .slice(0, 4)
+    .map((tag, i) => {
+      const x = 50 + i * 115;
+      return `
+      <g>
+        <rect x="${x}" y="222" width="105" height="24" rx="12" fill="#27101C" stroke="#C77B9B" stroke-opacity="0.35"/>
+        <text x="${x + 52}" y="238" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="600" fill="#E5B5C7">${tag}</text>
+      </g>`;
+    })
+    .join("");
+
+  const descClean = description || "Production system and verified implementation.";
+  const descLine1 = descClean.length > 70 ? descClean.substring(0, 68) + "..." : descClean;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 270" width="1200" height="270">
+  <defs>
+    <linearGradient id="vp-bg-${cleanName}-${index}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1F0D17"/>
+      <stop offset="50%" stop-color="#14080F"/>
+      <stop offset="100%" stop-color="#0E050A"/>
+    </linearGradient>
+    <radialGradient id="vp-glow-${cleanName}-${index}" cx="85%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#701A3D" stop-opacity="0.75"/>
+      <stop offset="60%" stop-color="#451126" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#190B12" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="vp-grid-${cleanName}-${index}" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="#C77B9B" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="vp-trace-${cleanName}-${index}" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F8F0F3"/>
+      <stop offset="35%" stop-color="#E5B5C7"/>
+      <stop offset="70%" stop-color="#C77B9B"/>
+      <stop offset="100%" stop-color="#701A3D" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="vp-clip-${cleanName}-${index}"><rect width="1200" height="270" rx="16"/></clipPath>
+  </defs>
+
+  <style>
+    .vp-serif { font-family: 'Playfair Display', Georgia, 'Times New Roman', serif; }
+    .vp-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .vp-sans { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    
+    /* Continuous Moving Laser Border */
+    .vp-laser {
+      stroke-dasharray: 480 2460;
+      stroke-dashoffset: 2940;
+      animation: vp-laser-run 6.5s linear infinite;
+    }
+    @keyframes vp-laser-run {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Ambient Pulsing Glow */
+    .vp-orb {
+      animation: vp-orb-pulse 8s ease-in-out infinite alternate;
+    }
+    @keyframes vp-orb-pulse {
+      0% { transform: scale(1) translate(0, 0); opacity: 0.7; }
+      100% { transform: scale(1.1) translate(-20px, 10px); opacity: 0.95; }
+    }
+  </style>
+
+  <g clip-path="url(#vp-clip-${cleanName}-${index})">
+    <!-- Velvet Darkroom Base Background -->
+    <rect width="1200" height="270" fill="url(#vp-bg-${cleanName}-${index})"/>
+    
+    <!-- Ambient Luminous Moving Glow Orb -->
+    <ellipse class="vp-orb" cx="950" cy="90" rx="360" ry="220" fill="url(#vp-glow-${cleanName}-${index})"/>
+
+    <!-- Architectural Grid on right -->
+    <rect x="650" width="550" height="270" fill="url(#vp-grid-${cleanName}-${index})"/>
+
+    <!-- Index & Sub-headline Deck -->
+    <text class="vp-mono" x="50" y="48" font-size="11.5" letter-spacing="2.8" font-weight="700" fill="#C77B9B">
+      <tspan fill="#E5B5C7">${numStr} · PRODUCTION REPOSITORY</tspan> · ${language.toUpperCase() || "ENGINEERING"}
+    </text>
+
+    <!-- Main Project Name (Editorial Serif) -->
+    <text class="vp-serif" x="48" y="104" font-size="44" font-weight="400" letter-spacing="-1" fill="#F8F0F3">
+      ${name}
+    </text>
+
+    <!-- Description -->
+    <text class="vp-sans" x="50" y="142" font-size="15" fill="#DDA3B8">
+      ${descLine1}
+    </text>
+
+    <!-- Subtitle Bullet -->
+    <text class="vp-mono" x="50" y="172" font-size="11.5" fill="#E5B5C7">
+      <tspan fill="#C77B9B">ARCHITECTURE ›</tspan> Optimized runtime, modular components &amp; verified GitHub release
+    </text>
+
+    <!-- Divider Line -->
+    <line x1="50" y1="198" x2="680" y2="198" stroke="#701A3D" stroke-opacity="0.4" stroke-width="1"/>
+
+    <!-- Tags Row -->
+    ${tagChips}
+
+    <!-- Right Telemetry Metrics Module -->
+    <g transform="translate(860, 45)">
+      <rect width="280" height="180" rx="14" fill="#180A12" fill-opacity="0.85" stroke="#701A3D" stroke-width="1.2"/>
+      
+      <!-- Stars Metric -->
+      <g transform="translate(30, 48)">
+        <text class="vp-serif" font-size="34" font-weight="400" fill="#F8F0F3">${stars.toLocaleString()}</text>
+        <text class="vp-sans" y="24" font-size="12" font-weight="600" fill="#C77B9B">★ REPOSITORY STARS</text>
+      </g>
+
+      <!-- Forks Metric -->
+      <g transform="translate(160, 48)">
+        <text class="vp-serif" font-size="34" font-weight="400" fill="#F8F0F3">${forks.toLocaleString()}</text>
+        <text class="vp-sans" y="24" font-size="12" font-weight="600" fill="#C77B9B">⑂ NETWORK FORKS</text>
+      </g>
+
+      <!-- Language Badge -->
+      <g transform="translate(30, 118)">
+        <rect width="220" height="32" rx="16" fill="#2A0E1B" stroke="#E5B5C7" stroke-opacity="0.4"/>
+        <text x="110" y="20" text-anchor="middle" class="vp-mono" font-size="11" font-weight="700" fill="#F8F0F3">
+          PRIMARY: ${language.toUpperCase() || "CODE"}
+        </text>
+      </g>
+    </g>
+
+    <!-- Static Subtle Border -->
+    <rect x="0.5" y="0.5" width="1199" height="269" rx="15.5" fill="none" stroke="#701A3D" stroke-opacity="0.35"/>
+
+    <!-- Dynamic Animated Running Laser Trace Border -->
+    <rect class="vp-laser" x="0.5" y="0.5" width="1199" height="269" rx="15.5" fill="none" stroke="url(#vp-trace-${cleanName}-${index})" stroke-width="2" stroke-linecap="round"/>
+  </g>
+</svg>`;
+
+  return encodeSvgDataUri(svg);
+}
