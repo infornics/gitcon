@@ -52,6 +52,7 @@ export interface ReadmeProfileData {
 
 export interface ReadmeConfig {
   template: ReadmeTemplate;
+  animeVariant?: "boy" | "girl";
   statsTheme: string;
   header: {
     greeting: string;
@@ -506,6 +507,7 @@ export function buildDefaultConfig(profile: ReadmeProfileData): ReadmeConfig {
 
   return {
     template: "modern",
+    animeVariant: "boy",
     statsTheme: "dark",
     header: {
       greeting: "Hi there 👋, I'm",
