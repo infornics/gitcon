@@ -665,63 +665,56 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                         >
                           {tpl.badge}
                         </span>
-                        <span className="text-[10px] font-semibold text-text-muted group-hover:text-text transition-colors">
-                          {isSelected ? "Active" : "Apply"} →
-                        </span>
+
+                        {/* For anime-shinobi, replace Apply button with interactive Boy / Girl variant pills directly inside card */}
+                        {tpl.id === "anime-shinobi" ? (
+                          <div
+                            className="flex items-center gap-1 bg-surface-1/90 p-0.5 rounded-lg border border-white/10"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isSelected) update("template", "anime-shinobi");
+                                update("animeVariant", "boy");
+                              }}
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+                                (config.animeVariant || "boy") === "boy" && isSelected
+                                  ? "bg-orange-500 text-black shadow-sm"
+                                  : "text-text-muted hover:text-orange-400 hover:bg-white/5"
+                              }`}
+                            >
+                              <span>🥷</span>
+                              <span>Boy</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isSelected) update("template", "anime-shinobi");
+                                update("animeVariant", "girl");
+                              }}
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+                                config.animeVariant === "girl" && isSelected
+                                  ? "bg-orange-500 text-black shadow-sm"
+                                  : "text-text-muted hover:text-orange-400 hover:bg-white/5"
+                              }`}
+                            >
+                              <span>🌸</span>
+                              <span>Girl</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[10px] font-semibold text-text-muted group-hover:text-text transition-colors">
+                            {isSelected ? "Active" : "Apply"} →
+                          </span>
+                        )}
                       </div>
                     </button>
                   );
                 })}
               </div>
-
-              {/* Anime Character Variant Selector (shown when Anime Shinobi Arc is selected) */}
-              {config.template === "anime-shinobi" && (
-                <div className="mt-4 p-3.5 rounded-xl border border-orange-500/30 bg-orange-500/5 backdrop-blur-sm">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                      <span className="text-xs font-bold text-text uppercase tracking-wider">
-                        Shinobi Character Variant
-                      </span>
-                    </div>
-                    <span className="text-[10px] font-semibold text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded border border-orange-500/20">
-                      Anime Cast
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        update("animeVariant", "boy");
-                      }}
-                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold border transition-all ${
-                        (config.animeVariant || "boy") === "boy"
-                          ? "bg-orange-500 text-black border-orange-400 shadow-[0_0_15px_-3px_rgba(255,122,26,0.5)]"
-                          : "bg-surface-2/80 text-text border-white/10 hover:border-orange-500/40 hover:text-orange-300"
-                      }`}
-                    >
-                      <span>🥷</span>
-                      <span>Boy Shinobi (Sasuke / Naruto)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        update("animeVariant", "girl");
-                      }}
-                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-bold border transition-all ${
-                        config.animeVariant === "girl"
-                          ? "bg-orange-500 text-black border-orange-400 shadow-[0_0_15px_-3px_rgba(255,122,26,0.5)]"
-                          : "bg-surface-2/80 text-text border-white/10 hover:border-orange-500/40 hover:text-orange-300"
-                      }`}
-                    >
-                      <span>🌸</span>
-                      <span>Girl Shinobi (Kunoichi Video)</span>
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Core Baseline Presets */}
