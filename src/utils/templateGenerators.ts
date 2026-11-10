@@ -14,6 +14,13 @@ import {
   createVelvetProjectCardSvg,
   createVelvetSectionDividerSvg,
 } from "./svgBanners";
+import {
+  createAnimeHeroSvg,
+  createAnimeNinjaWaySvg,
+  createAnimeJutsuStackSvg,
+  createAnimeNinjaIdSvg,
+  createAnimeConnectSvg,
+} from "./animeSvgs";
 
 export interface GitconTemplateDef {
   id: string;
@@ -26,6 +33,15 @@ export interface GitconTemplateDef {
 }
 
 export const GITCON_TEMPLATES_CATALOG: GitconTemplateDef[] = [
+  {
+    id: "anime-shinobi",
+    name: "Anime Shinobi Arc",
+    category: "creative",
+    badge: "Trending",
+    badgeColor: "bg-orange-500/15 text-orange-400 border-orange-500/30",
+    description: "Viral Naruto shinobi theme: Konoha animated video hero, swinging ninja ID registration lanyard, and torchlight jutsu arsenal.",
+    accentColor: "#FF7A1A",
+  },
   {
     id: "arcade-cabinet",
     name: "Arcade Cabinet 8-Bit",
@@ -1283,6 +1299,97 @@ export function generateVelvetEditorialTemplate(profile: ReadmeProfileData, conf
   return parts.join("\n");
 }
 
+// =========================================================================
+// 5. ANIME SHINOBI ARC TEMPLATE (Viral Reel Style)
+// =========================================================================
+
+export function generateAnimeShinobiTemplate(profile: ReadmeProfileData, config: ReadmeConfig): string {
+  const { featuredRepos, githubStats, socials } = config;
+  const username = profile.username;
+  const parts: string[] = [];
+
+  // Hero Section
+  parts.push(`<div align="center">\n`);
+  const heroSvg = createAnimeHeroSvg(profile, config);
+  parts.push(`<!-- 🎬 HERO video intro -->\n<img src="${heroSvg}" alt="Hi, I'm ${profile.name || username} — Shinobi Developer" width="100%"/>\n`);
+  parts.push(`<br/><br/>\n`);
+
+  // Team 7 dance GIF
+  parts.push(`<img src="https://raw.githubusercontent.com/Meghamittal0920/Meghamittal0920/main/team7-dance.gif" alt="Team 7 chibi dance" width="260"/>\n`);
+  parts.push(`<br/>\n`);
+
+  // Ninja Way
+  const ninjaWaySvg = createAnimeNinjaWaySvg(profile, config);
+  parts.push(`<!-- 🍥 MY NINJA WAY -->\n<img src="${ninjaWaySvg}" alt="My ninja way — what I build" width="100%"/>\n`);
+  parts.push(`<br/><br/>\n`);
+
+  // Jutsu Stack
+  const jutsuStackSvg = createAnimeJutsuStackSvg(profile, config);
+  parts.push(`<!-- 🔦 JUTSU ARSENAL -->\n<img src="${jutsuStackSvg}" alt="Jutsu arsenal — my tech stack" width="100%"/>\n`);
+  parts.push(`<br/><br/>\n`);
+
+  // Ninja ID + Mission Dashboard
+  const ninjaIdSvg = createAnimeNinjaIdSvg(profile, config);
+  parts.push(`<!-- 🪪 NINJA REGISTRATION + MISSION DASHBOARD -->\n<img src="${ninjaIdSvg}" alt="Ninja registration card and live GitHub dashboard" width="100%"/>\n`);
+  parts.push(`<br/><br/>\n</div>\n`);
+
+  // S-Rank Missions Table
+  if (featuredRepos.show && featuredRepos.repos.length > 0) {
+    const selected = featuredRepos.repos.filter((r) => r.selected !== false);
+    if (selected.length > 0) {
+      parts.push(`## 🍥 S-Rank Missions\n`);
+      parts.push(`<table>`);
+      parts.push(`<tr><th>Mission</th><th>What it is</th><th>Jutsu used</th><th align="center">⭐</th></tr>`);
+      selected.forEach((repo) => {
+        parts.push(
+          `<tr><td><a href="${repo.url}"><b>${repo.name}</b></a></td><td>${repo.description || "Production shinobi system"}</td><td><code>${repo.language || "Code"}</code></td><td align="center"><b>${repo.stars || 0}</b></td></tr>`
+        );
+      });
+      parts.push(`</table>\n`);
+      parts.push(`<div align="center">\n<a href="https://github.com/${username}?tab=repositories"><b>→ See all repositories</b></a>\n<br/><br/>\n</div>\n`);
+    }
+  }
+
+  // Contribution Village & Rasengan
+  parts.push(`<div align="center">\n`);
+  parts.push(`<img src="https://raw.githubusercontent.com/Meghamittal0920/Meghamittal0920/main/rasengan-run.gif" alt="Naruto running with a rasengan" width="150"/>\n`);
+  parts.push(`### 🌃 My contribution village\n\n*Every commit raises another building — rebuilt automatically every day.*\n`);
+
+  if (githubStats.showStatsCard || githubStats.showStreakCard) {
+    const cards: string[] = [];
+    if (githubStats.showStatsCard) {
+      cards.push(`<a href="https://gitcon.infornics.com/user/${username}"><img height="165em" src="https://github-readme-stats-fast.vercel.app/api?username=${username}&show_icons=true&hide_rank=true&hide_border=true&border_radius=16&bg_color=171B28&title_color=FF7A1A&text_color=8B93A7&icon_color=4AA8FF&custom_title=Shinobi%20Telemetry" /></a>`);
+    }
+    if (githubStats.showStreakCard) {
+      cards.push(`<a href="https://gitcon.infornics.com/user/${username}"><img height="165em" src="https://streak-stats.demolab.com?user=${username}&hide_border=true&border_radius=16&background=171B28&ring=FF7A1A&fire=FFB52E&currStreakNum=EEF1F7&sideNums=4AA8FF&currStreakLabel=FF7A1A&sideLabels=8B93A7&dates=FF7A1A" /></a>`);
+    }
+    parts.push(`<p align="center">\n  ${cards.join("\n  ")}\n</p>\n`);
+  }
+
+  // Connect Section
+  const connectSvg = createAnimeConnectSvg(profile, config);
+  parts.push(`<!-- 💌 JOIN THE SQUAD -->\n<img src="${connectSvg}" alt="Let's connect" width="100%"/>\n`);
+
+  parts.push(`<p align="center">`);
+  parts.push(`  <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/GitHub-ff7a1a?style=for-the-badge&logo=github&logoColor=0b0d13" alt="GitHub"/></a>`);
+  if (socials.email) {
+    parts.push(`  <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Email-e2383f?style=for-the-badge&logo=gmail&logoColor=0b0d13" alt="Email"/></a>`);
+  }
+  if (socials.linkedin) {
+    parts.push(`  <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/LinkedIn-4aa8ff?style=for-the-badge&logo=linkedin&logoColor=0b0d13" alt="LinkedIn"/></a>`);
+  }
+  if (socials.twitter) {
+    parts.push(`  <a href="https://twitter.com/${socials.twitter}"><img src="https://img.shields.io/badge/Twitter-2fd48a?style=for-the-badge&logo=x&logoColor=0b0d13" alt="Twitter"/></a>`);
+  }
+  parts.push(`</p>\n`);
+
+  parts.push(`<br/>\n<img src="https://raw.githubusercontent.com/Meghamittal0920/Meghamittal0920/main/chibi-walk.gif" alt="Chibi Naruto walking" width="90"/>\n`);
+  parts.push(`\n**Dattebayo — keep coding, keep growing.** 🍥\n`);
+  parts.push(`</div>\n`);
+
+  return parts.join("\n");
+}
+
 /**
  * Route generator for all extended Gitcon templates.
  */
@@ -1292,6 +1399,9 @@ export function generateExtendedTemplate(
   config: ReadmeConfig
 ): string | null {
   switch (templateId) {
+    // Creative
+    case "anime-shinobi":
+      return generateAnimeShinobiTemplate(profile, config);
     // Recruiter
     case "recruiter-ready":
       return generateRecruiterReadyTemplate(profile, config);
