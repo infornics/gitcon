@@ -625,11 +625,18 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 }).map((tpl) => {
                   const isSelected = config.template === tpl.id;
                   return (
-                    <button
+                    <div
                       key={tpl.id}
-                      type="button"
+                      role="button"
+                      tabIndex={0}
                       onClick={() => update("template", tpl.id)}
-                      className={`text-left p-3.5 rounded-xl border transition-all duration-200 relative group flex flex-col justify-between ${
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          update("template", tpl.id);
+                        }
+                      }}
+                      className={`text-left p-3.5 rounded-xl border transition-all duration-200 relative group flex flex-col justify-between cursor-pointer ${
                         isSelected
                           ? "border-primary bg-gradient-to-br from-primary/20 via-primary/5 to-surface-2 shadow-[0_0_20px_-5px_rgba(88,170,176,0.35)] ring-1 ring-primary/50"
                           : "border-white/10 bg-surface-2/60 hover:border-white/25 hover:bg-surface-2 hover:-translate-y-0.5"
@@ -679,7 +686,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                                 if (!isSelected) update("template", "anime-shinobi");
                                 update("animeVariant", "boy");
                               }}
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
                                 (config.animeVariant || "boy") === "boy" && isSelected
                                   ? "bg-orange-500 text-black shadow-sm"
                                   : "text-text-muted hover:text-orange-400 hover:bg-white/5"
@@ -695,7 +702,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                                 if (!isSelected) update("template", "anime-shinobi");
                                 update("animeVariant", "girl");
                               }}
-                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 ${
+                              className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer ${
                                 config.animeVariant === "girl" && isSelected
                                   ? "bg-orange-500 text-black shadow-sm"
                                   : "text-text-muted hover:text-orange-400 hover:bg-white/5"
@@ -711,7 +718,7 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                           </span>
                         )}
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>

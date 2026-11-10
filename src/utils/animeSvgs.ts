@@ -955,7 +955,10 @@ export function createAnimeNinjaIdSvg(profile: ReadmeProfileData, config: Readme
   svg = svg.replace("Wiley", company.slice(0, 18));
   svg = svg.replace("FRONTEND SHINOBI", role.slice(0, 22));
 
-  if (profile.avatarUrl) {
+  // Only replace avatar if it is a local/inline data URI.
+  // Note: External http/https URLs are strictly forbidden inside SVGs rendered via <img> tags
+  // by browser SVG security rules, which causes the entire SVG to fail rendering.
+  if (profile.avatarUrl && profile.avatarUrl.startsWith("data:image")) {
     svg = svg.replace(
       /href="data:image\/jpeg;base64,[^"]+"/i,
       `href="${profile.avatarUrl}"`
