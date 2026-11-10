@@ -712,6 +712,44 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                               <span>Girl</span>
                             </button>
                           </div>
+                        ) : tpl.id === "harry-potter" ? (
+                          <div
+                            className="flex items-center gap-1 bg-surface-1/90 p-0.5 rounded-lg border border-amber-500/20"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isSelected) update("template", "harry-potter");
+                                update("animeVariant", "boy");
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-0.5 cursor-pointer ${
+                                (config.animeVariant || "boy") === "boy" && isSelected
+                                  ? "bg-amber-400 text-black shadow-sm"
+                                  : "text-text-muted hover:text-amber-300 hover:bg-white/5"
+                              }`}
+                            >
+                              <span>🧙‍♂️</span>
+                              <span>Wizard</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (!isSelected) update("template", "harry-potter");
+                                update("animeVariant", "girl");
+                              }}
+                              className={`px-1.5 py-0.5 rounded text-[10px] font-bold transition-all flex items-center gap-0.5 cursor-pointer ${
+                                config.animeVariant === "girl" && isSelected
+                                  ? "bg-amber-400 text-black shadow-sm"
+                                  : "text-text-muted hover:text-amber-300 hover:bg-white/5"
+                              }`}
+                            >
+                              <span>🧙‍♀️</span>
+                              <span>Witch</span>
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-[10px] font-semibold text-text-muted group-hover:text-text transition-colors">
                             {isSelected ? "Active" : "Apply"} →
@@ -723,6 +761,50 @@ export function ReadmeControls({ config, profile, onChange }: ReadmeControlsProp
                 })}
               </div>
             </div>
+
+            {/* Hogwarts House Selector (when Hogwarts Lumos Arc is active) */}
+            {config.template === "harry-potter" && (
+              <div className="p-4 rounded-xl border border-amber-500/30 bg-gradient-to-r from-amber-950/20 via-surface-2 to-surface-1">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-base">🏰</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                      Hogwarts House Sorting
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-amber-400/80 font-mono">Sorting Hat Active</span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: "gryffindor", name: "Gryffindor", crest: "🦁", color: "from-red-950/80 to-amber-950/80 border-amber-500" },
+                    { id: "slytherin", name: "Slytherin", crest: "🐍", color: "from-emerald-950/80 to-slate-900 border-emerald-500" },
+                    { id: "ravenclaw", name: "Ravenclaw", crest: "🦅", color: "from-blue-950/80 to-indigo-950/80 border-sky-400" },
+                    { id: "hufflepuff", name: "Hufflepuff", crest: "🦡", color: "from-yellow-950/80 to-amber-950/80 border-yellow-500" },
+                  ].map((h) => {
+                    const isHouseSelected = (config.potterHouse || "gryffindor") === h.id;
+                    return (
+                      <button
+                        key={h.id}
+                        type="button"
+                        onClick={() => update("potterHouse", h.id)}
+                        className={`p-2.5 rounded-lg border text-left transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-br ${
+                          isHouseSelected
+                            ? `${h.color} ring-1 ring-amber-400 shadow-[0_0_15px_-3px_rgba(217,119,6,0.35)]`
+                            : "border-white/10 hover:border-white/20 bg-surface-2/60"
+                        }`}
+                      >
+                        <span className="text-xl">{h.crest}</span>
+                        <div>
+                          <strong className="block text-[11px] font-bold text-text">{h.name}</strong>
+                          <span className="text-[9px] text-text-muted">House</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Core Baseline Presets */}
             {templateCategory === "all" && !templateSearch && (

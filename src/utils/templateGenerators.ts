@@ -21,6 +21,12 @@ import {
   createAnimeNinjaIdSvg,
   createAnimeConnectSvg,
 } from "./animeSvgs";
+import {
+  createPotterHeroSvg,
+  createPotterSpellsStackSvg,
+  createPotterMaraudersMapSvg,
+  HOGWARTS_HOUSES,
+} from "./potterSvgs";
 
 export interface GitconTemplateDef {
   id: string;
@@ -41,6 +47,15 @@ export const GITCON_TEMPLATES_CATALOG: GitconTemplateDef[] = [
     badgeColor: "bg-orange-500/15 text-orange-400 border-orange-500/30",
     description: "Viral Naruto shinobi theme: Konoha animated video hero, swinging ninja ID registration lanyard, and torchlight jutsu arsenal.",
     accentColor: "#FF7A1A",
+  },
+  {
+    id: "harry-potter",
+    name: "Hogwarts Lumos Arc",
+    category: "creative",
+    badge: "Magical",
+    badgeColor: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+    description: "Harry Potter wizarding world: Astronomy Tower Lumos spell hero, glowing wand incantations tech arsenal, and Marauder's Map telemetry.",
+    accentColor: "#D3A625",
   },
   {
     id: "arcade-cabinet",
@@ -1391,6 +1406,131 @@ export function generateAnimeShinobiTemplate(profile: ReadmeProfileData, config:
 }
 
 /**
+ * ⚡ HARRY POTTER / HOGWARTS LUMOS ARC TEMPLATE GENERATOR
+ * Fully dynamic wizarding world theme featuring:
+ * - Astronomy Tower Lumos spell hero (Boy Wizard & Girl Witch variants)
+ * - The Alchemist's Shelf & Charms (Lumos-illuminated 15 dynamic tech spells)
+ * - Marauder's Map Telemetry & Hogwarts Student Registry
+ * - Ministry O.W.L. Level Grimoire Dispatches
+ * - Send an Owl Dispatch links
+ */
+export function generateHarryPotterTemplate(
+  profile: ReadmeProfileData,
+  config: ReadmeConfig
+): string {
+  const { featuredRepos, githubStats, socials } = config;
+  const username = profile.username;
+  const name = profile.name || username || "Wizard Scholar";
+  const parts: string[] = [];
+
+  const houseKey = config.potterHouse || "gryffindor";
+  const house = HOGWARTS_HOUSES[houseKey] || HOGWARTS_HOUSES.gryffindor;
+
+  // Center wrapper
+  parts.push(`<div align="center">\n`);
+
+  // 1. Hero Section (Lumos Spell on Astronomy Tower)
+  const heroSvg = createPotterHeroSvg(profile, config);
+  parts.push(
+    `<!-- ⚡ HOGWARTS LUMOS HERO -->\n<img src="${heroSvg}" alt="Mischief Managed — ${name} Hogwarts Dossier" width="100%"/>\n`
+  );
+  parts.push(`<br/><br/>\n`);
+
+  // 2. The Alchemist's Shelf & Charms (Tech Stack)
+  const spellsSvg = createPotterSpellsStackSvg(profile, config);
+  parts.push(
+    `<!-- 🪄 THE ALCHEMIST'S SHELF & SPELLS ARSENAL -->\n<img src="${spellsSvg}" alt="Spells I cast daily — tech stack" width="100%"/>\n`
+  );
+  parts.push(`<br/><br/>\n`);
+
+  // 3. Marauder's Map Telemetry & Student Registry
+  const maraudersMapSvg = createPotterMaraudersMapSvg(profile, config);
+  parts.push(
+    `<!-- 📜 MARAUDER'S MAP TELEMETRY -->\n<img src="${maraudersMapSvg}" alt="Marauder's Map Registry & Telemetry" width="100%"/>\n`
+  );
+  parts.push(`<br/><br/>\n</div>\n`);
+
+  // 4. O.W.L. Level Grimoire Dispatches (Top Repositories Table)
+  if (featuredRepos.show && featuredRepos.repos.length > 0) {
+    const selected = featuredRepos.repos.filter((r) => r.selected !== false);
+    if (selected.length > 0) {
+      parts.push(`## ⚡ O.W.L. Level Grimoire Dispatches\n`);
+      parts.push(`<table>`);
+      parts.push(
+        `<tr><th>Spellcraft Project</th><th>Incantation Purpose</th><th>Primary Lore</th><th align="center">⭐ Points</th></tr>`
+      );
+      selected.forEach((repo) => {
+        parts.push(
+          `<tr><td><a href="${repo.url}"><b>📜 ${repo.name}</b></a></td><td>${
+            repo.description || "Magical production software system"
+          }</td><td><code>${repo.language || "Magic"}</code></td><td align="center"><b>${
+            repo.stars || 0
+          }</b></td></tr>`
+        );
+      });
+      parts.push(`</table>\n`);
+    }
+  }
+
+  // 5. Ministry Telemetry Cards (GitHub Stats themed to House)
+  const statsTheme =
+    houseKey === "slytherin"
+      ? "tokyonight"
+      : houseKey === "ravenclaw"
+      ? "nightowl"
+      : houseKey === "hufflepuff"
+      ? "gruvbox"
+      : "radical";
+
+  const cards: string[] = [];
+  if (githubStats.showStatsCard) {
+    cards.push(
+      `<a href="https://github.com/${username}"><img src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${statsTheme}&hide_border=true&bg_color=070913&title_color=f59e0b&icon_color=d3a625&text_color=e2e8f0" alt="Hogwarts Academic Record" height="165"/></a>`
+    );
+  }
+  if (githubStats.showTopLangsCard) {
+    cards.push(
+      `<a href="https://github.com/${username}"><img src="https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=${statsTheme}&hide_border=true&bg_color=070913&title_color=f59e0b&text_color=e2e8f0" alt="Spellcasting Mastery" height="165"/></a>`
+    );
+  }
+  if (cards.length > 0) {
+    parts.push(`## 📊 Hogwarts Academic Record\n`);
+    parts.push(`<p align="center">\n  ${cards.join("\n  ")}\n</p>\n`);
+  }
+
+  // 6. Send an Owl (Connect links)
+  parts.push(`<div align="center">\n`);
+  parts.push(`### 🦉 Send An Owl — Connect with ${name}\n`);
+  parts.push(`<p align="center">`);
+  parts.push(
+    `  <a href="https://github.com/${username}"><img src="https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=f59e0b" alt="GitHub"/></a>`
+  );
+  if (socials.email) {
+    parts.push(
+      `  <a href="mailto:${socials.email}"><img src="https://img.shields.io/badge/Send_An_Owl-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/></a>`
+    );
+  }
+  if (socials.linkedin) {
+    parts.push(
+      `  <a href="https://linkedin.com/in/${socials.linkedin}"><img src="https://img.shields.io/badge/Ministry_Net-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>`
+    );
+  }
+  if (socials.twitter) {
+    parts.push(
+      `  <a href="https://twitter.com/${socials.twitter}"><img src="https://img.shields.io/badge/Daily_Prophet-1DA1F2?style=for-the-badge&logo=x&logoColor=white" alt="Twitter"/></a>`
+    );
+  }
+  parts.push(`</p>\n`);
+
+  parts.push(
+    `\n*"It is our choices that show what we truly are, far more than our abilities."* ✨\n`
+  );
+  parts.push(`</div>\n`);
+
+  return parts.join("\n");
+}
+
+/**
  * Route generator for all extended Gitcon templates.
  */
 export function generateExtendedTemplate(
@@ -1402,6 +1542,8 @@ export function generateExtendedTemplate(
     // Creative
     case "anime-shinobi":
       return generateAnimeShinobiTemplate(profile, config);
+    case "harry-potter":
+      return generateHarryPotterTemplate(profile, config);
     // Recruiter
     case "recruiter-ready":
       return generateRecruiterReadyTemplate(profile, config);

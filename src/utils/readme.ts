@@ -53,6 +53,7 @@ export interface ReadmeProfileData {
 export interface ReadmeConfig {
   template: ReadmeTemplate;
   animeVariant?: "boy" | "girl";
+  potterHouse?: "gryffindor" | "slytherin" | "ravenclaw" | "hufflepuff";
   statsTheme: string;
   header: {
     greeting: string;
@@ -508,6 +509,7 @@ export function buildDefaultConfig(profile: ReadmeProfileData): ReadmeConfig {
   return {
     template: "modern",
     animeVariant: "boy",
+    potterHouse: "gryffindor",
     statsTheme: "dark",
     header: {
       greeting: "Hi there 👋, I'm",
