@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <!-- Modern gradient matching Gitcon teal & emerald rhythm -->
+    <linearGradient id="gitcon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EEAD4" />
+      <stop offset="100%" stop-color="#2DD4BF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Git trunk vertical -->
+  <line x1="8" y1="5.5" x2="8" y2="18.5" stroke="url(#gitcon-grad)" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- Smooth continuous branch curve -->
+  <path d="M8 12.5 C 8 8, 16 9, 16 5.5" fill="none" stroke="url(#gitcon-grad)" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- Trunk nodes -->
+  <circle cx="8" cy="5.5" r="2.4" fill="#171614" stroke="#5EEAD4" stroke-width="2" />
+  <circle cx="8" cy="18.5" r="2.4" fill="#171614" stroke="#2DD4BF" stroke-width="2" />
+
+  <!-- Branch feature node (solid luminous) -->
+  <circle cx="16" cy="5.5" r="2.4" fill="#5EEAD4" />
+
+  <!-- Dynamic telemetry / rhythm wave (replaces random squares with purpose) -->
+  <path d="M13 14.5 L15 11.5 L17 17.5 L19 14.5" fill="none" stroke="#5EEAD4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+</svg>
+

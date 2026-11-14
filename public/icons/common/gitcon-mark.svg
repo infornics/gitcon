@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Minimal geometric fusion of Git Branch + Contribution cell -->
+  <!-- Main stem -->
+  <line x1="9" y1="8" x2="9" y2="24" stroke="#58aab0" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Smooth branch fork -->
+  <path d="M9 19 C 9 13.5, 23 16.5, 23 9" fill="none" stroke="#58aab0" stroke-width="2.5" stroke-linecap="round" />
+
+  <!-- Nodes (clean hollow & solid balance) -->
+  <circle cx="9" cy="8" r="3" fill="#171614" stroke="#58aab0" stroke-width="2.2" />
+  <circle cx="9" cy="24" r="3" fill="#171614" stroke="#58aab0" stroke-width="2.2" />
+  <circle cx="23" cy="9" r="3" fill="#58aab0" />
+</svg>

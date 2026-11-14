@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="gc-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EEAD4" />
+      <stop offset="100%" stop-color="#2DD4BF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Continuous unified ribbon: starts top-right, forms the 'G' outer arc, loops in to form the Git branch node -->
+  <!-- Outer smooth arc of 'G' -->
+  <path
+    d="M 23 8.5
+       C 19 4.5, 12 4.5, 7.5 9
+       C 3 13.5, 3 20.5, 7.5 25
+       C 12 29.5, 19.5 29.5, 24 25
+       C 26 23, 27 20.5, 27 17.5
+       L 16 17.5"
+    stroke="url(#gc-grad)"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Git branch fork from the inner crossbar of 'G' down to branch node -->
+  <path
+    d="M 16 17.5
+       C 16 22, 21.5 22, 21.5 22"
+    stroke="url(#gc-grad)"
+    stroke-width="2.5"
+    stroke-linecap="round"
+  />
+
+  <!-- Branch Commit Node -->
+  <circle cx="21.5" cy="22" r="2.2" fill="#5EEAD4" />
+
+  <!-- Center Commit Node on Crossbar -->
+  <circle cx="16" cy="17.5" r="2.2" fill="#171614" stroke="#5EEAD4" stroke-width="2" />
+</svg>
+

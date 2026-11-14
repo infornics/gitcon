@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 40" fill="none">
+  <!-- Minimalist Mark -->
+  <g transform="translate(4, 4)">
+    <line x1="8" y1="7" x2="8" y2="25" stroke="#58aab0" stroke-width="2.4" stroke-linecap="round" />
+    <path d="M8 20 C 8 14, 24 17, 24 9" fill="none" stroke="#58aab0" stroke-width="2.4" stroke-linecap="round" />
+    <circle cx="8" cy="7" r="3" fill="#171614" stroke="#58aab0" stroke-width="2" />
+    <circle cx="8" cy="25" r="3" fill="#171614" stroke="#58aab0" stroke-width="2" />
+    <circle cx="24" cy="9" r="3" fill="#58aab0" />
+  </g>
+
+  <!-- Clean Wordmark -->
+  <text x="44" y="27" font-family="-apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#f3f4f6" letter-spacing="-0.03em">
+    Git<tspan fill="#58aab0">con</tspan>
+  </text>
+</svg>

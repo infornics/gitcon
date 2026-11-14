@@ -110,14 +110,24 @@ export default function Header() {
             height="22"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <rect x="3" y="4" width="5" height="16" rx="2"></rect>
-            <rect x="10" y="9" width="5" height="11" rx="2"></rect>
-            <path d="M17 14a4 4 0 1 1 4 4h-2"></path>
+            <defs>
+              <linearGradient id="hdr-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#5EEAD4" />
+                <stop offset="100%" stopColor="#38A3A5" />
+              </linearGradient>
+            </defs>
+            <line x1="7.5" y1="6" x2="7.5" y2="18" stroke="url(#hdr-grad)" strokeWidth="2.2" />
+            <path d="M7.5 13.5 C 7.5 8.5, 16.5 10.5, 16.5 6" fill="none" stroke="url(#hdr-grad)" strokeWidth="2.2" />
+            <circle cx="7.5" cy="6" r="2.5" fill="#171614" stroke="#5EEAD4" strokeWidth="2" />
+            <circle cx="7.5" cy="18" r="2.5" fill="#171614" stroke="#38A3A5" strokeWidth="2" />
+            <circle cx="16.5" cy="6" r="2.5" fill="#5EEAD4" />
+            <rect x="13" y="13" width="3" height="3" rx="1" fill="#38A3A5" opacity="0.4" />
+            <rect x="17.5" y="13" width="3" height="3" rx="1" fill="#38A3A5" opacity="0.7" />
+            <rect x="13" y="17.5" width="3" height="3" rx="1" fill="#38A3A5" opacity="0.6" />
+            <rect x="17.5" y="17.5" width="3" height="3" rx="1" fill="#5EEAD4" />
           </svg>
         </div>
         <div className="brand-copy">
