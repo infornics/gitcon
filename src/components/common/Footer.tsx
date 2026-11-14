@@ -14,23 +14,20 @@ export default function Footer() {
                 height="18"
                 viewBox="0 0 24 24"
                 fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
               >
                 <defs>
-                  <linearGradient id="ftr-g-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <linearGradient id="ftr-solid-g" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#5EEAD4" />
-                    <stop offset="100%" stopColor="#38A3A5" />
+                    <stop offset="60%" stopColor="#2DD4BF" />
+                    <stop offset="100%" stopColor="#0F766E" />
                   </linearGradient>
                 </defs>
                 <path
-                  d="M 18.5 7 A 8.5 8.5 0 1 0 18.5 17 L 18.5 12 L 12 12"
-                  stroke="url(#ftr-g-grad)"
-                  strokeWidth="2.4"
+                  fill="url(#ftr-solid-g)"
+                  fillRule="evenodd"
+                  d="M 12 2.5 C 17.247 2.5 21.5 6.753 21.5 12 C 21.5 12.8 21.4 13.5 21.2 14.2 L 17.2 14.2 C 17.4 13.5 17.5 12.8 17.5 12 C 17.5 8.962 15.038 6.5 12 6.5 C 8.962 6.5 6.5 8.962 6.5 12 C 6.5 15.038 8.962 17.5 12 17.5 C 13.8 17.5 15.3 16.7 16.3 15.4 L 12 15.4 L 12 11.4 L 20.8 11.4 C 20.9 11.6 21 11.8 21 12 C 21 16.971 16.971 21.5 12 21.5 C 6.753 21.5 2.5 17.247 2.5 12 C 2.5 6.753 6.753 2.5 12 2.5 Z"
                 />
-                <circle cx="18.5" cy="7" r="2.2" fill="#171614" stroke="#5EEAD4" strokeWidth="2" />
-                <circle cx="12" cy="12" r="2.2" fill="#5EEAD4" />
-                <rect x="13" y="15" width="2.8" height="2.8" rx="0.8" fill="#38A3A5" opacity="0.8" />
+                <circle cx="12" cy="12" r="1.8" fill="#FFFFFF" />
               </svg>
             </div>
             <strong className="text-lg">Gitcon</strong>

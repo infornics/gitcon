@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="gitcon-hyper" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EEAD4" />
+      <stop offset="100%" stop-color="#2DD4BF" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left Spine: Solid commit bar representing daily streaks & git roots -->
+  <rect x="3.5" y="4.5" width="3.5" height="15" rx="1.75" fill="url(#gitcon-hyper)" />
+
+  <!-- The Upper Arch of G -->
+  <path d="M 5.25 4.5 H 17 C 19.5 4.5, 20.5 6.5, 20.5 9 V 9.5" stroke="url(#gitcon-hyper)" stroke-width="3" stroke-linecap="round" />
+
+  <!-- The Lower Arch & Crossbar of G -->
+  <path d="M 5.25 19.5 H 17 C 19.5 19.5, 20.5 17.5, 20.5 14.5 V 12 H 11.5" stroke="url(#gitcon-hyper)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- Central Commit Focal Node -->
+  <circle cx="11.5" cy="12" r="2.2" fill="#5EEAD4" />
+</svg>
+
