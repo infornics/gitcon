@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="g-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EEAD4" />
+      <stop offset="100%" stop-color="#38A3A5" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer 'G' curvature: begins at top right (19, 7.5), curves around to bottom, rises up to (19, 13), and goes inward to (12, 13) -->
+  <path
+    d="M 19 7.5
+       C 16.5 4, 8 4, 5.5 8
+       C 3 12, 3 15.5, 5.5 19.5
+       C 8 23.5, 16.5 23.5, 19 19.5
+       L 19 13.5
+       L 12 13.5"
+    stroke="url(#g-grad)"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Git Commit Branch dropping from the inner horizontal bar of 'G' -->
+  <path
+    d="M 12 13.5
+       C 12 17.5, 15 17.5, 15 17.5"
+    stroke="url(#g-grad)"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- Top start commit node -->
+  <circle cx="19" cy="7.5" r="2.2" fill="#171614" stroke="#5EEAD4" stroke-width="2" />
+
+  <!-- Inner central junction commit node -->
+  <circle cx="12" cy="13.5" r="2.2" fill="#5EEAD4" />
+
+  <!-- Branch leaf commit node -->
+  <circle cx="15" cy="17.5" r="1.8" fill="#38A3A5" />
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <defs>
+    <linearGradient id="g-clean" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5EEAD4" />
+      <stop offset="100%" stop-color="#38A3A5" />
+    </linearGradient>
+  </defs>
+
+  <!-- Clean, bold geometric 'G' arc -->
+  <path
+    d="M 18.5 7
+       A 8.5 8.5 0 1 0 18.5 17
+       L 18.5 12
+       L 12 12"
+    stroke="url(#g-clean)"
+    stroke-width="2.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Commit node on the 'G' terminal end (top) -->
+  <circle cx="18.5" cy="7" r="2.2" fill="#171614" stroke="#5EEAD4" stroke-width="2" />
+
+  <!-- Commit node at the heart of the 'G' crossbar -->
+  <circle cx="12" cy="12" r="2.2" fill="#5EEAD4" />
+
+  <!-- Heatmap activity accent dot in lower right cavity of G -->
+  <rect x="13" y="15" width="2.8" height="2.8" rx="0.8" fill="#38A3A5" opacity="0.8" />
+</svg>
